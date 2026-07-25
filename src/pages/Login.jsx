@@ -14,7 +14,7 @@ function Login() {
       const { data } = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", data.token);
       localStorage.setItem("refreshToken", data.refreshToken);
-        navigate("/home");
+      navigate("/home");
     } catch (err) {
       if (
         err.response?.status === 401 ||

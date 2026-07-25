@@ -100,7 +100,10 @@ function LoginForm({ onSubmit, error }) {
 
       <div
         className="flex-1 flex flex-col items-center justify-center px-20 py-12 relative"
-        style={{ background: BG }}
+        style={{
+          background:
+            "radial-gradient(circle at 50% 0%, #221c17 0%, #0c0a08 80%)",
+        }}
       >
         <div className="relative z-10 w-full max-w-[420px]">
           <div className="flex lg:hidden items-center gap-3 mb-10">
@@ -123,7 +126,7 @@ function LoginForm({ onSubmit, error }) {
 
           <div className="mb-10">
             <h2
-              className="font-extrabold leading-tight text-center"
+              className="font-extrabold leading-tight"
               style={{
                 color: TEXT,
                 fontFamily: "'Barlow Condensed', sans-serif",
@@ -253,7 +256,7 @@ function LoginForm({ onSubmit, error }) {
           </form>
 
           <p className="text-center text-sm mt-8" style={{ color: MUTED }}>
-            Não tem conta?{"  "}
+            Não possui conta?{"  "}
             <Link
               to="/cadastro"
               className="font-medium transition-colors underline"
