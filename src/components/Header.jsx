@@ -59,12 +59,12 @@ function Header({ onLogout, userName = "Atleta" }) {
             <NavLink
               key={item.to}
               to={item.to}
-              className="relative px-4 py-2 rounded-lg text-lg transition-all"
+              className="relative px-4 py-2 rounded-xl text-base transition-all"
               style={({ isActive }) => ({
                 color: isActive ? BG : "#c9c4bf",
                 fontWeight: isActive ? 550 : 500,
                 background: isActive
-                  ? "linear-gradient(180deg, #FF7A45 0%, " + ORANGE + " 45%, #D93E12 100%)"
+                  ? "linear-gradient(180deg, #FF7A45 0%, " + ORANGE + " 55%, #D93E12 100%)"
                   : "transparent",
                 boxShadow: isActive
                   ? "0 2px 6px rgba(255,77,28,0.1), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.15)"
