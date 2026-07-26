@@ -35,7 +35,7 @@ function CadastroForm({ onSubmit, error, success }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
     if (success) {
       setName("");
       setEmail("");
@@ -360,6 +360,12 @@ function CadastroForm({ onSubmit, error, success }) {
         />
 
         <div className="relative z-10 flex items-center gap-3 justify-end">
+          <div
+            className="w-11 h-11 rounded-xl flex items-center justify-center"
+            style={{ background: ORANGE }}
+          >
+            <Dumbbell size={22} color="#0c0a08" strokeWidth={2.5} />
+          </div>
           <span
             className="text-[1.6rem] font-extrabold tracking-widest"
             style={{
@@ -369,12 +375,6 @@ function CadastroForm({ onSubmit, error, success }) {
           >
             NAME<span style={{ color: ORANGE }}>FIT</span>
           </span>
-          <div
-            className="w-11 h-11 rounded-xl flex items-center justify-center"
-            style={{ background: ORANGE }}
-          >
-            <Dumbbell size={22} color="#0c0a08" strokeWidth={2.5} />
-          </div>
         </div>
 
         <div className="relative z-10 ml-auto max-w-md">
