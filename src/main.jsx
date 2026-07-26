@@ -7,6 +7,8 @@ import Cadastro from "./pages/Cadastro.jsx";
 import Login from "./pages/Login.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import PublicRoute from "./components/PublicRoute.jsx";
+import Layout from "./components/Layout.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 
@@ -21,19 +23,29 @@ const router = createBrowserRouter([
         element: <Navigate to="/login" replace />,
       },
       {
-        path: "cadastro",
-        element: <Cadastro />,
-      },
-      {
-        path: "login",
-        element: <Login />,
+        element: <PublicRoute />,
+        children: [
+          {
+            path: "cadastro",
+            element: <Cadastro />,
+          },
+          {
+            path: "login",
+            element: <Login />,
+          },
+        ],
       },
       {
         element: <ProtectedRoute />,
         children: [
           {
-            path: "home",
-            element: <Home />,
+            element: <Layout />,
+            children: [
+              {
+                path: "home",
+                element: <Home />,
+              },
+            ],
           },
         ],
       },
