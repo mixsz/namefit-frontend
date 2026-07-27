@@ -17,15 +17,24 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isAuthRoute = originalRequest.url?.includes("/auth/login");
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthRoute
+    ) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = localStorage.getItem("refreshToken");
 
-        const { data } = await axios.post("http://localhost:8080/auth/refresh", {
-          refreshToken: refreshToken,
-        });
+        const { data } = await axios.post(
+          "http://localhost:8080/auth/refresh",
+          {
+            refreshToken: refreshToken,
+          },
+        );
 
         localStorage.setItem("token", data.token);
         localStorage.setItem("refreshToken", data.refreshToken);
@@ -42,7 +51,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

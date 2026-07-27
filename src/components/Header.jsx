@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Dumbbell, User, Pencil, LogOut, ChevronDown } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth.js";
+import api from "../services/api.js";
 
 const ORANGE = "#FF4D1C";
 const HOVER_ACCENT = "#FFB020";
@@ -19,9 +21,18 @@ const NAV_ITEMS = [
   { label: "Histórico", to: "/historico" },
 ];
 
-function Header({ onLogout, userName = "Atleta" }) {
+function Header({ userName }) {
+  const [username, setUsername] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const { logout } = useAuth();
+
+  useEffect(() => {
+    api
+      .get("/auth/me")
+      .then(({ data }) => setUsername(data.name))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -64,7 +75,9 @@ function Header({ onLogout, userName = "Atleta" }) {
                 color: isActive ? BG : "#c9c4bf",
                 fontWeight: isActive ? 550 : 500,
                 background: isActive
-                  ? "linear-gradient(180deg, #FF7A45 0%, " + ORANGE + " 55%, #D93E12 100%)"
+                  ? "linear-gradient(180deg, #FF7A45 0%, " +
+                    ORANGE +
+                    " 55%, #D93E12 100%)"
                   : "transparent",
                 boxShadow: isActive
                   ? "0 2px 6px rgba(255,77,28,0.1), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.15)"
@@ -164,7 +177,7 @@ function Header({ onLogout, userName = "Atleta" }) {
                 style={{ borderBottom: "1px solid " + BORDER }}
               >
                 <p className="text-sm font-medium truncate text-white">
-                  Olá, {userName}!
+                  Olá, {username}!
                 </p>
               </div>
 
@@ -181,7 +194,7 @@ function Header({ onLogout, userName = "Atleta" }) {
                 danger
                 onClick={() => {
                   setMenuOpen(false);
-                  if (onLogout) onLogout();
+                  logout();
                 }}
               />
             </div>

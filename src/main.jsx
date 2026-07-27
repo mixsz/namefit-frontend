@@ -9,6 +9,10 @@ import ErrorPage from "./pages/ErrorPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PublicRoute from "./components/PublicRoute.jsx";
 import Layout from "./components/Layout.jsx";
+import Exercicios from "./pages/Exercicios.jsx";
+import Historico from "./pages/Historico.jsx";
+import Treinos from "./pages/Treinos.jsx";
+import Perfil from "./pages/Perfil.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 
@@ -45,6 +49,22 @@ const router = createBrowserRouter([
                 path: "home",
                 element: <Home />,
               },
+              {
+                path: "exercicios",
+                element: <Exercicios />,
+              },
+              {
+                path: "historico",
+                element: <Historico />,
+              },
+              {
+                path: "treinos",
+                element: <Treinos />,
+              },
+              {
+                path: "perfil",
+                element: <Perfil />,
+              }
             ],
           },
         ],
