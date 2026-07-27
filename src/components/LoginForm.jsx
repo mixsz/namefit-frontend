@@ -220,11 +220,13 @@ function LoginForm({ onSubmit, error }) {
                 </button>
               </div>
             </div>
-            {error && (
-              <p className="text-sm" style={{ color: "#ef4444" }}>
-                {error}
-              </p>
-            )}
+            <div className="min-h-[20px]">
+              {error && (
+                <p className="text-sm" style={{ color: "#ef4444" }}>
+                  {error}
+                </p>
+              )}
+            </div>
 
             <button
               type="submit"

@@ -25,7 +25,7 @@ function Cadastro() {
       if (err.response?.status === 400) {
         const data = err.response.data;
         const mensagens =
-          typeof data === "string" ? data : Object.values(data).join("\n");
+          typeof data === "string" ? data : Object.values(data)[0];
         setError(mensagens);
       } else {
         setError("Erro ao realizar cadastro. Tente novamente.");

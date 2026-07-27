@@ -273,26 +273,26 @@ function CadastroForm({ onSubmit, error, success }) {
               </div>
             </div>
 
-            {error && (
-              <p
-                className="text-sm notranslate whitespace-pre-line"
-                translate="no"
-                style={{ color: "#ef4444" }}
-              >
-                {error}
-              </p>
-            )}
-
-            {success && (
-              <p
-                className="text-sm notranslate"
-                translate="no"
-                style={{ color: "#67b75c" }}
-              >
-                {success}
-              </p>
-            )}
-
+            <div className="min-h-[72px]">
+              {error && (
+                <p
+                  className="text-sm notranslate whitespace-pre-line"
+                  translate="no"
+                  style={{ color: "#ef4444" }}
+                >
+                  {error}
+                </p>
+              )}
+              {success && (
+                <p
+                  className="text-sm notranslate"
+                  translate="no"
+                  style={{ color: "#67b75c" }}
+                >
+                  {success}
+                </p>
+              )}
+            </div>
             <button
               type="submit"
               disabled={loading}
