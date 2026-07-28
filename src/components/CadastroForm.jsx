@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme.js";
 import {
   Eye,
   EyeOff,
@@ -11,14 +12,6 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
-
-const ORANGE = "#FF4D1C";
-const BG = "#0c0a08";
-const PANEL = "#141210";
-const FIELD = "#1e1a17";
-const BORDER = "rgba(255,255,255,0.06)";
-const TEXT = "#f2ede8";
-const MUTED = "#6b6460";
 
 const BENEFITS = [
   "Treinos personalizados para o seu objetivo",

@@ -1,5 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { Dumbbell, User, Pencil, LogOut, ChevronDown } from "lucide-react";
+import {
+  Dumbbell,
+  User,
+  Pencil,
+  LogOut,
+  ChevronDown,
+  Menu,
+  X,
+} from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
 import api from "../services/api.js";
@@ -22,8 +30,9 @@ const NAV_ITEMS = [
 ];
 
 function Header({ userName }) {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("Teste Dentro dos States");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef(null);
   const { logout } = useAuth();
 
@@ -41,7 +50,10 @@ function Header({ userName }) {
       }
     }
     function handleEsc(e) {
-      if (e.key === "Escape") setMenuOpen(false);
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        setMobileNavOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleEsc);
@@ -53,18 +65,20 @@ function Header({ userName }) {
 
   return (
     <header
-      className="fixed top-0 left-12 right-12 z-50 rounded-b-xl"
+      className="fixed top-0 left-0 right-0 z-50"
       style={{
-        height: "66px",
         background:
-          "linear-gradient(to bottom, rgba(255,77,28,0.05) 0%, rgba(12,10,8,0.6) 90%, rgba(12,10,8,0.97) 100%)",
+          "linear-gradient(0deg, #141210 0%, #17130f 30%, rgba(255,77,28,0.05) 100%)",
         backdropFilter: "blur(10px)",
         WebkitBackdropFilter: "blur(10px)",
-        boxShadow: "0 1px 12px rgba(0,0,0,0.25)",
+        boxShadow: "0 1px 12px rgba(0,0,0,0.75)",
         fontFamily: "'Barlow', sans-serif",
       }}
     >
-      <div className="px-8 h-16 grid grid-cols-3 items-center">
+      <div
+        className="px-8 grid grid-cols-3 items-center"
+        style={{ height: "66px" }}
+      >
         <nav className="hidden md:flex items-center gap-1 justify-self-start">
           {NAV_ITEMS.map((item) => (
             <NavLink
@@ -72,28 +86,20 @@ function Header({ userName }) {
               to={item.to}
               className="relative px-4 py-2 rounded-xl text-base transition-all"
               style={({ isActive }) => ({
-                color: isActive ? BG : "#c9c4bf",
-                fontWeight: isActive ? 550 : 500,
-                background: isActive
-                  ? "linear-gradient(180deg, #FF7A45 0%, " +
-                    ORANGE +
-                    " 55%, #D93E12 100%)"
-                  : "transparent",
-                boxShadow: isActive
-                  ? "0 2px 6px rgba(255,77,28,0.1), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.15)"
-                  : "none",
+                color: isActive ? ORANGE : "#c9c4bf",
+                fontWeight: 550,
+                background: "transparent",
+                boxShadow: "none",
                 letterSpacing: "0.01em",
               })}
               onMouseOver={(e) => {
                 if (e.currentTarget.getAttribute("aria-current") !== "page") {
-                  e.currentTarget.style.color = TEXT;
-                  e.currentTarget.style.background = FIELD;
+                  e.currentTarget.style.color = "#ffffff";
                 }
               }}
               onMouseOut={(e) => {
                 if (e.currentTarget.getAttribute("aria-current") !== "page") {
                   e.currentTarget.style.color = "#c9c4bf";
-                  e.currentTarget.style.background = "transparent";
                 }
               }}
             >
@@ -101,6 +107,18 @@ function Header({ userName }) {
             </NavLink>
           ))}
         </nav>
+
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen((v) => !v)}
+          aria-haspopup="menu"
+          aria-expanded={mobileNavOpen}
+          aria-label={mobileNavOpen ? "Fechar menu" : "Abrir menu"}
+          className="md:hidden justify-self-start p-2 rounded-lg"
+          style={{ color: TEXT }}
+        >
+          {mobileNavOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
 
         <Link
           to="/home"
@@ -165,7 +183,7 @@ function Header({ userName }) {
               className="absolute right-0 mt-2 w-64 rounded-xl overflow-hidden py-2"
               style={{
                 background:
-                  "linear-gradient(to bottom, rgba(255,77,28,0.02) 0%, rgba(12,10,8,0.85) 15%, rgba(12,10,8,0.97) 100%)",
+                  "linear-gradient(0deg, #141210 90%, #17130f 100%, rgba(255,77,28,0.1) 100%)",
                 backdropFilter: "blur(16px)",
                 WebkitBackdropFilter: "blur(16px)",
                 border: "1px solid " + BORDER,
@@ -177,7 +195,7 @@ function Header({ userName }) {
                 style={{ borderBottom: "1px solid " + BORDER }}
               >
                 <p className="text-sm font-medium truncate text-white">
-                  Olá, {username}!
+                  {username}
                 </p>
               </div>
 
@@ -201,6 +219,29 @@ function Header({ userName }) {
           )}
         </div>
       </div>
+
+      {mobileNavOpen && (
+        <div
+          className="md:hidden px-4 pb-4 flex flex-col gap-1"
+          style={{ borderTop: "1px solid " + BORDER }}
+        >
+          {NAV_ITEMS.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              onClick={() => setMobileNavOpen(false)}
+              className="px-4 py-3 rounded-xl text-base"
+              style={({ isActive }) => ({
+                color: isActive ? ORANGE : "#c9c4bf",
+                fontWeight: 550,
+                background: isActive ? FIELD : "transparent",
+              })}
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+      )}
     </header>
   );
 }

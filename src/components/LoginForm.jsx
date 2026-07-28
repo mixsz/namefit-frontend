@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, Dumbbell, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const ORANGE = "#FF4D1C";
-const BG = "#0c0a08";
-const PANEL = "#141210";
-const FIELD = "#1e1a17";
-const BORDER = "rgba(255,255,255,0.06)";
-const TEXT = "#f2ede8";
-const MUTED = "#6b6460";
+import {ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED} from "../theme.js";
 
 function LoginForm({ onSubmit, error }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -99,7 +92,7 @@ function LoginForm({ onSubmit, error }) {
       </div>
 
       <div
-        className="flex-1 flex flex-col items-center justify-center px-20 py-12 relative"
+        className="flex-1 flex flex-col items-center justify-center px-6 sm:px-12 lg:px-20 py-12 relative"
         style={{
           background:
             "radial-gradient(circle at 50% 0%, #221c17 0%, #0c0a08 80%)",
