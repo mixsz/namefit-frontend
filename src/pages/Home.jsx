@@ -179,7 +179,7 @@ function Home() {
       data={{
         username: "Mudar Dados da Home.jsx Depois do Santos",
         hasWorkout: true,
-        trained: true,
+        trained: false,
         todayWorkoutName: "Peito e Tríceps",
         weekCount: 5,
         lastWorkout: { id: "abc-123", name: "Costas e Bíceps", daysAgo: 1 },

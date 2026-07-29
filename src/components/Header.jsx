@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme.js";
 import {
   Dumbbell,
   User,
@@ -11,16 +12,6 @@ import {
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
 import api from "../services/api.js";
-
-const ORANGE = "#FF4D1C";
-const HOVER_ACCENT = "#FFB020";
-const BG = "#0f0c0a";
-const HEADER_BG = "#1c1815";
-const PANEL = "#141210";
-const FIELD = "#1e1a17";
-const BORDER = "rgba(255,255,255,0.06)";
-const TEXT = "#f2ede8";
-const MUTED = "#6b6460";
 
 const NAV_ITEMS = [
   { label: "Home", to: "/home" },
@@ -134,7 +125,7 @@ function Header({ userName }) {
           <span
             className="text-2xl font-extrabold tracking-widest"
             style={{
-              color: TEXT,
+              color: "#ffffff",
               fontFamily: "'Barlow Condensed', sans-serif",
             }}
           >

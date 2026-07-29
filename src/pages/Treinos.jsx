@@ -1,5 +1,80 @@
+import TreinosView from "../components/TreinosView";
+import { useEffect, useState } from "react";
+import api from "../services/api";
+import { useNavigate } from "react-router-dom";
+
 function Treinos() {
-  return <div>Treinos</div>;
+  const [workouts, setWorkouts] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function fetchWorkouts() {
+      try {
+        const response = await api.get("/workout");
+        setWorkouts(response.data);
+        //console.log(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar treinos:", error);
+      }
+    }
+    fetchWorkouts();
+  }, []);
+
+  async function handleCreateWorkout(title) {
+    try {
+      const response = await api.post("/workout", { title });
+      setWorkouts([...workouts, response.data]);
+      //console.log("Treino criado:", response.data);
+    } catch (error) {
+      console.error("Erro ao criar treino:", error);
+    }
+  }
+
+  async function handleDeleteWorkout(id) {
+    try {
+      await api.delete(`/workout/${id}`);
+      setWorkouts(workouts.filter((w) => w.id !== id));
+    } catch (error) {
+      console.error("Erro ao deletar treino:", error);
+    }
+  }
+
+  async function handleReorderWorkout(id, direction) {
+    const ordered = [...workouts].sort((a, b) => a.position - b.position);
+    const index = ordered.findIndex((w) => w.id === id);
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+
+    if (targetIndex < 0 || targetIndex >= ordered.length) return;
+
+    [ordered[index], ordered[targetIndex]] = [
+      ordered[targetIndex],
+      ordered[index],
+    ];
+
+    try {
+      const response = await api.put("/workout/reorder", {
+        workoutIds: ordered.map((w) => w.id),
+      });
+      setWorkouts(response.data);
+    } catch (error) {
+      console.error("Erro ao reordenar treinos:", error);
+    }
+  }
+
+  return (
+    <TreinosView
+      data={{
+        workouts,
+        onCreate: handleCreateWorkout,
+        onStart: (id) => navigate(`/executar/${id}`),
+        onEdit: (id) =>
+          navigate(`/treinos/${id}`, { state: { isEditing: true } }),
+        onDetails: (id) => navigate(`/treinos/${id}`),
+        onDelete: (id) => handleDeleteWorkout(id),
+        onReorder: (id, direction) => handleReorderWorkout(id, direction),
+      }}
+    />
+  );
 }
 
 export default Treinos;

@@ -83,7 +83,7 @@ function CadastroForm({ onSubmit, error, success }) {
             <span
               className="text-2xl font-extrabold tracking-widest"
               style={{
-                color: TEXT,
+                color: "#ffffff",
                 fontFamily: "'Barlow Condensed', sans-serif",
               }}
             >
@@ -362,7 +362,7 @@ function CadastroForm({ onSubmit, error, success }) {
           <span
             className="text-[1.6rem] font-extrabold tracking-widest"
             style={{
-              color: TEXT,
+              color: "#ffffff",
               fontFamily: "'Barlow Condensed', sans-serif",
             }}
           >

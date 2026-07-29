@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme";
+import { ORANGE, BG, PANEL, FIELD, BORDER, MUTED, TEXT } from "../theme";
 import {
   Dumbbell,
   Flame,
@@ -15,7 +15,6 @@ import {
   ListPlus,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-
 function HomeView({ data }) {
   const {
     username,

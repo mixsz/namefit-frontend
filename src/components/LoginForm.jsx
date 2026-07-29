@@ -56,7 +56,7 @@ function LoginForm({ onSubmit, error }) {
           <span
             className="text-[1.6rem] font-extrabold tracking-widest"
             style={{
-              color: TEXT,
+              color: "#ffffff",
               fontFamily: "'Barlow Condensed', sans-serif",
             }}
           >
