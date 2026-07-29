@@ -17,14 +17,7 @@ import {
 import { Link } from "react-router-dom";
 
 function TreinosView({ data }) {
-  const {
-    workouts = [],
-    onCreate,
-    onStart,
-    onEdit,
-    onDelete,
-    onReorder,
-  } = data;
+  const { workouts = [], onCreate, onStart, onDelete, onReorder } = data;
 
   const [query, setQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -111,7 +104,10 @@ function TreinosView({ data }) {
             {filtered.length === 0 ? (
               <NoResults query={query} onClear={() => setQuery("")} />
             ) : (
-              <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div
+                key={filtered.map((w) => w.id).join(",")}
+                className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+              >
                 {filtered.map((workout, index) => (
                   <WorkoutCard
                     key={workout.id}
@@ -119,7 +115,6 @@ function TreinosView({ data }) {
                     isFirst={index === 0}
                     isLast={index === filtered.length - 1}
                     onStart={onStart}
-                    onEdit={onEdit}
                     onRequestDelete={setDeleteTarget}
                     onReorder={onReorder}
                   />
@@ -195,7 +190,6 @@ function WorkoutCard({
   isFirst,
   isLast,
   onStart,
-  onEdit,
   onRequestDelete,
   onReorder,
 }) {
@@ -285,14 +279,25 @@ function WorkoutCard({
                   onStart?.(workout.id);
                 }}
               />
-              <DropdownItem
-                icon={<Pencil size={16} />}
-                label="Editar"
-                onClick={() => {
-                  setMenuOpen(false);
-                  onEdit?.(workout.id);
+              <Link
+                to={`/treinos/${workout.id}`}
+                state={{ isEditing: true }}
+                onClick={() => setMenuOpen(false)}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-normal transition-colors"
+                style={{ color: TEXT, background: "transparent" }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = FIELD;
+                  e.currentTarget.style.color = ORANGE;
                 }}
-              />
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = TEXT;
+                }}
+              >
+                <Pencil size={16} />
+                Editar
+              </Link>
+
               <DropdownItem
                 icon={<Trash2 size={16} />}
                 label="Excluir"
@@ -306,7 +311,6 @@ function WorkoutCard({
           )}
         </div>
       </div>
-
       <Link to={`/treinos/${workout.id}`} className="mt-5 block">
         <h3
           className="font-bold"
@@ -329,12 +333,18 @@ function WorkoutCard({
           <ReorderButton
             direction="up"
             disabled={isFirst}
-            onClick={() => onReorder?.(workout.id, "up")}
+            onClick={() => {
+              setHover(false);
+              onReorder?.(workout.id, "up");
+            }}
           />
           <ReorderButton
             direction="down"
             disabled={isLast}
-            onClick={() => onReorder?.(workout.id, "down")}
+            onClick={() => {
+              setHover(false);
+              onReorder?.(workout.id, "down");
+            }}
           />
         </div>
 
@@ -359,19 +369,13 @@ function ReorderButton({ direction, disabled, onClick }) {
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === "up" ? "Mover para tras" : "Mover para frente"}
-      className="flex h-8 w-8 items-center justify-center rounded-lg transition-all"
-      style={{
-        background: FIELD,
-        color: disabled ? "#3a3430" : MUTED,
-        cursor: disabled ? "not-allowed" : "pointer",
-        opacity: disabled ? 0.5 : 1,
-      }}
-      onMouseOver={(e) => {
-        if (!disabled) e.currentTarget.style.color = ORANGE;
-      }}
-      onMouseOut={(e) => {
-        if (!disabled) e.currentTarget.style.color = MUTED;
-      }}
+      className={
+        "flex h-8 w-8 items-center justify-center rounded-lg transition-all " +
+        (disabled
+          ? "cursor-not-allowed opacity-50 text-[#6b6460]"
+          : "cursor-pointer text-[#6b6460] hover:text-[#FF4D1C]")
+      }
+      style={{ background: FIELD }}
     >
       <Icon size={16} strokeWidth={2.5} />
     </button>

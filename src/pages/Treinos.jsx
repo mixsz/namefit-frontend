@@ -61,15 +61,21 @@ function Treinos() {
     }
   }
 
+  async function startWorkout(id) {
+    try {
+      const { data } = await api.post(`/workoutLog/${id}`);
+      navigate(`/execucao/${data.id}`);
+    } catch (error) {
+      console.error("Erro ao iniciar treino:", error);
+    }
+  }
+
   return (
     <TreinosView
       data={{
         workouts,
         onCreate: handleCreateWorkout,
-        onStart: (id) => navigate(`/executar/${id}`),
-        onEdit: (id) =>
-          navigate(`/treinos/${id}`, { state: { isEditing: true } }),
-        onDetails: (id) => navigate(`/treinos/${id}`),
+        onStart: (id) => startWorkout(id),
         onDelete: (id) => handleDeleteWorkout(id),
         onReorder: (id, direction) => handleReorderWorkout(id, direction),
       }}
