@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 function Treinos() {
   const [workouts, setWorkouts] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchWorkouts() {
@@ -15,6 +16,8 @@ function Treinos() {
         //console.log(response.data);
       } catch (error) {
         console.error("Erro ao buscar treinos:", error);
+      } finally {
+        setLoading(false);
       }
     }
     fetchWorkouts();
@@ -74,6 +77,7 @@ function Treinos() {
     <TreinosView
       data={{
         workouts,
+        loading,
         onCreate: handleCreateWorkout,
         onStart: (id) => startWorkout(id),
         onDelete: (id) => handleDeleteWorkout(id),

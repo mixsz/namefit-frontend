@@ -59,10 +59,7 @@ function HomeView({ data }) {
               </p>
             </header>
 
-            <StatusCard
-              trained={trained}
-              todayWorkoutName={todayWorkoutName}
-            />
+            <StatusCard trained={trained} todayWorkoutName={todayWorkoutName} />
 
             <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               <Link to="/historico" className="block h-full">
@@ -122,7 +119,8 @@ function BuildWorkoutCard() {
   const [hover, setHover] = useState(false);
   return (
     <Link
-      to="/treinos/novo"
+      to="/treinos"
+      state={{ openCreate: true }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       className="relative mt-6 flex flex-col overflow-hidden rounded-2xl p-6 transition-all md:flex-row md:items-center md:justify-between md:p-8"
@@ -215,9 +213,7 @@ function StatusCard({ trained, todayWorkoutName }) {
                 lineHeight: 1.1,
               }}
             >
-              {trained
-                ? "Você já treinou hoje!"
-                : "Ainda não treinou hoje..."}
+              {trained ? "Você já treinou hoje!" : "Ainda não treinou hoje..."}
             </h2>
             <p className="mt-1 text-sm" style={{ color: MUTED }}>
               {trained
@@ -397,6 +393,7 @@ function EmptyState() {
       </p>
       <Link
         to="/treinos"
+        state={{ openCreate: true }}
         className="mt-8 inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-extrabold uppercase tracking-[0.18em] transition-all"
         style={{
           background: ORANGE,

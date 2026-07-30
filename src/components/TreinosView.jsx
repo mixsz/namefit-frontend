@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme.js";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Dumbbell,
   Plus,
@@ -17,7 +18,16 @@ import {
 import { Link } from "react-router-dom";
 
 function TreinosView({ data }) {
-  const { workouts = [], onCreate, onStart, onDelete, onReorder } = data;
+  const {
+    workouts = [],
+    onCreate,
+    onStart,
+    onDelete,
+    onReorder,
+    loading,
+  } = data;
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [query, setQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -34,7 +44,14 @@ function TreinosView({ data }) {
     return ordered.filter((w) => w.title.toLowerCase().includes(q));
   }, [ordered, query]);
 
-  const isEmpty = workouts.length === 0;
+  useEffect(() => {
+    if (location.state?.openCreate) {
+      setModalOpen(true);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, []);
+
+  const isEmpty = !loading && workouts.length === 0;
 
   return (
     <main
@@ -47,7 +64,11 @@ function TreinosView({ data }) {
       }}
     >
       <div className="mx-auto w-full max-w-6xl px-6 pb-16 md:px-10">
-        {isEmpty ? (
+        {loading ? (
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <p style={{ color: MUTED }}>Carregando treinos...</p>
+          </div>
+        ) : isEmpty ? (
           <EmptyState onCreate={() => setModalOpen(true)} />
         ) : (
           <>
@@ -743,7 +764,7 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
             style={{
               background: "#a61b1b",
               color: "#fff",
-              boxShadow: "0 3px 7px rgba(0,0,0,0.18)",
+              boxShadow: "0 3px 7px rgba(0,0,0,0.1)",
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.background = "#8f1717";
