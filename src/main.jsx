@@ -12,6 +12,7 @@ import Layout from "./components/Layout.jsx";
 import Exercicios from "./pages/Exercicios.jsx";
 import Historico from "./pages/Historico.jsx";
 import Treinos from "./pages/Treinos.jsx";
+import TreinoDetalhe from "./pages/TreinoDetalhe.jsx";
 import Perfil from "./pages/Perfil.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Navigate } from "react-router-dom";
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
               {
                 path: "treinos",
                 element: <Treinos />,
+              },
+              {
+                path: "treinos/:id",
+                element: <TreinoDetalhe />,
               },
               {
                 path: "perfil",

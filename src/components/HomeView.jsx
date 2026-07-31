@@ -25,6 +25,7 @@ function HomeView({ data }) {
     lastWorkout,
     streak,
     suggestion,
+    loading,
   } = data;
 
   return (
@@ -38,7 +39,11 @@ function HomeView({ data }) {
       }}
     >
       <div className="mx-auto w-full max-w-6xl px-6 pb-16 md:px-10">
-        {!hasWorkout ? (
+        {loading ? (
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <p style={{ color: MUTED }}>Carregando...</p>
+          </div>
+        ) : !hasWorkout ? (
           <EmptyState />
         ) : (
           <>

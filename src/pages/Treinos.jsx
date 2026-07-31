@@ -2,11 +2,13 @@ import TreinosView from "../components/TreinosView";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../context/ToastContext.jsx";
 
 function Treinos() {
   const [workouts, setWorkouts] = useState([]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
   useEffect(() => {
     async function fetchWorkouts() {
@@ -27,9 +29,11 @@ function Treinos() {
     try {
       const response = await api.post("/workout", { title });
       setWorkouts([...workouts, response.data]);
+      showToast("Treino criado com sucesso!", "success");
       //console.log("Treino criado:", response.data);
     } catch (error) {
       console.error("Erro ao criar treino:", error);
+      showToast("Erro ao criar treino, tente novamente", "error");
     }
   }
 
@@ -37,8 +41,10 @@ function Treinos() {
     try {
       await api.delete(`/workout/${id}`);
       setWorkouts(workouts.filter((w) => w.id !== id));
+      showToast("Treino deletado com sucesso!", "success");
     } catch (error) {
       console.error("Erro ao deletar treino:", error);
+      showToast("Erro ao excluir treino, tente novamente", "error");
     }
   }
 
@@ -61,6 +67,7 @@ function Treinos() {
       setWorkouts(response.data);
     } catch (error) {
       console.error("Erro ao reordenar treinos:", error);
+      showToast("Erro ao reordenar treinos, tente novamente", "error");
     }
   }
 
@@ -70,6 +77,7 @@ function Treinos() {
       navigate(`/execucao/${data.id}`);
     } catch (error) {
       console.error("Erro ao iniciar treino:", error);
+      showToast("Erro ao iniciar treino, tente novamente", "error");
     }
   }
 
