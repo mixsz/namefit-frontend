@@ -677,7 +677,8 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
         aria-describedby="confirm-delete-desc"
         className="w-full max-w-md overflow-hidden rounded-2xl p-6"
         style={{
-          background: "linear-gradient(180deg, #141210 0%, #17130f 100%)",
+          background:
+            "radial-gradient(circle at 50% -100%, #241d17 0%, #100d0a 70%)",
           border: "1px solid " + BORDER,
           boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
         }}
@@ -711,21 +712,20 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
             id="confirm-delete-desc"
             className="mt-3 max-w-xs text-center text-sm leading-relaxed"
             style={{
-              color: MUTED,
+              color: "#a39d97",
             }}
           >
             Deseja realmente excluir o treino{" "}
             <span
               style={{
-                color: TEXT,
-                fontWeight: 700,
+                color: ORANGE,
               }}
             >
               {workout.title}
             </span>
             ?
             <br />
-            <span style={{ opacity: 0.8 }}>
+            <span style={{ color: "#a39d97" }}>
               Essa ação não pode ser desfeita.
             </span>
           </p>

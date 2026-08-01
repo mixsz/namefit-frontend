@@ -368,6 +368,7 @@ function SuggestionCard({ suggestion }) {
         }}
       >
         Ver exercício
+        <ArrowRight size={16} strokeWidth={2.5} />
       </span>
     </Link>
   );
