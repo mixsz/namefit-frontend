@@ -125,13 +125,10 @@ function TreinosView({ data }) {
             {filtered.length === 0 ? (
               <NoResults query={query} onClear={() => setQuery("")} />
             ) : (
-              <div
-                key={filtered.map((w) => w.id).join(",")}
-                className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-              >
+              <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((workout, index) => (
                   <WorkoutCard
-                    key={workout.id}
+                    key={index}
                     workout={workout}
                     isFirst={index === 0}
                     isLast={index === filtered.length - 1}
@@ -354,18 +351,12 @@ function WorkoutCard({
           <ReorderButton
             direction="up"
             disabled={isFirst}
-            onClick={() => {
-              setHover(false);
-              onReorder?.(workout.id, "up");
-            }}
+            onClick={() => onReorder?.(workout.id, "up")}
           />
           <ReorderButton
             direction="down"
             disabled={isLast}
-            onClick={() => {
-              setHover(false);
-              onReorder?.(workout.id, "down");
-            }}
+            onClick={() => onReorder?.(workout.id, "down")}
           />
         </div>
 
@@ -677,8 +668,7 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
         aria-describedby="confirm-delete-desc"
         className="w-full max-w-md overflow-hidden rounded-2xl p-6"
         style={{
-          background:
-            "radial-gradient(circle at 50% -100%, #241d17 0%, #100d0a 70%)",
+          background: PANEL,
           border: "1px solid " + BORDER,
           boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
         }}
