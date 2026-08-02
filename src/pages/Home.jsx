@@ -159,7 +159,7 @@ function Home() {
   }
 
   return (
-    <HomeView // dps atualizar conforme as outras pages estiverem prontas
+    <HomeView
       data={{
         username,
         hasWorkout,

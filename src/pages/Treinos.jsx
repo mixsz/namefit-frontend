@@ -77,7 +77,11 @@ function Treinos() {
       navigate(`/execucao/${data.id}`);
     } catch (error) {
       console.error("Erro ao iniciar treino:", error);
-      showToast("Erro ao iniciar treino, tente novamente", "error");
+      if (error.response?.status === 400) {
+        showToast(error.response.data, "error");
+      } else {
+        showToast("Erro ao iniciar treino, tente novamente", "error");
+      }
     }
   }
 
