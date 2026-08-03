@@ -8,6 +8,7 @@ function Home() {
   const [hasWorkout, setHasWorkout] = useState(false);
   const [trained, setTrained] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState(false);
   const [todayWorkoutName, setTodayWorkoutName] = useState("");
   const [weekCount, setWeekCount] = useState(0);
   const [lastWorkout, setLastWorkout] = useState({
@@ -19,22 +20,32 @@ function Home() {
   const [suggestion, setSuggestion] = useState({ name: "", muscleGroup: "" });
 
   useEffect(() => {
-    async function fetchAll() {
-      try {
-        await Promise.all([
-          hasAnyWorkout(),
-          trainedToday(),
-          fetchWeekCount(),
-          fetchLastWorkout(),
-          fetchStreak(),
-          fetchSuggestion(),
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchAll();
   }, []);
+
+  async function fetchAll() {
+    setLoading(true);
+    setConnectionError(false);
+    try {
+      const results = await Promise.allSettled([
+        hasAnyWorkout(),
+        trainedToday(),
+        fetchWeekCount(),
+        fetchLastWorkout(),
+        fetchStreak(),
+        fetchSuggestion(),
+      ]);
+
+      const allFailedByNetwork = results.every(
+        (r) => r.status === "rejected" && r.reason?.code === "ERR_NETWORK",
+      );
+      if (allFailedByNetwork) {
+        setConnectionError(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function hasAnyWorkout() {
     try {
@@ -43,6 +54,7 @@ function Home() {
       // console.log("Has any workout:", response.data.length > 0);
     } catch (error) {
       console.error("Error fetching workouts:", error);
+      throw error;
     }
   }
 
@@ -60,6 +72,7 @@ function Home() {
       // console.log("Today's workout name:", response.data[0]?.workoutTitle);
     } catch (error) {
       console.error("Error fetching workout logs:", error);
+      throw error;
     }
   }
 
@@ -84,6 +97,7 @@ function Home() {
       setWeekCount(response.data.length);
     } catch (error) {
       console.error("Error fetching week count:", error);
+      throw error;
     }
   }
 
@@ -109,6 +123,7 @@ function Home() {
       }
     } catch (error) {
       console.error("Error fetching last workout:", error);
+      throw error;
     }
   }
 
@@ -138,6 +153,7 @@ function Home() {
       setStreak(streakCount);
     } catch (error) {
       console.error("Error fetching streak:", error);
+      throw error;
     }
   }
 
@@ -155,6 +171,7 @@ function Home() {
       }
     } catch (error) {
       console.error("Error fetching exercise suggestion:", error);
+      throw error;
     }
   }
 
@@ -170,6 +187,8 @@ function Home() {
         streak,
         suggestion,
         loading,
+        connectionError,
+        onRetry: fetchAll,
       }}
     />
   );
