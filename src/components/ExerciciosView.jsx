@@ -10,7 +10,7 @@ import {
   Check,
 } from "lucide-react";
 
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import MuscleIcon from "./MuscleIcon";
 
 const CATEGORIES = [
@@ -70,10 +70,18 @@ function matchesQuery(exercise, query) {
 
 function ExerciciosView({ data, onAddToWorkout }) {
   const { exercises = [], workouts = [], loading } = data;
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(location.state?.searchQuery ?? "");
   const [activeCategory, setActiveCategory] = useState(null);
   const [modalExercise, setModalExercise] = useState(null);
+
+  useEffect(() => {
+    if (location.state?.searchQuery) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, []);
 
   const category = CATEGORIES.find((c) => c.key === activeCategory);
   const activeGroups = category ? category.groups : null;

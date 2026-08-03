@@ -30,10 +30,9 @@ function Treinos() {
       const response = await api.post("/workout", { title });
       setWorkouts([...workouts, response.data]);
       showToast("Treino criado com sucesso!", "success");
-      //console.log("Treino criado:", response.data);
     } catch (error) {
       console.error("Erro ao criar treino:", error);
-      showToast("Erro ao criar treino, tente novamente", "error");
+      throw error; 
     }
   }
 

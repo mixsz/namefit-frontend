@@ -15,7 +15,9 @@ import {
   Search,
   Check,
   Dumbbell,
+  Minus,
 } from "lucide-react";
+
 import MuscleIcon from "./MuscleIcon";
 
 import { Link } from "react-router-dom";
@@ -25,12 +27,12 @@ function TreinoDetalheView({ data }) {
     workout,
     onSave,
     onCancel,
-    onDelete,
     onAddExercise,
     onStartWorkout,
     onOpenExercise,
     startInEdit = false,
     loading,
+    otherWorkoutTitles = [],
   } = data;
 
   const [isEditing, setIsEditing] = useState(startInEdit);
@@ -38,6 +40,10 @@ function TreinoDetalheView({ data }) {
   const [draftTitle, setDraftTitle] = useState(workout?.title ?? "");
   const [draftExercises, setDraftExercises] = useState(
     () => workout?.exercises?.map((e) => ({ ...e })) ?? [],
+  );
+
+  const isDuplicateTitle = otherWorkoutTitles.some(
+    (t) => t.trim().toLowerCase() === draftTitle.trim().toLowerCase(),
   );
 
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -53,10 +59,11 @@ function TreinoDetalheView({ data }) {
     setIsEditing(true);
   }
 
-  function handleSave() {
-    onSave?.({
+  async function handleSave() {
+    if (draftTitle.trim().length === 0) return;
+    await onSave?.({
       id: workout.id,
-      title: draftTitle.trim() || workout.title,
+      title: draftTitle.trim(),
       exercises: draftExercises,
     });
     setIsEditing(false);
@@ -123,7 +130,11 @@ function TreinoDetalheView({ data }) {
           <>
             <BackLink isEditing={isEditing} onExitEdit={handleCancel} />
             {isEditing ? (
-              <EditHeader value={draftTitle} onChange={setDraftTitle} />
+              <EditHeader
+                value={draftTitle}
+                onChange={setDraftTitle}
+                isDuplicate={isDuplicateTitle}
+              />
             ) : (
               <ViewHeader title={workout?.title} onEdit={enterEdit} />
             )}
@@ -145,32 +156,45 @@ function TreinoDetalheView({ data }) {
               )}
 
               {isEditing && (
-                <button
-                  type="button"
-                  onClick={() => setPickerOpen(true)}
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-bold uppercase tracking-[0.05em] transition-all"
-                  style={{
-                    background: "transparent",
-                    color: ORANGE,
-                    border: "1.5px solid " + ORANGE,
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = "rgba(255,77,28,0.1)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <Plus size={16} strokeWidth={2.5} />
-                  Adicionar exercício
-                </button>
+                <div className="mt-4 flex justify-start">
+                  <button
+                    type="button"
+                    onClick={() => setPickerOpen(true)}
+                    className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold uppercase tracking-[0.05em] transition-all sm:px-5 sm:py-3 sm:text-sm"
+                    style={{
+                      background: "transparent",
+                      color: ORANGE,
+                      border: "1.5px solid " + ORANGE,
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = "rgba(255,77,28,0.1)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = "transparent";
+                    }}
+                  >
+                    <Plus size={14} strokeWidth={2.5} />
+                    Adicionar exercício
+                  </button>
+                </div>
               )}
             </section>
 
             {isEditing ? (
-              <EditActions onSave={handleSave} onCancel={handleCancel} />
+              <EditActions
+                onSave={handleSave}
+                onCancel={handleCancel}
+                disabled={
+                  draftTitle.trim().length === 0 ||
+                  isDuplicateTitle ||
+                  !hasChanges(workout, draftTitle, draftExercises)
+                }
+              />
             ) : (
-              <ViewActions onStart={() => onStartWorkout?.(workout.id)} />
+              <ViewActions
+                onStart={() => onStartWorkout?.(workout.id)}
+                disabled={viewExercises.length === 0}
+              />
             )}
           </>
         )}
@@ -252,7 +276,7 @@ function ViewHeader({ title, onEdit }) {
   return (
     <header className="mt-5 flex items-end justify-between gap-4">
       <h1
-        className="font-bold leading-[0.95]"
+        className="ml-2 font-bold leading-[0.95] sm:ml-0"
         style={{
           color: TEXT,
           fontFamily: "'Barlow Condensed', sans-serif",
@@ -282,9 +306,10 @@ function ViewHeader({ title, onEdit }) {
   );
 }
 
-function EditHeader({ value, onChange }) {
+function EditHeader({ value, onChange, isDuplicate }) {
   const [focused, setFocused] = useState(false);
   const inputRef = useRef(null);
+  const isEmpty = value.trim().length === 0;
 
   return (
     <header className="mt-5">
@@ -304,7 +329,6 @@ function EditHeader({ value, onChange }) {
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholder="Nome do treino"
           className="w-full rounded-xl bg-transparent px-4 py-3 outline-none transition-all"
           style={{
             color: TEXT,
@@ -312,9 +336,27 @@ function EditHeader({ value, onChange }) {
             fontSize: "clamp(1.9rem, 4.5vw, 2.8rem)",
             lineHeight: 1,
             background: FIELD,
-            border: "1.5px solid " + (focused ? ORANGE : BORDER),
+            border:
+              "1.5px solid " +
+              (isEmpty ? "#ef4444" : focused ? ORANGE : BORDER),
           }}
         />
+        {isEmpty && (
+          <p
+            className="mt-1.5 text-xs font-medium"
+            style={{ color: "#ef4444" }}
+          >
+            O nome do treino não pode ficar vazio.
+          </p>
+        )}
+        {!isEmpty && isDuplicate && (
+          <p
+            className="mt-1.5 text-xs font-medium"
+            style={{ color: "#ef4444" }}
+          >
+            Já existe um treino com esse nome.
+          </p>
+        )}
       </div>
     </header>
   );
@@ -334,7 +376,7 @@ function EditTable({
       style={{ border: "1px solid " + BORDER }}
     >
       <div
-        className="grid items-center gap-3 px-5 py-3 text-xs font-bold uppercase tracking-[0.12em]"
+        className="hidden items-center gap-3 px-5 py-3 text-xs font-bold uppercase tracking-[0.12em] sm:grid"
         style={{
           background: FIELD,
           color: MUTED,
@@ -349,79 +391,163 @@ function EditTable({
         <div />
       </div>
 
+      {exercises.length > 0 && (
+        <div
+          className="flex items-center gap-2 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.08em] sm:hidden"
+          style={{ background: FIELD, color: MUTED }}
+        >
+          <div className="w-8 shrink-0" />
+          <div className="min-w-0 flex-1">Exercício</div>
+          <div className="w-11 shrink-0 text-center">Séries</div>
+          <div className="w-11 shrink-0 text-center">Reps</div>
+          <div className="w-6 shrink-0" />
+        </div>
+      )}
+
       {exercises.length === 0 ? (
         <div
           className="px-5 py-10 text-center text-sm"
           style={{ background: PANEL, color: MUTED }}
-        >
-        </div>
+        ></div>
       ) : (
         exercises.map((ex, i) => (
-          <div
-            key={i}
-            className="grid items-center gap-3 px-5 py-3.5"
-            style={{
-              background: PANEL,
-              gridTemplateColumns: EDIT_COLUMNS,
-              borderTop: i === 0 ? "none" : "1px solid " + BORDER,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => onRequestDelete(ex)}
-              aria-label={"Remover " + ex.name}
-              className="flex h-9 w-9 items-center justify-center rounded-lg transition-all"
-              style={{ background: FIELD, color: "#ef4444" }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = "rgba(239,68,68,0.14)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = FIELD;
+          <div key={i}>
+            <div
+              className="flex items-center gap-2 px-4 py-2.5 sm:hidden"
+              style={{
+                background: PANEL,
+                borderTop: i === 0 ? "none" : "1px solid " + BORDER,
               }}
             >
-              <Trash2 size={16} strokeWidth={2.4} />
-            </button>
+              <button
+                type="button"
+                onClick={() => onRequestDelete(ex)}
+                aria-label={"Remover " + ex.name}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all"
+                style={{ background: FIELD, color: "#ef4444" }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = "rgba(239,68,68,0.14)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = FIELD;
+                }}
+              >
+                <Trash2 size={14} strokeWidth={2.4} />
+              </button>
 
-            <div className="min-w-0">
               <span
-                className="truncate font-bold"
+                className="min-w-0 flex-1 truncate font-bold"
                 style={{
                   color: TEXT,
                   fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: "1.3rem",
+                  fontSize: "0.95rem",
                   lineHeight: 1.1,
-                  display: "block",
                 }}
               >
                 {ex.name}
               </span>
+
+              <div className="w-11 shrink-0">
+                <NumberInput
+                  value={ex.sets}
+                  onChange={(v) => onChangeField(ex.id, "sets", v)}
+                  ariaLabel={"Séries de " + ex.name}
+                  max={30}
+                  compact
+                />
+              </div>
+
+              <div className="w-11 shrink-0">
+                <NumberInput
+                  value={ex.reps}
+                  onChange={(v) => onChangeField(ex.id, "reps", v)}
+                  ariaLabel={"Repetições de " + ex.name}
+                  max={30}
+                  compact
+                />
+              </div>
+
+              <div className="flex w-6 shrink-0 flex-col gap-0.5">
+                <ReorderArrow
+                  direction="up"
+                  disabled={i === 0}
+                  onClick={() => onMoveUp(i)}
+                />
+                <ReorderArrow
+                  direction="down"
+                  disabled={i === exercises.length - 1}
+                  onClick={() => onMoveDown(i)}
+                />
+              </div>
             </div>
 
-            <NumberInput
-              value={ex.sets}
-              onChange={(v) => onChangeField(ex.id, "sets", v)}
-              ariaLabel={"Séries de " + ex.name}
-            />
-            <div />
+            <div
+              className="hidden items-center gap-3 px-5 py-3.5 sm:grid"
+              style={{
+                background: PANEL,
+                gridTemplateColumns: EDIT_COLUMNS,
+                borderTop: i === 0 ? "none" : "1px solid " + BORDER,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => onRequestDelete(ex)}
+                aria-label={"Remover " + ex.name}
+                className="flex h-9 w-9 items-center justify-center rounded-lg transition-all"
+                style={{ background: FIELD, color: "#ef4444" }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = "rgba(239,68,68,0.14)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = FIELD;
+                }}
+              >
+                <Trash2 size={16} strokeWidth={2.4} />
+              </button>
 
-            <NumberInput
-              value={ex.reps}
-              onChange={(v) => onChangeField(ex.id, "reps", v)}
-              ariaLabel={"Repetições de " + ex.name}
-            />
-            <div />
+              <div className="min-w-0">
+                <span
+                  className="truncate font-bold"
+                  style={{
+                    color: TEXT,
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: "1.3rem",
+                    lineHeight: 1.1,
+                    display: "block",
+                  }}
+                >
+                  {ex.name}
+                </span>
+              </div>
 
-            <div className="flex flex-col gap-0.5">
-              <ReorderArrow
-                direction="up"
-                disabled={i === 0}
-                onClick={() => onMoveUp(i)}
+              <NumberInput
+                value={ex.sets}
+                onChange={(v) => onChangeField(ex.id, "sets", v)}
+                ariaLabel={"Séries de " + ex.name}
+                max={30}
               />
-              <ReorderArrow
-                direction="down"
-                disabled={i === exercises.length - 1}
-                onClick={() => onMoveDown(i)}
+              <div />
+
+              <NumberInput
+                value={ex.reps}
+                onChange={(v) => onChangeField(ex.id, "reps", v)}
+                ariaLabel={"Repetições de " + ex.name}
+                max={30}
               />
+              <div />
+
+              <div className="flex flex-col gap-0.5">
+                <ReorderArrow
+                  direction="up"
+                  disabled={i === 0}
+                  onClick={() => onMoveUp(i)}
+                />
+                <ReorderArrow
+                  direction="down"
+                  disabled={i === exercises.length - 1}
+                  onClick={() => onMoveDown(i)}
+                />
+              </div>
             </div>
           </div>
         ))
@@ -534,30 +660,95 @@ function ViewTable({ exercises, onOpenExercise }) {
   );
 }
 
-function NumberInput({ value, onChange, ariaLabel }) {
+function NumberInput({ value, onChange, ariaLabel, max = 30, compact = false }) {
   const [focused, setFocused] = useState(false);
+
+  const numericValue = typeof value === "number" ? value : 0;
+  const atMax = numericValue >= max;
+  const atMin = numericValue <= 1;
+
+  function increment() {
+    const n = Math.min(max, numericValue + 1);
+    onChange(n);
+  }
+
+  function decrement() {
+    const n = Math.max(1, numericValue - 1);
+    onChange(n);
+  }
+
   return (
-    <input
-      type="number"
-      min={1}
-      inputMode="numeric"
-      aria-label={ariaLabel}
-      value={value}
-      onChange={(e) => {
-        const n = parseInt(e.target.value, 10);
-        onChange(Number.isNaN(n) ? "" : n);
-      }}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      className="w-full rounded-lg px-2 py-2.5 text-center text-sm font-bold outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
-      style={{
-        background: FIELD,
-        border: "1.5px solid " + (focused ? ORANGE : BORDER),
-        color: TEXT,
-        fontFamily: "'Barlow Condensed', sans-serif",
-        fontSize: "1.2rem",
-      }}
-    />
+    <div className="relative">
+      <input
+        type="number"
+        min={1}
+        max={max}
+        inputMode="numeric"
+        aria-label={ariaLabel}
+        value={value}
+        onChange={(e) => {
+          const raw = e.target.value;
+          if (raw === "") {
+            onChange("");
+            return;
+          }
+          const n = parseInt(raw, 10);
+          if (Number.isNaN(n)) return;
+          onChange(Math.min(max, Math.max(1, n)));
+        }}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className={
+          "w-full rounded-lg text-center text-sm font-bold outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0 " +
+          (compact ? "py-1.5 px-1" : "py-2.5 pl-2 pr-6")
+        }
+        style={{
+          background: FIELD,
+          border: "1.5px solid " + (focused ? ORANGE : BORDER),
+          color: TEXT,
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontSize: "1.2rem",
+        }}
+      />
+      {!compact && (
+        <div className="absolute right-1 top-1/2 hidden -translate-y-1/2 flex-col gap-0.5 sm:flex">
+          <button
+            type="button"
+            tabIndex={-1}
+            onClick={increment}
+            disabled={atMax}
+            aria-label="Aumentar"
+            className="flex h-3.5 w-4 items-center justify-center rounded-sm transition-colors disabled:opacity-30"
+            style={{ background: "rgba(255,255,255,0.06)", color: "#c9c4bf" }}
+            onMouseOver={(e) => {
+              if (!atMax) e.currentTarget.style.color = ORANGE;
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = "#c9c4bf";
+            }}
+          >
+            <Plus size={10} strokeWidth={3} />
+          </button>
+          <button
+            type="button"
+            tabIndex={-1}
+            onClick={decrement}
+            disabled={atMin}
+            aria-label="Diminuir"
+            className="flex h-3.5 w-4 items-center justify-center rounded-sm transition-colors disabled:opacity-30"
+            style={{ background: "rgba(255,255,255,0.06)", color: "#c9c4bf" }}
+            onMouseOver={(e) => {
+              if (!atMin) e.currentTarget.style.color = ORANGE;
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = "#c9c4bf";
+            }}
+          >
+            <Minus size={10} strokeWidth={3} />
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -572,7 +763,7 @@ function ReorderArrow({ direction, disabled, onClick }) {
       className={
         "flex h-6 w-9 items-center justify-center rounded-md transition-all " +
         (disabled
-          ? "cursor-not-allowed opacity-40 text-[#4a453f]"
+          ? "opacity-40 text-[#4a453f]"
           : "cursor-pointer text-[#c9c4bf] hover:text-[#FF4D1C]")
       }
       style={{ background: "transparent" }}
@@ -595,19 +786,21 @@ function EmptyRows() {
   );
 }
 
-function ViewActions({ onStart }) {
+function ViewActions({ onStart, disabled }) {
   return (
     <div className="mt-10 flex justify-center">
       <button
         type="button"
         onClick={onStart}
-        className="inline-flex items-center justify-center gap-2.5 rounded-full px-56 py-4 text-base font-extrabold uppercase tracking-[0.05em] transition-all"
+        disabled={disabled}
+        className="inline-flex items-center justify-center gap-2 rounded-full px-12 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all disabled:opacity-50 sm:gap-2.5 sm:px-56 sm:py-4 sm:text-base"
         style={{
           background: ORANGE,
           color: BG,
           boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
         }}
         onMouseOver={(e) => {
+          if (disabled) return;
           e.currentTarget.style.background = "#ff6b42";
           e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
         }}
@@ -616,23 +809,29 @@ function ViewActions({ onStart }) {
           e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
         }}
       >
-        <Play size={20} strokeWidth={2.5} fill={BG} />
+        <Play size={18} strokeWidth={2.5} fill={BG} className="sm:hidden" />
+        <Play
+          size={20}
+          strokeWidth={2.5}
+          fill={BG}
+          className="hidden sm:block"
+        />
         Iniciar treino
       </button>
     </div>
   );
 }
 
-function EditActions({ onSave, onCancel }) {
+function EditActions({ onSave, onCancel, disabled }) {
   const [cancelHover, setCancelHover] = useState(false);
   return (
-    <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+    <div className="mt-10 flex items-center justify-end gap-3">
       <button
         type="button"
         onClick={onCancel}
         onMouseEnter={() => setCancelHover(true)}
         onMouseLeave={() => setCancelHover(false)}
-        className="inline-flex items-center justify-center rounded-full px-6 py-4 text-sm font-bold uppercase tracking-[0.05em] transition-all"
+        className="inline-flex items-center justify-center rounded-full px-4 py-2.5 text-xs font-bold uppercase tracking-[0.05em] transition-all sm:px-6 sm:py-4 sm:text-sm"
         style={{
           background: cancelHover ? "rgba(239,68,68,0.16)" : "transparent",
           color: "#ef4444",
@@ -644,7 +843,8 @@ function EditActions({ onSave, onCancel }) {
       <button
         type="button"
         onClick={onSave}
-        className="inline-flex items-center justify-center gap-2.5 rounded-full px-6 py-4 text-base font-extrabold uppercase tracking-[0.01em] transition-all"
+        disabled={disabled}
+        className="disabled:opacity-50 inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.01em] transition-all sm:gap-2.5 sm:px-6 sm:py-4 sm:text-base"
         style={{
           background: ORANGE,
           color: BG,
@@ -659,7 +859,8 @@ function EditActions({ onSave, onCancel }) {
           e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
         }}
       >
-        <Save size={18} strokeWidth={2.5} />
+        <Save size={15} strokeWidth={2.5} className="sm:hidden" />
+        <Save size={18} strokeWidth={2.5} className="hidden sm:block" />
         Salvar alterações
       </button>
     </div>
@@ -906,7 +1107,7 @@ function ExercisePickerModal({ exercises, existingIds, onClose, onConfirm }) {
                     type="button"
                     disabled={disabled}
                     onClick={() => setSelectedId(ex.id)}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all disabled:cursor-not-allowed"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all"
                     style={{
                       background: isSelected
                         ? "rgba(255,77,28,0.12)"

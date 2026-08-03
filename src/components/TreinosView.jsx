@@ -14,6 +14,8 @@ import {
   X,
   ArrowRight,
   AlertTriangle,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -146,8 +148,8 @@ function TreinosView({ data }) {
       {modalOpen && (
         <CreateWorkoutModal
           onClose={() => setModalOpen(false)}
-          onCreate={(title) => {
-            onCreate?.(title);
+          onCreate={async (title) => {
+            await onCreate?.(title);
             setModalOpen(false);
           }}
         />
@@ -347,7 +349,7 @@ function WorkoutCard({
         className="mt-5 flex items-center justify-between pt-4"
         style={{ borderTop: "1px solid " + BORDER }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex gap-1 sm:flex-row sm:items-center sm:gap-2">
           <ReorderButton
             direction="up"
             disabled={isFirst}
@@ -374,7 +376,8 @@ function WorkoutCard({
 }
 
 function ReorderButton({ direction, disabled, onClick }) {
-  const Icon = direction === "up" ? ChevronLeft : ChevronRight;
+  const UpDownIcon = direction === "up" ? ChevronUp : ChevronDown;
+  const LeftRightIcon = direction === "up" ? ChevronLeft : ChevronRight;
   return (
     <button
       type="button"
@@ -384,12 +387,13 @@ function ReorderButton({ direction, disabled, onClick }) {
       className={
         "flex h-8 w-8 items-center justify-center rounded-lg transition-all " +
         (disabled
-          ? "cursor-not-allowed opacity-50 text-[#6b6460]"
+          ? "opacity-50 text-[#6b6460]"
           : "cursor-pointer text-[#6b6460] hover:text-[#FF4D1C]")
       }
       style={{ background: FIELD }}
     >
-      <Icon size={16} strokeWidth={2.5} />
+      <UpDownIcon size={16} strokeWidth={2.5} className="sm:hidden" />
+      <LeftRightIcon size={16} strokeWidth={2.5} className="hidden sm:block" />
     </button>
   );
 }
@@ -496,7 +500,10 @@ function EmptyState({ onCreate }) {
 function CreateWorkoutModal({ onClose, onCreate }) {
   const [title, setTitle] = useState("");
   const [focused, setFocused] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const inputRef = useRef(null);
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -507,11 +514,25 @@ function CreateWorkoutModal({ onClose, onCreate }) {
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    if (submittingRef.current) return;
     const trimmed = title.trim();
     if (!trimmed) return;
-    onCreate(trimmed);
+
+    submittingRef.current = true;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await onCreate(trimmed);
+    } catch (err) {
+      const message =
+        err.response?.data || "Erro ao criar treino, tente novamente";
+      setError(typeof message === "string" ? message : "Erro ao criar treino");
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -580,17 +601,32 @@ function CreateWorkoutModal({ onClose, onCreate }) {
               ref={inputRef}
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (error) setError(null);
+              }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               placeholder="Ex: Peito e Tríceps"
               className="w-full rounded-xl px-5 py-4 text-sm outline-none transition-all"
               style={{
                 background: FIELD,
-                border: "1.5px solid " + (focused ? ORANGE : BORDER),
+                border:
+                  "1.5px solid " +
+                  (error ? "#ef4444" : focused ? ORANGE : BORDER),
                 color: TEXT,
               }}
             />
+            <div className="min-h-[20px]">
+              {error && (
+                <p
+                  className="text-xs font-semibold"
+                  style={{ color: "#ef4444" }}
+                >
+                  {error}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3">
@@ -616,23 +652,25 @@ function CreateWorkoutModal({ onClose, onCreate }) {
             </button>
             <button
               type="submit"
-              disabled={!title.trim()}
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
+              disabled={!title.trim() || submitting}
+              className="inline-flex min-w-[140px] items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
               style={{
                 background: title.trim() ? ORANGE : "#3a2a22",
                 color: title.trim() ? BG : "#7a6a60",
-                cursor: title.trim() ? "pointer" : "not-allowed",
+                cursor: title.trim() && !submitting ? "pointer" : "not-allowed",
                 boxShadow: title.trim() ? "0 2px 8px rgba(0,0,0,0.35)" : "none",
               }}
               onMouseOver={(e) => {
-                if (title.trim()) e.currentTarget.style.background = "#ff6b42";
+                if (title.trim() && !submitting)
+                  e.currentTarget.style.background = "#ff6b42";
               }}
               onMouseOut={(e) => {
-                if (title.trim()) e.currentTarget.style.background = ORANGE;
+                if (title.trim() && !submitting)
+                  e.currentTarget.style.background = ORANGE;
               }}
             >
               <Plus size={16} strokeWidth={2.5} />
-              Criar
+              {submitting ? "Criando..." : "Criar"}
             </button>
           </div>
         </form>
