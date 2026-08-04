@@ -8,22 +8,28 @@ function Treinos() {
   const [workouts, setWorkouts] = useState([]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState(false);
   const { showToast } = useToast();
 
   useEffect(() => {
-    async function fetchWorkouts() {
-      try {
-        const response = await api.get("/workout");
-        setWorkouts(response.data);
-        //console.log(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar treinos:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchWorkouts();
   }, []);
+
+  async function fetchWorkouts() {
+    setLoading(true);
+    setConnectionError(false);
+    try {
+      const response = await api.get("/workout");
+      setWorkouts(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar treinos:", error);
+      if (error.code === "ERR_NETWORK") {
+        setConnectionError(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function handleCreateWorkout(title) {
     try {
@@ -32,7 +38,7 @@ function Treinos() {
       showToast("Treino criado com sucesso!", "success");
     } catch (error) {
       console.error("Erro ao criar treino:", error);
-      throw error; 
+      throw error;
     }
   }
 
@@ -89,6 +95,8 @@ function Treinos() {
       data={{
         workouts,
         loading,
+        connectionError,
+        onRetry: fetchWorkouts, 
         onCreate: handleCreateWorkout,
         onStart: (id) => startWorkout(id),
         onDelete: (id) => handleDeleteWorkout(id),

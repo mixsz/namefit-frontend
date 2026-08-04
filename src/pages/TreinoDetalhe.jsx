@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 function TreinoDetalhe() {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState(false);
   const [workout, setWorkout] = useState(null);
   const [availableExercises, setAvailableExercises] = useState([]);
   const [allWorkouts, setAllWorkouts] = useState([]);
@@ -15,21 +16,27 @@ function TreinoDetalhe() {
   const location = useLocation();
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        await Promise.all([
-          fetchWorkout(),
-          fetchAvailableExercises(),
-          fetchAllWorkouts(),
-        ]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchData();
   }, [params.id]);
+
+  async function fetchData() {
+    setLoading(true);
+    setConnectionError(false);
+    try {
+      await Promise.all([
+        fetchWorkout(),
+        fetchAvailableExercises(),
+        fetchAllWorkouts(),
+      ]);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      if (error.code === "ERR_NETWORK") {
+        setConnectionError(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function fetchWorkout() {
     try {
@@ -51,6 +58,7 @@ function TreinoDetalhe() {
       });
     } catch (error) {
       console.error("Error fetching workout:", error);
+      throw error;
     }
   }
 
@@ -60,6 +68,7 @@ function TreinoDetalhe() {
       setAvailableExercises(response.data);
     } catch (error) {
       console.error("Error fetching available exercises:", error);
+      throw error;
     }
   }
 
@@ -69,6 +78,7 @@ function TreinoDetalhe() {
       setAllWorkouts(response.data);
     } catch (error) {
       console.error("Error fetching all workouts:", error);
+      throw error;
     }
   }
 
@@ -153,6 +163,8 @@ function TreinoDetalhe() {
           .filter((w) => w.id !== params.id)
           .map((w) => w.title),
         loading,
+        connectionError,
+        onRetry: fetchData,
         startInEdit: location.state?.isEditing ?? false,
         onSave: handleSave,
         onCancel: (hasChanges) => {

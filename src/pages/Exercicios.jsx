@@ -7,39 +7,44 @@ function Exercicios() {
   const [exercises, setExercises] = useState([]);
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [connectionError, setConnectionError] = useState(false);
   const { showToast } = useToast();
 
   useEffect(() => {
-    async function fetchExercises() {
-      try {
-        const [exercisesRes, workoutsRes] = await Promise.all([
-          api.get("/exercise"),
-          api.get("/workout"),
-        ]);
-
-        setExercises(exercisesRes.data);
-
-        const workoutExercisesRes = await Promise.all(
-          workoutsRes.data.map((w) => api.get(`/workoutExercise/${w.id}`)),
-        );
-
-        setWorkouts(
-          workoutsRes.data.map((w, i) => ({
-            id: w.id,
-            title: w.title,
-            exerciseIds: workoutExercisesRes[i].data.map(
-              (we) => we.exercise.id,
-            ),
-          })),
-        );
-      } catch (error) {
-        console.error("Error fetching exercises:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchExercises();
   }, []);
+
+  async function fetchExercises() {
+    setLoading(true);
+    setConnectionError(false);
+    try {
+      const [exercisesRes, workoutsRes] = await Promise.all([
+        api.get("/exercise"),
+        api.get("/workout"),
+      ]);
+
+      setExercises(exercisesRes.data);
+
+      const workoutExercisesRes = await Promise.all(
+        workoutsRes.data.map((w) => api.get(`/workoutExercise/${w.id}`)),
+      );
+
+      setWorkouts(
+        workoutsRes.data.map((w, i) => ({
+          id: w.id,
+          title: w.title,
+          exerciseIds: workoutExercisesRes[i].data.map((we) => we.exercise.id),
+        })),
+      );
+    } catch (error) {
+      console.error("Error fetching exercises:", error);
+      if (error.code === "ERR_NETWORK") {
+        setConnectionError(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function handleAddToWorkout({ workoutId, exerciseId, sets, reps }) {
     try {
@@ -66,7 +71,7 @@ function Exercicios() {
 
   return (
     <ExerciciosView
-      data={{ exercises, workouts, loading}}
+      data={{ exercises, workouts, loading, connectionError, onRetry: fetchExercises }}
       onAddToWorkout={handleAddToWorkout}
     />
   );
