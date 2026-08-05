@@ -5,6 +5,7 @@ import api from "../services/api";
 
 function Home() {
   const { username } = useAuth();
+  console.log("Username: ", username);
   const [hasWorkout, setHasWorkout] = useState(false);
   const [trained, setTrained] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -110,11 +111,14 @@ function Home() {
         );
         const latest = sorted[0];
 
-        const daysAgo = Math.floor(
-          (new Date().setHours(0, 0, 0, 0) -
-            new Date(latest.date).setHours(0, 0, 0, 0)) /
-            (1000 * 60 * 60 * 24),
+        const rawDiff =
+          new Date().setHours(0, 0, 0, 0) -
+          new Date(latest.date).setHours(0, 0, 0, 0);
+        const daysAgo = Math.max(
+          0,
+          Math.floor(rawDiff / (1000 * 60 * 60 * 24)),
         );
+
         setLastWorkout({
           id: latest.id,
           name: latest.workoutTitle,

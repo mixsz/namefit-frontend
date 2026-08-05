@@ -14,11 +14,10 @@ import {
   X,
   ArrowRight,
   AlertTriangle,
-  ChevronDown,
-  ChevronUp,
   WifiOff,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { formatLastTrained } from "../pages/Treinos.jsx";
 
 function TreinosView({ data }) {
   const {
@@ -135,7 +134,7 @@ function TreinosView({ data }) {
               <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
                 {filtered.map((workout, index) => (
                   <WorkoutCard
-                    key={workout.id}
+                    key={index}
                     workout={workout}
                     index={index}
                     isFirst={index === 0}
@@ -211,21 +210,50 @@ function SearchField({ value, onChange }) {
   );
 }
 
+const BASE = "#0e0b09";
+const GLOW_BR =
+  "radial-gradient(ellipse at 120% 120%, rgba(200,60,10,0.45) 0%, rgba(140,35,5,0.22) 30%, #161210 60%, " +
+  BASE +
+  " 100%)";
+const GLOW_BL =
+  "radial-gradient(ellipse at -20% 120%, rgba(200,60,10,0.38) 0%, rgba(140,35,5,0.18) 32%, #161210 62%, " +
+  BASE +
+  " 100%)";
+const GLOW_TR =
+  "radial-gradient(ellipse at 120% -20%, rgba(200,60,10,0.34) 0%, rgba(140,35,5,0.16) 34%, #161210 64%, " +
+  BASE +
+  " 100%)";
+const STRIPE_D =
+  "repeating-linear-gradient(-45deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.024) 1px, transparent 1px, transparent 2px)";
+const STRIPE_H =
+  "repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.022) 1px, transparent 1px, transparent 3px)";
+const DOTS =
+  "radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px) 0 0 / 8px 8px";
+const GRID = [
+  "repeating-linear-gradient(0deg,  rgba(255,255,255,0.022) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 3px)",
+  "repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 3px)",
+].join(", ");
+const CROSS = [
+  "repeating-linear-gradient(45deg,  rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 3px)",
+  "repeating-linear-gradient(-45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 3px)",
+].join(", ");
+
 const CARD_VARIANTS = [
-  {
-    background:
-      "radial-gradient(circle at 90% 100%, rgba(255,77,28,0.35) 0%, #141210 45%, #0c0a08 100%)",
-  },
+  { background: [STRIPE_D, GLOW_BR].join(", ") },
+  { background: [DOTS, GLOW_BL].join(", ") },
+  { background: [GRID, GLOW_BR].join(", ") },
+  { background: [STRIPE_H, GLOW_TR].join(", ") },
+  { background: [CROSS, GLOW_BL].join(", ") },
 ];
 
 function hashId(id) {
-  let hash = 0;
-  const str = String(id);
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
+  let h = 0;
+  const s = String(id);
+  for (let i = 0; i < s.length; i++) {
+    h = (h << 5) - h + s.charCodeAt(i);
+    h |= 0;
   }
-  return Math.abs(hash);
+  return Math.abs(h);
 }
 
 function WorkoutCard({
@@ -240,7 +268,6 @@ function WorkoutCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const variant = CARD_VARIANTS[hashId(workout.id) % CARD_VARIANTS.length];
-
   useEffect(() => {
     function handleClickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -265,6 +292,7 @@ function WorkoutCard({
       className="relative flex h-60 flex-col justify-between rounded-2xl p-6 transition-all"
       style={{
         ...variant,
+        backgroundClip: "padding-box",
         border:
           "1px solid " + (hover || menuOpen ? "rgba(255,77,28,0.35)" : BORDER),
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
@@ -355,22 +383,33 @@ function WorkoutCard({
           )}
         </div>
       </div>
-      <Link to={`/treinos/${workout.id}`} className="mt-5 block">
-        <h3
-          className="font-bold"
-          style={{
-            color: TEXT,
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: "1.7rem",
-            lineHeight: 1.05,
-          }}
-        >
-          {workout.title}
-        </h3>
-      </Link>
+      <div className="mt-5">
+        <Link to={`/treinos/${workout.id}`} className="block">
+          <h3
+            className="font-bold"
+            style={{
+              color: TEXT,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: "1.7rem",
+              lineHeight: 1.05,
+            }}
+          >
+            {workout.title}
+          </h3>
+        </Link>
+        <div
+          className="mt-2 mb-3"
+          style={{ width: 28, height: 2, background: ORANGE, borderRadius: 2 }}
+        />
+        <p className="text-xs" style={{ color: MUTED }}>
+          {workout.lastTrainedAt
+            ? "Último treino: " + formatLastTrained(workout.lastTrainedAt)
+            : "Nenhum treino realizado"}
+        </p>
+      </div>
 
       <div
-        className="mt-5 flex items-center justify-between pt-4"
+        className="mt-4 flex items-center justify-between pt-4"
         style={{ borderTop: "1px solid " + BORDER }}
       >
         <div className="flex gap-1 sm:flex-row sm:items-center sm:gap-2">
@@ -400,8 +439,7 @@ function WorkoutCard({
 }
 
 function ReorderButton({ direction, disabled, onClick }) {
-  const UpDownIcon = direction === "up" ? ChevronUp : ChevronDown;
-  const LeftRightIcon = direction === "up" ? ChevronLeft : ChevronRight;
+  const Icon = direction === "up" ? ChevronLeft : ChevronRight;
   return (
     <button
       type="button"
@@ -416,8 +454,7 @@ function ReorderButton({ direction, disabled, onClick }) {
       }
       style={{ background: FIELD }}
     >
-      <UpDownIcon size={16} strokeWidth={2.5} className="sm:hidden" />
-      <LeftRightIcon size={16} strokeWidth={2.5} className="hidden sm:block" />
+      <Icon size={16} strokeWidth={2.5} />
     </button>
   );
 }
