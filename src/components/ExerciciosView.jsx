@@ -8,11 +8,13 @@ import {
   SlidersHorizontal,
   ChevronDown,
   Check,
-  WifiOff
+  WifiOff,
+  ArrowUpRight,
 } from "lucide-react";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import MuscleIcon from "./MuscleIcon";
+import ConnectionErrorState from "./ConnectionErrorState";
 
 const CATEGORIES = [
   { key: "PEITO", label: "Peito", icon: "CHEST", groups: ["CHEST"] },
@@ -168,7 +170,7 @@ function ExerciciosView({ data, onAddToWorkout }) {
               {filtered.length === 0 ? (
                 <NoResults hasFilters={hasFilters} onClear={clearFilters} />
               ) : (
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {filtered.map((exercise) => (
                     <ExerciseCard
                       key={exercise.id}
@@ -280,32 +282,38 @@ function ResultsCount({ count }) {
 
 function ExerciseCard({ exercise, onAdd }) {
   const [hover, setHover] = useState(false);
+  const BASE = "#0e0b09";
+
   return (
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="flex h-full flex-col justify-between rounded-2xl p-5 transition-all"
+      className="flex h-44 flex-col justify-between rounded-xl p-6 transition-all"
       style={{
-        background: PANEL,
+        background:
+          "linear-gradient(135deg, rgba(200,60,10,0.20) 0%, rgba(140,35,5,0.08) 30%, #161210 60%, " +
+          BASE +
+          " 100%)",
+        backgroundClip: "padding-box",
         border: "1px solid " + (hover ? "rgba(255,77,28,0.35)" : BORDER),
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
       }}
     >
       <div className="flex items-center gap-4">
         <span
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl"
-          style={{ background: FIELD }}
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl"
+          style={{ background: FIELD, border: "1px solid " + BORDER }}
         >
-          <MuscleIcon group={exercise.muscleGroup} size={44} />
+          <MuscleIcon group={exercise.muscleGroup} size={60} />
         </span>
         <div className="min-w-0">
           <h3
-            className="truncate font-bold"
+            className="truncate font-semibold"
             style={{
               color: TEXT,
               fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: "1.4rem",
-              lineHeight: 1.1,
+              fontSize: "1.5rem",
+              lineHeight: 1.3,
             }}
           >
             {exercise.name}
@@ -323,19 +331,54 @@ function ExerciseCard({ exercise, onAdd }) {
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={onAdd}
-        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold uppercase tracking-[0.03em] transition-all"
-        style={{
-          background: hover ? ORANGE : "transparent",
-          color: hover ? BG : ORANGE,
-          border: "1.5px solid " + ORANGE,
-        }}
+      <div
+        className="mt-5 flex items-center gap-2 pt-4"
+        style={{ borderTop: "1px solid " + BORDER }}
       >
-        <Plus size={16} strokeWidth={2.5} />
-        Adicionar ao treino
-      </button>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.01em] transition-all"
+          style={{
+            background: "transparent",
+            color: ORANGE,
+            border: "1.5px solid " + ORANGE,
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = ORANGE;
+            e.currentTarget.style.color = BG;
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = ORANGE;
+          }}
+        >
+          <Plus size={14} strokeWidth={2.5} />
+          Adicionar ao treino
+        </button>
+
+        <Link
+          to={`/exercicios/${exercise.id}`}
+          state={{ exercise }}
+          aria-label={"Ver detalhes de " + exercise.name}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all"
+          style={{
+            background: FIELD,
+            border: "1.5px solid " + BORDER,
+            color: MUTED,
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.borderColor = ORANGE;
+            e.currentTarget.style.color = ORANGE;
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.borderColor = BORDER;
+            e.currentTarget.style.color = MUTED;
+          }}
+        >
+          <ArrowUpRight size={16} strokeWidth={2.5} />
+        </Link>
+      </div>
     </div>
   );
 }
@@ -625,7 +668,7 @@ function Dropdown({ label, value, onChange, options, placeholder }) {
           <div
             className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl"
             style={{
-              background: "#1b1712",
+              background: "linear-gradient(180deg, #17130f 0%, #141210 100%)",
               border: "1.5px solid " + BORDER,
               boxShadow: "0 16px 40px rgba(0,0,0,0.55)",
             }}
@@ -724,54 +767,6 @@ function EmptyWorkouts({ onClose }) {
       >
         Criar meu primeiro treino →
       </Link>
-    </div>
-  );
-}
-
-function ConnectionErrorState({ onRetry }) {
-  return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-      <div
-        className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
-        style={{ background: PANEL, border: "1px solid " + BORDER }}
-      >
-        <WifiOff size={38} color={ORANGE} strokeWidth={2.2} />
-      </div>
-      <h1
-        className="font-extrabold"
-        style={{
-          color: TEXT,
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontSize: "clamp(2rem, 5vw, 3rem)",
-          lineHeight: 1,
-        }}
-      >
-        NÃO FOI POSSÍVEL CONECTAR
-      </h1>
-      <p className="mt-3 max-w-md text-sm" style={{ color: MUTED }}>
-        Não conseguimos falar com o servidor agora. Verifique sua conexão e
-        tente novamente.
-      </p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className="mt-8 inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-extrabold uppercase tracking-[0.18em] transition-all"
-        style={{
-          background: ORANGE,
-          color: BG,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
-        }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.background = "#ff6b42";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.background = ORANGE;
-          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
-        }}
-      >
-        Tentar novamente
-      </button>
     </div>
   );
 }

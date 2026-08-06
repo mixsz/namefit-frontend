@@ -266,7 +266,7 @@ function CadastroForm({ onSubmit, error, success }) {
               </div>
             </div>
 
-            <div className="min-h-[72px]">
+            <div className="min-h-[24px]">
               {error && (
                 <p
                   className="text-sm notranslate whitespace-pre-line"

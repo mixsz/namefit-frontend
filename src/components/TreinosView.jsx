@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatLastTrained } from "../pages/Treinos.jsx";
+import { CARD_VARIANTS, hashId } from "../cardBackground.js";
+import ConnectionErrorState from "./ConnectionErrorState.jsx";
 
 function TreinosView({ data }) {
   const {
@@ -210,52 +212,6 @@ function SearchField({ value, onChange }) {
   );
 }
 
-const BASE = "#0e0b09";
-const GLOW_BR =
-  "radial-gradient(ellipse at 120% 120%, rgba(200,60,10,0.45) 0%, rgba(140,35,5,0.22) 30%, #161210 60%, " +
-  BASE +
-  " 100%)";
-const GLOW_BL =
-  "radial-gradient(ellipse at -20% 120%, rgba(200,60,10,0.38) 0%, rgba(140,35,5,0.18) 32%, #161210 62%, " +
-  BASE +
-  " 100%)";
-const GLOW_TR =
-  "radial-gradient(ellipse at 120% -20%, rgba(200,60,10,0.34) 0%, rgba(140,35,5,0.16) 34%, #161210 64%, " +
-  BASE +
-  " 100%)";
-const STRIPE_D =
-  "repeating-linear-gradient(-45deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.024) 1px, transparent 1px, transparent 2px)";
-const STRIPE_H =
-  "repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.022) 1px, transparent 1px, transparent 3px)";
-const DOTS =
-  "radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px) 0 0 / 8px 8px";
-const GRID = [
-  "repeating-linear-gradient(0deg,  rgba(255,255,255,0.022) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 3px)",
-  "repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 3px)",
-].join(", ");
-const CROSS = [
-  "repeating-linear-gradient(45deg,  rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 3px)",
-  "repeating-linear-gradient(-45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 3px)",
-].join(", ");
-
-const CARD_VARIANTS = [
-  { background: [STRIPE_D, GLOW_BR].join(", ") },
-  { background: [DOTS, GLOW_BL].join(", ") },
-  { background: [GRID, GLOW_BR].join(", ") },
-  { background: [STRIPE_H, GLOW_TR].join(", ") },
-  { background: [CROSS, GLOW_BL].join(", ") },
-];
-
-function hashId(id) {
-  let h = 0;
-  const s = String(id);
-  for (let i = 0; i < s.length; i++) {
-    h = (h << 5) - h + s.charCodeAt(i);
-    h |= 0;
-  }
-  return Math.abs(h);
-}
-
 function WorkoutCard({
   workout,
   isFirst,
@@ -267,7 +223,9 @@ function WorkoutCard({
   const [hover, setHover] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const navigate = useNavigate();
   const variant = CARD_VARIANTS[hashId(workout.id) % CARD_VARIANTS.length];
+
   useEffect(() => {
     function handleClickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -289,7 +247,8 @@ function WorkoutCard({
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="relative flex h-60 flex-col justify-between rounded-2xl p-6 transition-all"
+      onClick={() => navigate(`/treinos/${workout.id}`)}
+      className="relative flex h-60 cursor-pointer flex-col justify-between rounded-2xl p-6 transition-all"
       style={{
         ...variant,
         backgroundClip: "padding-box",
@@ -309,7 +268,7 @@ function WorkoutCard({
           <Dumbbell size={22} strokeWidth={2.4} />
         </div>
 
-        <div className="relative" ref={menuRef}>
+        <div className="relative" ref={menuRef} onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
@@ -383,20 +342,19 @@ function WorkoutCard({
           )}
         </div>
       </div>
+
       <div className="mt-5">
-        <Link to={`/treinos/${workout.id}`} className="block">
-          <h3
-            className="font-bold"
-            style={{
-              color: TEXT,
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: "1.7rem",
-              lineHeight: 1.05,
-            }}
-          >
-            {workout.title}
-          </h3>
-        </Link>
+        <h3
+          className="font-bold"
+          style={{
+            color: TEXT,
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontSize: "1.7rem",
+            lineHeight: 1.05,
+          }}
+        >
+          {workout.title}
+        </h3>
         <div
           className="mt-2 mb-3"
           style={{ width: 28, height: 2, background: ORANGE, borderRadius: 2 }}
@@ -412,7 +370,10 @@ function WorkoutCard({
         className="mt-4 flex items-center justify-between pt-4"
         style={{ borderTop: "1px solid " + BORDER }}
       >
-        <div className="flex gap-1 sm:flex-row sm:items-center sm:gap-2">
+        <div
+          className="flex gap-1 sm:flex-row sm:items-center sm:gap-2"
+          onClick={(e) => e.stopPropagation()}
+        >
           <ReorderButton
             direction="up"
             disabled={isFirst}
@@ -425,14 +386,13 @@ function WorkoutCard({
           />
         </div>
 
-        <Link
-          to={`/treinos/${workout.id}`}
+        <span
           className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.08em] transition-colors"
           style={{ color: hover ? ORANGE : MUTED }}
         >
           Abrir
           <ArrowRight size={14} strokeWidth={2.5} />
-        </Link>
+        </span>
       </div>
     </div>
   );
@@ -868,54 +828,6 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
           </button>
         </div>
       </div>
-    </div>
-  );
-}
-
-function ConnectionErrorState({ onRetry }) {
-  return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-      <div
-        className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
-        style={{ background: PANEL, border: "1px solid " + BORDER }}
-      >
-        <WifiOff size={38} color={ORANGE} strokeWidth={2.2} />
-      </div>
-      <h1
-        className="font-extrabold"
-        style={{
-          color: TEXT,
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontSize: "clamp(2rem, 5vw, 3rem)",
-          lineHeight: 1,
-        }}
-      >
-        NÃO FOI POSSÍVEL CONECTAR
-      </h1>
-      <p className="mt-3 max-w-md text-sm" style={{ color: MUTED }}>
-        Não conseguimos falar com o servidor agora. Verifique sua conexão e
-        tente novamente.
-      </p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className="mt-8 inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-extrabold uppercase tracking-[0.18em] transition-all"
-        style={{
-          background: ORANGE,
-          color: BG,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
-        }}
-        onMouseOver={(e) => {
-          e.currentTarget.style.background = "#ff6b42";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.background = ORANGE;
-          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
-        }}
-      >
-        Tentar novamente
-      </button>
     </div>
   );
 }

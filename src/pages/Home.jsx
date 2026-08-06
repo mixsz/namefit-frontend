@@ -5,7 +5,7 @@ import api from "../services/api";
 
 function Home() {
   const { username } = useAuth();
-  console.log("Username: ", username);
+  // console.log("Username: ", username);
   const [hasWorkout, setHasWorkout] = useState(false);
   const [trained, setTrained] = useState(false);
   const [loading, setLoading] = useState(true);
