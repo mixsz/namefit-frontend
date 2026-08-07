@@ -77,6 +77,16 @@ function Home() {
     }
   }
 
+  const [trainedWeekDays, setTrainedWeekDays] = useState([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
+
   async function fetchWeekCount() {
     try {
       const now = new Date();
@@ -96,6 +106,16 @@ function Home() {
         params: { start, end },
       });
       setWeekCount(response.data.length);
+
+      const trainedDates = new Set(
+        response.data.map((log) => formatDate(new Date(log.date))),
+      );
+      const days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        return trainedDates.has(formatDate(d));
+      });
+      setTrainedWeekDays(days);
     } catch (error) {
       console.error("Error fetching week count:", error);
       throw error;
@@ -187,6 +207,7 @@ function Home() {
         trained,
         todayWorkoutName,
         weekCount,
+        trainedWeekDays,
         lastWorkout,
         streak,
         suggestion,

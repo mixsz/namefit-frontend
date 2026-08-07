@@ -292,8 +292,7 @@ function ExerciseCard({ exercise, onAdd }) {
       style={{
         background:
           "linear-gradient(135deg, rgba(200,60,10,0.20) 0%, rgba(140,35,5,0.08) 30%, #161210 60%, " +
-          BASE +
-          " 100%)",
+          BASE,
         backgroundClip: "padding-box",
         border: "1px solid " + (hover ? "rgba(255,77,28,0.35)" : BORDER),
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",

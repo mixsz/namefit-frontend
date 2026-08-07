@@ -6,17 +6,30 @@ import {
   FlameKindling,
   CalendarCheck,
   History,
-  Zap,
   ArrowRight,
   CheckCircle2,
+  BicepsFlexed,
   Sparkles,
   Target,
   Plus,
   ListPlus,
-  WifiOff,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
+
+const CARD_BG =
+  "linear-gradient(135deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.06) 30%, #161210 60%, #0e0b09 100%)";
+
+function SectionLabel({ children }) {
+  return (
+    <p
+      className="mb-3 text-xs font-bold uppercase tracking-[0.15em]"
+      style={{ color: MUTED }}
+    >
+      {children}
+    </p>
+  );
+}
 
 function HomeView({ data }) {
   const {
@@ -43,7 +56,7 @@ function HomeView({ data }) {
         paddingTop: "90px",
       }}
     >
-      <div className="mx-auto w-full max-w-6xl px-6 pb-16 md:px-10">
+      <div className="mx-auto w-full max-w-6xl px-6 pb-24 md:px-10">
         {loading ? (
           <div className="flex min-h-[60vh] items-center justify-center">
             <p style={{ color: MUTED }}>Carregando...</p>
@@ -54,7 +67,7 @@ function HomeView({ data }) {
           <EmptyState />
         ) : (
           <>
-            <header className="mb-8">
+            <header className="mb-10">
               <h1
                 className="font-bold leading-[0.95]"
                 style={{
@@ -66,60 +79,79 @@ function HomeView({ data }) {
               >
                 Olá, {username}!
               </h1>
-              <p className="mt-2 text-sm" style={{ color: MUTED }}>
+              <div
+                className="my-3"
+                style={{
+                  width: 28,
+                  height: 2,
+                  background: ORANGE,
+                  borderRadius: 2,
+                }}
+              />
+              <p className="text-sm" style={{ color: MUTED }}>
                 Cada treino conta. O esforço de hoje é o resultado de amanhã!
               </p>
             </header>
 
-            <StatusCard trained={trained} todayWorkoutName={todayWorkoutName} />
-
-            <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              <Link to="/historico" className="block h-full">
-                <MetricCard
-                  icon={<CalendarCheck size={20} />}
-                  value={weekCount}
-                  unit="treinos"
-                  label="Nesta semana"
-                />
-              </Link>
-
-              <Link
-                to={`/historico/${lastWorkout.id}`}
-                className="block h-full"
-              >
-                <MetricCard
-                  icon={<History size={20} />}
-                  value={lastWorkout.name}
-                  label={
-                    lastWorkout.daysAgo === 0
-                      ? "Último treino · hoje"
-                      : `Último treino · há ${lastWorkout.daysAgo} ${
-                          lastWorkout.daysAgo === 1 ? "dia" : "dias"
-                        }`
-                  }
-                  compact
-                />
-              </Link>
-
-              <MetricCard
-                icon={
-                  trained ? (
-                    <Flame size={20} fill={ORANGE} color={ORANGE} />
-                  ) : (
-                    <FlameKindling size={20} />
-                  )
-                }
-                value={streak}
-                unit={streak === 1 ? "dia" : "dias"}
-                label="Sequência ativa"
-                labelColor={trained ? ORANGE : undefined}
-                hoverable={false}
-              />
-
-              <SuggestionCard suggestion={suggestion} />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="flex h-full flex-col gap-4 sm:col-span-2">
+                <div className="flex-1">
+                  <StatusCard
+                    trained={trained}
+                    todayWorkoutName={todayWorkoutName}
+                  />
+                </div>
+                <div className="flex-1">
+                  <MiniWeekCalendar trainedWeekDays={data.trainedWeekDays} />
+                </div>
+              </div>
+              <div>
+                <StreakCard streak={streak} trained={trained} />
+              </div>
             </div>
 
-            <BuildWorkoutCard />
+            <section className="mt-8">
+              <SectionLabel>Estatísticas</SectionLabel>
+              <div className="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Link to="/historico" className="block h-full">
+                  <SmallMetricCard
+                    icon={<CalendarCheck size={18} />}
+                    value={weekCount}
+                    unit="treinos"
+                    label="Nesta semana"
+                    showDivider={false}
+                  />
+                </Link>
+
+                <Link
+                  to={`/historico/${lastWorkout.id}`}
+                  className="block h-full"
+                >
+                  <SmallMetricCard
+                    icon={<History size={18} />}
+                    value={lastWorkout.name}
+                    label={
+                      lastWorkout.daysAgo === 0
+                        ? "Último treino · hoje"
+                        : `Último treino · há ${lastWorkout.daysAgo} ${
+                            lastWorkout.daysAgo === 1 ? "dia" : "dias"
+                          }`
+                    }
+                    compact
+                  />
+                </Link>
+              </div>
+            </section>
+
+            <section className="mt-12">
+              <SectionLabel>Sugestão de agora</SectionLabel>
+              <SuggestionCard suggestion={suggestion} />
+            </section>
+
+            <section className="mt-12">
+              <SectionLabel>Monte algo novo</SectionLabel>
+              <BuildWorkoutCard />
+            </section>
           </>
         )}
       </div>
@@ -127,86 +159,132 @@ function HomeView({ data }) {
   );
 }
 
-function BuildWorkoutCard() {
-  const [hover, setHover] = useState(false);
+function StreakCard({ streak, trained }) {
+  const accent = trained ? ORANGE : MUTED;
+  const radius = 52;
+  const circumference = 2 * Math.PI * radius;
+  const fraction = Math.min(streak / 30, 1);
+  const dashoffset = circumference * (1 - fraction);
+
   return (
-    <Link
-      to="/treinos"
-      state={{ openCreate: true }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className="relative mt-6 flex flex-col overflow-hidden rounded-2xl p-6 transition-all md:flex-row md:items-center md:justify-between md:p-8"
+    <div
+      className="relative h-full flex flex-col overflow-hidden rounded-2xl p-5 transition-all"
       style={{
-        background:
-          "linear-gradient(180deg, #141210 0%, #17130f 70%, rgba(255,77,28,0.12) 100%)",
-        border: "1px solid transparent",
+        background: trained
+          ? "linear-gradient(160deg, rgba(255,77,28,0.22) 0%, rgba(200,60,10,0.10) 40%, #161210 70%, #0e0b09 100%)"
+          : CARD_BG,
         backgroundClip: "padding-box",
-        boxShadow: hover
-          ? "0 0 0 1px rgba(255,77,28,0.45)"
-          : "0 0 0 1px rgba(255,255,255,0.06)",
+        border: "1px solid " + BORDER,
+        minHeight: "100%",
       }}
     >
-      <div className="relative z-10 flex items-start gap-4">
-        <div
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-          style={{ background: ORANGE }}
-        >
-          <ListPlus size={24} color={BG} strokeWidth={2.5} />
-        </div>
-        <div>
-          <h3
-            className="font-bold"
-            style={{
-              color: TEXT,
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: "1.9rem",
-              lineHeight: 1,
-            }}
-          >
-            Monte seu próprio treino
-          </h3>
-          <p className="mt-2 max-w-md text-sm" style={{ color: MUTED }}>
-            Escolha os exercícios, defina séries e repetições e crie a rotina
-            perfeita para os seus treinos.
-          </p>
-        </div>
-      </div>
-
-      <span
-        className="relative z-10 mt-6 inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all md:mt-0"
+      <div
+        className="flex h-10 w-10 items-center justify-center rounded-xl"
         style={{
-          background: hover ? ORANGE : "transparent",
-          color: hover ? BG : ORANGE,
-          border: "1.5px solid " + ORANGE,
+          background: trained ? "rgba(255,77,28,0.14)" : FIELD,
+          border: "1px solid " + (trained ? "rgba(255,77,28,0.4)" : BORDER),
         }}
       >
-        <Plus size={16} strokeWidth={2.5} />
-        Criar treino
-      </span>
-    </Link>
+        {trained ? (
+          <Flame size={18} fill={ORANGE} color={ORANGE} />
+        ) : (
+          <FlameKindling size={18} color={MUTED} />
+        )}
+      </div>
+
+      <div className="mt-3">
+        <h3
+          className="font-bold uppercase leading-none"
+          style={{
+            color: accent,
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontSize: "1.4rem",
+            letterSpacing: "0.01em",
+          }}
+        >
+          Sequência ativa
+        </h3>
+        <p className="mt-2 text-sm" style={{ color: MUTED }}>
+          {trained
+            ? "Você está mantendo o foco e a constância."
+            : "Treine hoje pra manter sua sequência viva."}
+        </p>
+      </div>
+
+      <div className="relative z-10 flex flex-1 items-center justify-center py-3">
+        <div className="relative flex h-32 w-32 items-center justify-center">
+          <svg
+            width="128"
+            height="128"
+            viewBox="0 0 128 128"
+            className="absolute inset-0 -rotate-90"
+          >
+            <circle
+              cx="64"
+              cy="64"
+              r={radius}
+              fill="none"
+              stroke={BORDER}
+              strokeWidth="6"
+            />
+            <circle
+              cx="64"
+              cy="64"
+              r={radius}
+              fill="none"
+              stroke={accent}
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={dashoffset}
+              style={{
+                transition: "stroke-dashoffset 0.6s ease",
+              }}
+            />
+          </svg>
+          <div className="flex flex-col items-center">
+            <span
+              className="font-bold leading-none"
+              style={{
+                color: trained ? ORANGE : TEXT,
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: "2.4rem",
+                lineHeight: 1,
+              }}
+            >
+              {streak}
+            </span>
+            <span
+              className="text-sm font-semibold"
+              style={{ color: trained ? "rgba(255,150,90,0.8)" : MUTED }}
+            >
+              {streak === 1 ? "dia" : "dias"}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function StatusCard({ trained, todayWorkoutName }) {
+  const [hoverBtn, setHoverBtn] = useState(false);
   return (
     <div
-      className="relative overflow-hidden rounded-2xl p-6 md:p-8"
+      className="h-full relative overflow-hidden rounded-2xl p-6 md:p-7"
       style={{
-        background:
-          "linear-gradient(270deg, #141210 0%, #17130f 85%, rgba(255,77,28,0.08) 100%)",
+        background: CARD_BG,
+        backgroundClip: "padding-box",
         border: "1px solid " + BORDER,
       }}
     >
-      <div
-        className="absolute -right-16 -top-10 h-48 w-48 rounded-full opacity-[0.08]"
-        style={{ background: ORANGE }}
-      />
-      <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+      <div className="relative z-10 flex h-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-start gap-4">
           <div
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
             style={{
               background: trained ? "rgba(255,77,28,0.14)" : ORANGE,
+              border: trained ? "1px solid rgba(255,77,28,0.3)" : "none",
             }}
           >
             {trained ? (
@@ -217,7 +295,7 @@ function StatusCard({ trained, todayWorkoutName }) {
           </div>
           <div>
             <h2
-              className="font-medium"
+              className="font-bold"
               style={{
                 color: TEXT,
                 fontFamily: "'Barlow Condensed', sans-serif",
@@ -227,7 +305,7 @@ function StatusCard({ trained, todayWorkoutName }) {
             >
               {trained ? "Você já treinou hoje!" : "Ainda não treinou hoje..."}
             </h2>
-            <p className="mt-1 text-sm" style={{ color: MUTED }}>
+            <p className="mt-2 text-sm" style={{ color: MUTED }}>
               {trained
                 ? `O treino ${todayWorkoutName} foi insano!`
                 : "Que tal começar agora? A consistência transforma esforço em resultado!"}
@@ -238,19 +316,13 @@ function StatusCard({ trained, todayWorkoutName }) {
         {!trained && (
           <Link
             to="/treinos"
+            onMouseEnter={() => setHoverBtn(true)}
+            onMouseLeave={() => setHoverBtn(false)}
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: ORANGE,
-              color: BG,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.background = "#ff6b42";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.background = ORANGE;
-              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
+              background: hoverBtn ? ORANGE : "transparent",
+              color: hoverBtn ? BG : ORANGE,
+              border: "1.5px solid " + ORANGE,
             }}
           >
             Ir para Treinos
@@ -262,15 +334,15 @@ function StatusCard({ trained, todayWorkoutName }) {
   );
 }
 
-function MetricCard({
+function SmallMetricCard({
   icon,
   value,
   unit,
   label,
   labelColor,
-  highlight,
   compact,
   hoverable = true,
+  showDivider = true,
 }) {
   const [hover, setHover] = useState(false);
   const active = hoverable && hover;
@@ -280,17 +352,19 @@ function MetricCard({
       onMouseLeave={() => hoverable && setHover(false)}
       className="h-full rounded-2xl p-5 transition-all"
       style={{
-        background: PANEL,
+        background: CARD_BG,
+        backgroundClip: "padding-box",
         border: "1px solid " + (active ? "rgba(255,77,28,0.35)" : BORDER),
-        transform: active ? "translateY(-2px)" : "translateY(0)",
         boxShadow: active ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
+        transform: active ? "translateY(-2px)" : "translateY(0)",
       }}
     >
       <div
-        className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl"
+        className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl transition-all"
         style={{
-          background: highlight ? ORANGE : FIELD,
-          color: highlight ? BG : ORANGE,
+          background: active ? ORANGE : FIELD,
+          color: active ? BG : ORANGE,
+          border: active ? "none" : "1px solid " + BORDER,
         }}
       >
         {icon}
@@ -301,20 +375,35 @@ function MetricCard({
           style={{
             color: TEXT,
             fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: compact ? "1.5rem" : "2.4rem",
+            fontSize: compact ? "1.4rem" : "2rem",
             lineHeight: 1,
           }}
         >
           {value}
         </span>
         {unit && (
-          <span className="text-sm font-semibold" style={{ color: MUTED }}>
+          <span className="text-xs font-semibold" style={{ color: MUTED }}>
             {unit}
           </span>
         )}
       </div>
+      {showDivider && (
+        <div
+          className="my-2"
+          style={{
+            width: 18,
+            height: 2,
+            background: labelColor || "rgba(255,77,28,0.22)",
+            borderRadius: 2,
+          }}
+        />
+      )}
       <p
-        className="mt-2 text-xs font-bold uppercase tracking-[0.12em]"
+        className={
+          showDivider
+            ? "text-xs font-bold uppercase tracking-[0.12em]"
+            : "mt-2 text-xs font-bold uppercase tracking-[0.12em]"
+        }
         style={{ color: labelColor || MUTED }}
       >
         {label}
@@ -331,42 +420,53 @@ function SuggestionCard({ suggestion }) {
       state={{ searchQuery: suggestion.name }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl p-6 transition-all sm:flex-row sm:col-span-2 lg:col-span-3"
+      className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl p-6 transition-all sm:flex-row sm:items-center"
       style={{
-        background:
-          "linear-gradient(120deg, #141210 0%, #141210 55%, rgba(255,77,28,0.12) 100%)",
-        border: "1px solid " + (hover ? "rgba(255,77,28,0.45)" : "#1a1a1a"),
+        background: CARD_BG,
+        border: "1px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
         backgroundClip: "padding-box",
+        boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
         minHeight: "150px",
       }}
     >
-      <div className="relative z-10">
-        <span
-          className="flex items-center gap-2 text-sm font-bold tracking-[0.1em] pb-1"
-          style={{ color: ORANGE }}
-        >
-          <Sparkles size={16} fill={ORANGE} color={ORANGE} />
-          Sugestão de exercício
-        </span>
-        <h3
-          className="mt-2 font-extrabold"
+      <div className="relative z-10 flex items-center gap-6 min-w-0">
+        <div
+          className="hidden shrink-0 sm:flex h-16 w-16 items-center justify-center rounded-xl"
           style={{
-            color: TEXT,
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: "2rem",
-            lineHeight: 1,
+            background: "#0e0b09",
+            border: "1px solid " + BORDER,
           }}
         >
-          {suggestion.name.toUpperCase()}
-        </h3>
-        <div className="mt-2 flex items-center gap-2">
-          <Target size={15} color={ORANGE} />
-          <span className="text-sm font-semibold" style={{ color: MUTED }}>
-            {suggestion.muscleGroup}
+          <BicepsFlexed size={26} color={ORANGE} />
+        </div>
+
+        <div>
+          <span
+            className="flex items-center gap-2 text-sm font-bold tracking-[0.1em] pb-1"
+            style={{ color: ORANGE }}
+          >
+            <Sparkles size={16} fill={ORANGE} color={ORANGE} />
+            Sugestão de exercício
           </span>
+          <h3
+            className="mt-2 font-extrabold"
+            style={{
+              color: TEXT,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: "2rem",
+              lineHeight: 1,
+            }}
+          >
+            {suggestion.name.toUpperCase()}
+          </h3>
+          <div className="mt-2 flex items-center gap-2">
+            <Target size={15} color={ORANGE} />
+            <span className="text-sm font-semibold" style={{ color: MUTED }}>
+              {suggestion.muscleGroup}
+            </span>
+          </div>
         </div>
       </div>
-
       <span
         className="relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold uppercase tracking-[0.05em] transition-all self-center"
         style={{
@@ -377,6 +477,78 @@ function SuggestionCard({ suggestion }) {
       >
         Ver exercício
         <ArrowRight size={16} strokeWidth={2.5} />
+      </span>
+    </Link>
+  );
+}
+
+function BuildWorkoutCard() {
+  const [hover, setHover] = useState(false);
+  return (
+    <Link
+      to="/treinos"
+      state={{ openCreate: true }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      className="flex flex-col gap-5 overflow-hidden rounded-2xl p-7 transition-all md:flex-row md:items-center md:justify-between"
+      style={{
+        background: hover
+          ? "linear-gradient(135deg, rgba(255,77,28,0.18) 0%, rgba(200,60,10,0.08) 40%, #161210 70%, #0e0b09 100%)"
+          : CARD_BG,
+        backgroundClip: "padding-box",
+        border: "1px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
+        boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
+        transition: "all 0.2s ease",
+      }}
+    >
+      <div className="flex items-start gap-4">
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all"
+          style={{
+            background: hover ? ORANGE : FIELD,
+            border: hover ? "none" : "1px solid " + BORDER,
+          }}
+        >
+          <ListPlus size={24} color={hover ? BG : ORANGE} strokeWidth={2.5} />
+        </div>
+        <div>
+          <h3
+            className="font-bold"
+            style={{
+              color: TEXT,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: "1.9rem",
+              lineHeight: 1,
+            }}
+          >
+            Monte seu próprio treino
+          </h3>
+          <div
+            className="my-2"
+            style={{
+              width: 22,
+              height: 2,
+              background: "rgba(255,77,28,0.3)",
+              borderRadius: 2,
+            }}
+          />
+          <p className="max-w-md text-sm" style={{ color: MUTED }}>
+            Escolha os exercícios, defina séries e repetições e crie a rotina
+            perfeita para os seus treinos.
+          </p>
+        </div>
+      </div>
+
+      <span
+        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
+        style={{
+          background: hover ? ORANGE : "transparent",
+          color: hover ? BG : ORANGE,
+          border: "1.5px solid " + ORANGE,
+        }}
+      >
+        <Plus size={16} strokeWidth={2.5} />
+        Criar treino
       </span>
     </Link>
   );
@@ -402,7 +574,11 @@ function EmptyState() {
       >
         VOCÊ AINDA NÃO TEM TREINOS REGISTRADOS
       </h1>
-      <p className="mt-3 max-w-md text-sm" style={{ color: MUTED }}>
+      <div
+        className="my-4"
+        style={{ width: 28, height: 2, background: ORANGE, borderRadius: 2 }}
+      />
+      <p className="max-w-md text-sm" style={{ color: MUTED }}>
         Comece agora a montar sua rotina e acompanhe cada evolução por aqui.
       </p>
       <Link
@@ -426,6 +602,87 @@ function EmptyState() {
         Criar meu primeiro treino
         <ArrowRight size={16} strokeWidth={2.5} />
       </Link>
+    </div>
+  );
+}
+
+const WEEKDAY_LABELS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+
+function MiniWeekCalendar({ trainedWeekDays = [] }) {
+  const todayIndex = (() => {
+    const d = new Date().getDay();
+    return d === 0 ? 6 : d - 1;
+  })();
+
+  const trainedCount = trainedWeekDays.filter(Boolean).length;
+
+  return (
+    <div
+      className="flex h-full flex-col justify-center rounded-2xl p-5"
+      style={{
+        background: CARD_BG,
+        backgroundClip: "padding-box",
+        border: "1px solid " + BORDER,
+      }}
+    >
+      <div className="mb-5 flex items-center justify-between">
+        <p
+          className="text-xs font-bold uppercase tracking-[0.15em]"
+          style={{ color: TEXT }}
+        >
+          Sua semana
+        </p>
+        <p className="text-xs font-bold" style={{ color: ORANGE }}>
+          {trainedCount}/7
+        </p>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1">
+        {WEEKDAY_LABELS.map((label, i) => (
+          <span
+            key={i}
+            className="text-center text-[9px] font-bold uppercase tracking-[0.03em]"
+            style={{ color: i === todayIndex ? ORANGE : MUTED }}
+          >
+            {label}
+          </span>
+        ))}
+      </div>
+
+      <div className="relative mt-2">
+        <div
+          className="absolute top-1/2 h-px -translate-y-1/2"
+          style={{
+            left: "calc(100%/14)",
+            right: "calc(100%/14)",
+            background: BORDER,
+          }}
+        />
+
+        <div className="relative z-10 grid grid-cols-7 gap-1">
+          {WEEKDAY_LABELS.map((label, i) => {
+            const trained = trainedWeekDays[i];
+            const isToday = i === todayIndex;
+            return (
+              <div key={i} className="flex items-center justify-center">
+                <span
+                  className="h-7 w-7 rounded-full transition-all"
+                  style={{
+                    background: trained
+                      ? "linear-gradient(160deg, #ff6b42 0%, " +
+                        ORANGE +
+                        " 50%)"
+                      : "#161210",
+                    border: isToday
+                      ? "1.5px solid " + ORANGE
+                      : "1px solid " + BORDER,
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
