@@ -8,7 +8,6 @@ import {
   History,
   ArrowRight,
   CheckCircle2,
-  BicepsFlexed,
   Sparkles,
   Target,
   Plus,
@@ -16,9 +15,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
-
-const CARD_BG =
-  "linear-gradient(135deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.06) 30%, #161210 60%, #0e0b09 100%)";
+import MuscleIcon from "./MuscleIcon";
 
 function SectionLabel({ children }) {
   return (
@@ -40,6 +37,7 @@ function HomeView({ data }) {
     weekCount,
     lastWorkout,
     streak,
+    trainedThisWeek,
     suggestion,
     loading,
     connectionError,
@@ -106,7 +104,7 @@ function HomeView({ data }) {
                 </div>
               </div>
               <div>
-                <StreakCard streak={streak} trained={trained} />
+                <StreakCard streak={streak} trained={trainedThisWeek} />
               </div>
             </div>
 
@@ -120,6 +118,7 @@ function HomeView({ data }) {
                     unit="treinos"
                     label="Nesta semana"
                     showDivider={false}
+                    bg="linear-gradient(135deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.06) 30%, #161210 60%, #0e0b09 120%)"
                   />
                 </Link>
 
@@ -138,6 +137,7 @@ function HomeView({ data }) {
                           }`
                     }
                     compact
+                    bg="linear-gradient(225deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.06) 30%, #161210 60%, #0e0b09 120%)"
                   />
                 </Link>
               </div>
@@ -163,51 +163,36 @@ function StreakCard({ streak, trained }) {
   const accent = trained ? ORANGE : MUTED;
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
-  const fraction = Math.min(streak / 30, 1);
+  const fraction = Math.min(streak / 12, 1);
   const dashoffset = circumference * (1 - fraction);
 
   return (
     <div
       className="relative h-full flex flex-col overflow-hidden rounded-2xl p-5 transition-all"
       style={{
-        background: trained
-          ? "linear-gradient(160deg, rgba(255,77,28,0.22) 0%, rgba(200,60,10,0.10) 40%, #161210 70%, #0e0b09 100%)"
-          : CARD_BG,
+        background:
+          "linear-gradient(310deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.15) 0%, #161210 40%, #0e0b09 210%)",
         backgroundClip: "padding-box",
         border: "1px solid " + BORDER,
         minHeight: "100%",
       }}
     >
-      <div
-        className="flex h-10 w-10 items-center justify-center rounded-xl"
-        style={{
-          background: trained ? "rgba(255,77,28,0.14)" : FIELD,
-          border: "1px solid " + (trained ? "rgba(255,77,28,0.4)" : BORDER),
-        }}
-      >
-        {trained ? (
-          <Flame size={18} fill={ORANGE} color={ORANGE} />
-        ) : (
-          <FlameKindling size={18} color={MUTED} />
-        )}
-      </div>
-
       <div className="mt-3">
         <h3
           className="font-bold uppercase leading-none"
           style={{
-            color: accent,
+            color: trained ? ORANGE : TEXT,
             fontFamily: "'Barlow Condensed', sans-serif",
             fontSize: "1.4rem",
             letterSpacing: "0.01em",
           }}
         >
-          Sequência ativa
+          Ofensiva semanal
         </h3>
         <p className="mt-2 text-sm" style={{ color: MUTED }}>
           {trained
-            ? "Você está mantendo o foco e a constância."
-            : "Treine hoje pra manter sua sequência viva."}
+            ? "Você conseguiu essa semana, continue treinando!"
+            : "Treine hoje para manter sua sequência viva."}
         </p>
       </div>
 
@@ -258,7 +243,7 @@ function StreakCard({ streak, trained }) {
               className="text-sm font-semibold"
               style={{ color: trained ? "rgba(255,150,90,0.8)" : MUTED }}
             >
-              {streak === 1 ? "dia" : "dias"}
+              {streak === 1 ? "semana" : "semanas"}
             </span>
           </div>
         </div>
@@ -268,29 +253,45 @@ function StreakCard({ streak, trained }) {
 }
 
 function StatusCard({ trained, todayWorkoutName }) {
-  const [hoverBtn, setHoverBtn] = useState(false);
+  const [hover, setHover] = useState(false);
   return (
     <div
-      className="h-full relative overflow-hidden rounded-2xl p-6 md:p-7"
+      onMouseEnter={() => !trained && setHover(true)}
+      onMouseLeave={() => !trained && setHover(false)}
+      className="h-full relative overflow-hidden rounded-2xl p-6 md:p-7 transition-all"
       style={{
-        background: CARD_BG,
+        background:
+          "linear-gradient(0deg, rgba(200,60,10,0.13) 0%, rgba(140,35,5,0.02) 30%, #161210 60%, #0e0b09 300%)",
         backgroundClip: "padding-box",
-        border: "1px solid " + BORDER,
+        border: "1.4px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
+        boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
       }}
     >
       <div className="relative z-10 flex h-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-start gap-4">
           <div
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all"
             style={{
-              background: trained ? "rgba(255,77,28,0.14)" : ORANGE,
-              border: trained ? "1px solid rgba(255,77,28,0.3)" : "none",
+              background: trained
+                ? "rgba(255,77,28,0.14)"
+                : hover
+                  ? ORANGE
+                  : FIELD,
+              border: trained
+                ? "1px solid rgba(255,77,28,0.3)"
+                : hover
+                  ? "none"
+                  : "1px solid " + BORDER,
             }}
           >
             {trained ? (
               <CheckCircle2 size={24} color={ORANGE} strokeWidth={2.5} />
             ) : (
-              <Dumbbell size={24} color={BG} strokeWidth={2.5} />
+              <Dumbbell
+                size={24}
+                color={hover ? BG : ORANGE}
+                strokeWidth={2.5}
+              />
             )}
           </div>
           <div>
@@ -316,12 +317,10 @@ function StatusCard({ trained, todayWorkoutName }) {
         {!trained && (
           <Link
             to="/treinos"
-            onMouseEnter={() => setHoverBtn(true)}
-            onMouseLeave={() => setHoverBtn(false)}
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: hoverBtn ? ORANGE : "transparent",
-              color: hoverBtn ? BG : ORANGE,
+              background: hover ? ORANGE : "transparent",
+              color: hover ? BG : ORANGE,
               border: "1.5px solid " + ORANGE,
             }}
           >
@@ -343,6 +342,7 @@ function SmallMetricCard({
   compact,
   hoverable = true,
   showDivider = true,
+  bg,
 }) {
   const [hover, setHover] = useState(false);
   const active = hoverable && hover;
@@ -352,7 +352,9 @@ function SmallMetricCard({
       onMouseLeave={() => hoverable && setHover(false)}
       className="h-full rounded-2xl p-5 transition-all"
       style={{
-        background: CARD_BG,
+        background:
+          bg ||
+          "linear-gradient(135deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.06) 30%, #161210 60%, #0e0b09 100%)",
         backgroundClip: "padding-box",
         border: "1px solid " + (active ? "rgba(255,77,28,0.35)" : BORDER),
         boxShadow: active ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
@@ -422,7 +424,8 @@ function SuggestionCard({ suggestion }) {
       onMouseLeave={() => setHover(false)}
       className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl p-6 transition-all sm:flex-row sm:items-center"
       style={{
-        background: CARD_BG,
+        background:
+          "linear-gradient(70deg, rgba(200,60,10,0.14) 0%, rgba(140,35,5,0.11) 35%, #161210 65%, #0e0b09 100%)",
         border: "1px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
         backgroundClip: "padding-box",
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
@@ -433,11 +436,11 @@ function SuggestionCard({ suggestion }) {
         <div
           className="hidden shrink-0 sm:flex h-16 w-16 items-center justify-center rounded-xl"
           style={{
-            background: "#0e0b09",
+            background: FIELD,
             border: "1px solid " + BORDER,
           }}
         >
-          <BicepsFlexed size={26} color={ORANGE} />
+          <MuscleIcon group={suggestion.muscleGroup} size={55} />
         </div>
 
         <div>
@@ -462,7 +465,7 @@ function SuggestionCard({ suggestion }) {
           <div className="mt-2 flex items-center gap-2">
             <Target size={15} color={ORANGE} />
             <span className="text-sm font-semibold" style={{ color: MUTED }}>
-              {suggestion.muscleGroup}
+              {suggestion.muscleGroupLabel}
             </span>
           </div>
         </div>
@@ -492,9 +495,8 @@ function BuildWorkoutCard() {
       onMouseLeave={() => setHover(false)}
       className="flex flex-col gap-5 overflow-hidden rounded-2xl p-7 transition-all md:flex-row md:items-center md:justify-between"
       style={{
-        background: hover
-          ? "linear-gradient(135deg, rgba(255,77,28,0.18) 0%, rgba(200,60,10,0.08) 40%, #161210 70%, #0e0b09 100%)"
-          : CARD_BG,
+        background:
+          "linear-gradient(250deg, rgba(200,60,10,0.14) 0%, rgba(140,35,5,0.11) 35%, #161210 65%, #0e0b09 120%)",
         backgroundClip: "padding-box",
         border: "1px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
@@ -528,7 +530,7 @@ function BuildWorkoutCard() {
             style={{
               width: 22,
               height: 2,
-              background: "rgba(255,77,28,0.3)",
+              background: ORANGE,
               borderRadius: 2,
             }}
           />
@@ -620,7 +622,8 @@ function MiniWeekCalendar({ trainedWeekDays = [] }) {
     <div
       className="flex h-full flex-col justify-center rounded-2xl p-5"
       style={{
-        background: CARD_BG,
+        background:
+          "linear-gradient(180deg, rgba(200,60,10,0.04) 0%, rgba(140,35,5,0.06) 10%, #161210 30%, #0e0b09 300%)",
         backgroundClip: "padding-box",
         border: "1px solid " + BORDER,
       }}

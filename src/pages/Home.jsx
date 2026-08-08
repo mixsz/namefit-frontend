@@ -18,6 +18,7 @@ function Home() {
     daysAgo: 0,
   });
   const [streak, setStreak] = useState(0);
+  const [trainedThisWeek, setTrainedThisWeek] = useState(false);
   const [suggestion, setSuggestion] = useState({ name: "", muscleGroup: "" });
 
   useEffect(() => {
@@ -116,6 +117,7 @@ function Home() {
         return trainedDates.has(formatDate(d));
       });
       setTrainedWeekDays(days);
+      setTrainedThisWeek(days.some(Boolean));
     } catch (error) {
       console.error("Error fetching week count:", error);
       throw error;
@@ -151,6 +153,16 @@ function Home() {
     }
   }
 
+  function getMonday(date) {
+    // pega a segunda da semana dessa data
+    const d = new Date(date);
+    const dayOfWeek = d.getDay();
+    const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    d.setDate(d.getDate() - diffToMonday);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
   async function fetchStreak() {
     try {
       const response = await api.get("/workoutLog");
@@ -158,20 +170,20 @@ function Home() {
       const formatDate = (date) =>
         `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
-      const trainedDates = new Set(
-        response.data.map((log) => formatDate(new Date(log.date))),
+      const trainedWeeks = new Set(
+        response.data.map((log) => formatDate(getMonday(log.date))),
       );
 
-      let cursor = new Date();
+      let cursor = getMonday(new Date());
       let streakCount = 0;
 
-      if (!trainedDates.has(formatDate(cursor))) {
-        cursor.setDate(cursor.getDate() - 1);
+      if (!trainedWeeks.has(formatDate(cursor))) {
+        cursor.setDate(cursor.getDate() - 7);
       }
 
-      while (trainedDates.has(formatDate(cursor))) {
+      while (trainedWeeks.has(formatDate(cursor))) {
         streakCount++;
-        cursor.setDate(cursor.getDate() - 1);
+        cursor.setDate(cursor.getDate() - 7);
       }
 
       setStreak(streakCount);
@@ -190,7 +202,8 @@ function Home() {
 
         setSuggestion({
           name: randomExercise.name,
-          muscleGroup: randomExercise.muscleGroupLabel,
+          muscleGroup: randomExercise.muscleGroup,
+          muscleGroupLabel: randomExercise.muscleGroupLabel,
         });
       }
     } catch (error) {
@@ -210,6 +223,7 @@ function Home() {
         trainedWeekDays,
         lastWorkout,
         streak,
+        trainedThisWeek,
         suggestion,
         loading,
         connectionError,
