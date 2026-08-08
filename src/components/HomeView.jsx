@@ -118,7 +118,7 @@ function HomeView({ data }) {
                     unit="treinos"
                     label="Nesta semana"
                     showDivider={false}
-                    bg="linear-gradient(135deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.06) 30%, #161210 60%, #0e0b09 120%)"
+                    bg="linear-gradient(175deg, rgba(200,60,10,0.03) 0%, rgba(140,35,5,0.09) 30%, #161210 80%, #0e0b09 110%)"
                   />
                 </Link>
 
@@ -137,7 +137,7 @@ function HomeView({ data }) {
                           }`
                     }
                     compact
-                    bg="linear-gradient(225deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.06) 30%, #161210 60%, #0e0b09 120%)"
+                    bg="linear-gradient(190deg, rgba(200,60,10,0.08) 0%, rgba(140,35,5,0.08) 30%, #161210 80%, #0e0b09 110%)"
                   />
                 </Link>
               </div>
@@ -171,7 +171,9 @@ function StreakCard({ streak, trained }) {
       className="relative h-full flex flex-col overflow-hidden rounded-2xl p-5 transition-all"
       style={{
         background:
-          "linear-gradient(310deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.15) 0%, #161210 40%, #0e0b09 210%)",
+          trained
+            ? "linear-gradient(310deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.15) 0%, #161210 40%, #0e0b09 1000%)"
+            : "linear-gradient(310deg, rgba(200,60,10,0.0) 0%, rgba(140,35,5,0.1) 0%, #161210 0%, #0e0b09 1000%)",
         backgroundClip: "padding-box",
         border: "1px solid " + BORDER,
         minHeight: "100%",
@@ -261,7 +263,7 @@ function StatusCard({ trained, todayWorkoutName }) {
       className="h-full relative overflow-hidden rounded-2xl p-6 md:p-7 transition-all"
       style={{
         background:
-          "linear-gradient(0deg, rgba(200,60,10,0.13) 0%, rgba(140,35,5,0.02) 30%, #161210 60%, #0e0b09 300%)",
+          "linear-gradient(0deg, rgba(200,60,10,0.06) 0%, rgba(140,35,5,0.02) 30%, #161210 60%, #0e0b09 1000%)",
         backgroundClip: "padding-box",
         border: "1.4px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
@@ -425,7 +427,7 @@ function SuggestionCard({ suggestion }) {
       className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl p-6 transition-all sm:flex-row sm:items-center"
       style={{
         background:
-          "linear-gradient(70deg, rgba(200,60,10,0.14) 0%, rgba(140,35,5,0.11) 35%, #161210 65%, #0e0b09 100%)",
+          "linear-gradient(140deg, rgba(200,60,10,0.08) 0%, rgba(140,35,5,0.2) 40%, #161210 75%, #0e0b09 105%)",
         border: "1px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
         backgroundClip: "padding-box",
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
@@ -496,7 +498,7 @@ function BuildWorkoutCard() {
       className="flex flex-col gap-5 overflow-hidden rounded-2xl p-7 transition-all md:flex-row md:items-center md:justify-between"
       style={{
         background:
-          "linear-gradient(250deg, rgba(200,60,10,0.14) 0%, rgba(140,35,5,0.11) 35%, #161210 65%, #0e0b09 120%)",
+          "linear-gradient(320deg, rgba(200,60,10,0.14) 0%, rgba(140,35,5,0.11) 35%, #161210 65%, #0e0b09 115%)",
         backgroundClip: "padding-box",
         border: "1px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
@@ -623,7 +625,7 @@ function MiniWeekCalendar({ trainedWeekDays = [] }) {
       className="flex h-full flex-col justify-center rounded-2xl p-5"
       style={{
         background:
-          "linear-gradient(180deg, rgba(200,60,10,0.04) 0%, rgba(140,35,5,0.06) 10%, #161210 30%, #0e0b09 300%)",
+          "linear-gradient(179deg, rgba(200,60,10,0.02) 0%, rgba(140,35,5,0.07) 1%, #161210 40%, #0e0b09 1000%)",
         backgroundClip: "padding-box",
         border: "1px solid " + BORDER,
       }}
