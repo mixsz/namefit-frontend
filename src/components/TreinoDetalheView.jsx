@@ -23,6 +23,7 @@ import MuscleIcon from "./MuscleIcon";
 
 import { Link } from "react-router-dom";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
+import ExerciseDetail from "./ExerciseDetail.jsx";
 
 function TreinoDetalheView({ data }) {
   const {
@@ -111,6 +112,7 @@ function TreinoDetalheView({ data }) {
     onCancel?.(changed);
   }
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [detailExercise, setDetailExercise] = useState(null);
 
   const viewExercises = workout?.exercises ?? [];
 
@@ -156,7 +158,12 @@ function TreinoDetalheView({ data }) {
               ) : (
                 <ViewTable
                   exercises={viewExercises}
-                  onOpenExercise={onOpenExercise}
+                  onOpenExercise={(exerciseId) => {
+                    const full = (data.availableExercises ?? []).find(
+                      (ex) => ex.id === exerciseId,
+                    );
+                    if (full) setDetailExercise(full);
+                  }}
                 />
               )}
 
@@ -230,6 +237,12 @@ function TreinoDetalheView({ data }) {
             ]);
             setPickerOpen(false);
           }}
+        />
+      )}
+      {detailExercise && (
+        <ExerciseDetail
+          exercise={detailExercise}
+          onClose={() => setDetailExercise(null)}
         />
       )}
     </main>
@@ -424,21 +437,21 @@ function EditTable({
                 borderTop: i === 0 ? "none" : "1px solid " + BORDER,
               }}
             >
-              <button
-                type="button"
-                onClick={() => onRequestDelete(ex)}
-                aria-label={"Remover " + ex.name}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all"
-                style={{ background: FIELD, color: "#ef4444" }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = "rgba(239,68,68,0.14)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = FIELD;
-                }}
-              >
-                <Trash2 size={14} strokeWidth={2.4} />
-              </button>
+          <button
+                  type="button"
+                  onClick={() => onRequestDelete(ex)}
+                  aria-label={"Remover " + ex.name}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all"
+                  style={{ background: "transparent", color: "#dc2626" }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.color = "#ff7a7a";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.color = "#dc2626";
+                  }}
+                >
+                  <Trash2 size={17} strokeWidth={2.4} />
+                </button>
 
               <span
                 className="min-w-0 flex-1 truncate font-bold"
@@ -494,23 +507,26 @@ function EditTable({
                 borderTop: i === 0 ? "none" : "1px solid " + BORDER,
               }}
             >
-              <button
-                type="button"
-                onClick={() => onRequestDelete(ex)}
-                aria-label={"Remover " + ex.name}
-                className="flex h-9 w-9 items-center justify-center rounded-lg transition-all"
-                style={{ background: FIELD, color: "#ef4444" }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = "rgba(239,68,68,0.14)";
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = FIELD;
-                }}
+              <div
+                className="-ml-3 flex min-w-0 items-center gap-1"
+                style={{ gridColumn: "1 / 3" }}
               >
-                <Trash2 size={16} strokeWidth={2.4} />
-              </button>
+                <button
+                  type="button"
+                  onClick={() => onRequestDelete(ex)}
+                  aria-label={"Remover " + ex.name}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all"
+                  style={{ background: "transparent", color: "#dc2626" }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.color = "#ff7a7a";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.color = "#dc2626";
+                  }}
+                >
+                  <Trash2 size={20} strokeWidth={2.4} />
+                </button>
 
-              <div className="min-w-0">
                 <span
                   className="truncate font-bold"
                   style={{
@@ -518,7 +534,6 @@ function EditTable({
                     fontFamily: "'Barlow Condensed', sans-serif",
                     fontSize: "1.3rem",
                     lineHeight: 1.1,
-                    display: "block",
                   }}
                 >
                   {ex.name}
@@ -614,16 +629,16 @@ function ViewTable({ exercises, onOpenExercise }) {
                     : console.log("[v0] abrir detalhe do exercício:", ex.name)
                 }
                 aria-label={"Ver detalhes de " + ex.name}
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all"
-                style={{ background: FIELD, color: ORANGE }}
+                className=" -ml-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all"
+                style={{ background: "transparent", color: ORANGE }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.background = "rgba(255,77,28,0.18)";
+                  e.currentTarget.style.color = "#ff8f5c";
                 }}
                 onMouseOut={(e) => {
-                  e.currentTarget.style.background = FIELD;
+                  e.currentTarget.style.color = ORANGE;
                 }}
               >
-                <Info size={15} strokeWidth={2.5} />
+                <Info size={17} strokeWidth={2.5} />
               </button>
               <span
                 className="truncate font-bold"
@@ -903,27 +918,27 @@ function ConfirmDeleteModal({ exercise, onClose, onConfirm }) {
         aria-modal="true"
         aria-labelledby="confirm-delete-exercise-title"
         aria-describedby="confirm-delete-exercise-desc"
-        className="w-full max-w-md overflow-hidden rounded-2xl p-6"
+        className="relative w-full max-w-md overflow-hidden rounded-2xl p-6"
         style={{
-          background: PANEL,
+          background: "linear-gradient(180deg, #141210 0%, #17130f 100%)",
           border: "1px solid " + BORDER,
           boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
         }}
       >
-        <div className="flex flex-col items-center text-center">
-          <div
-            className="flex h-10 w-10 items-center justify-center rounded-lg"
-            style={{
-              background: "rgba(185,28,28,0.12)",
-              color: "#dc2626",
-            }}
-          >
-            <AlertTriangle size={20} strokeWidth={2.4} />
-          </div>
+        <div
+          className="absolute left-2 top-2 flex h-10 w-10 items-center justify-center rounded-lg"
+          style={{
+            background: "transparent",
+            color: "#dc2626",
+          }}
+        >
+          <AlertTriangle size={26} strokeWidth={2} />
+        </div>
 
+        <div className="flex flex-col items-center pt-1 text-center">
           <h2
             id="confirm-delete-exercise-title"
-            className="mt-3 font-bold"
+            className="font-bold"
             style={{
               color: TEXT,
               fontFamily: "'Barlow Condensed', sans-serif",
@@ -943,14 +958,7 @@ function ConfirmDeleteModal({ exercise, onClose, onConfirm }) {
             }}
           >
             Deseja realmente remover{" "}
-            <span
-              style={{
-                color: ORANGE,
-              }}
-            >
-              {exercise.name}
-            </span>{" "}
-            deste treino?
+            <span style={{ color: ORANGE }}>{exercise.name}</span> deste treino?
             <br />
             <span style={{ color: "#a39d97" }}>
               A alteração só será aplicada ao salvar.
@@ -965,20 +973,17 @@ function ConfirmDeleteModal({ exercise, onClose, onConfirm }) {
             onClick={onClose}
             className="w-32 rounded-full px-4 py-2.5 text-sm font-bold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: "#171412",
-              color: MUTED,
-              border: "1.5px solid rgba(255,255,255,0.12)",
-              boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
+              background: "rgba(255,255,255,0.04)",
+              color: TEXT,
+              border: "1.5px solid rgba(255,255,255,0.14)",
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.color = TEXT;
-              e.currentTarget.style.background = "#211d19";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.22)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.24)";
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.color = MUTED;
-              e.currentTarget.style.background = "#171412";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
             }}
           >
             Cancelar
@@ -989,17 +994,19 @@ function ConfirmDeleteModal({ exercise, onClose, onConfirm }) {
             onClick={onConfirm}
             className="inline-flex w-32 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: "#ad2424",
+              background: "linear-gradient(180deg, #c22626 0%, #a61818 100%)",
               color: "#fff",
-              boxShadow: "0 3px 7px rgba(0,0,0,0.18)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.background = "#8f1717";
-              e.currentTarget.style.boxShadow = "0 4px 9px rgba(0,0,0,0.25)";
+              e.currentTarget.style.background =
+                "linear-gradient(180deg, #d13030 0%, #b82020 100%)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.background = "#ad2424";
-              e.currentTarget.style.boxShadow = "0 3px 7px rgba(0,0,0,0.18)";
+              e.currentTarget.style.background =
+                "linear-gradient(180deg, #c22626 0%, #a61818 100%)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
             }}
           >
             Remover

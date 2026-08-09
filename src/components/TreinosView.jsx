@@ -268,7 +268,11 @@ function WorkoutCard({
           <Dumbbell size={22} strokeWidth={2.4} />
         </div>
 
-        <div className="relative" ref={menuRef} onClick={(e) => e.stopPropagation()}>
+        <div
+          className="relative"
+          ref={menuRef}
+          onClick={(e) => e.stopPropagation()}
+        >
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
@@ -725,27 +729,27 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
         aria-modal="true"
         aria-labelledby="confirm-delete-title"
         aria-describedby="confirm-delete-desc"
-        className="w-full max-w-md overflow-hidden rounded-2xl p-6"
+        className="relative w-full max-w-[420px] overflow-hidden rounded-2xl p-6"
         style={{
-          background: PANEL,
+          background: "linear-gradient(180deg, #141210 0%, #17130f 100%)",
           border: "1px solid " + BORDER,
           boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
         }}
       >
-        <div className="flex flex-col items-center text-center">
-          <div
-            className="flex h-10 w-10 items-center justify-center rounded-lg"
-            style={{
-              background: "rgba(185,28,28,0.12)",
-              color: "#dc2626",
-            }}
-          >
-            <AlertTriangle size={20} strokeWidth={2.4} />
-          </div>
+        <div
+          className="absolute left-2 top-2 flex h-10 w-10 items-center justify-center rounded-lg"
+          style={{
+            background: "transparent",
+            color: "#dc2626",
+          }}
+        >
+          <AlertTriangle size={26} strokeWidth={2} />
+        </div>
 
+        <div className="flex flex-col items-center pt-1 text-center">
           <h2
             id="confirm-delete-title"
-            className="mt-3 font-bold"
+            className="font-bold"
             style={{
               color: TEXT,
               fontFamily: "'Barlow Condensed', sans-serif",
@@ -765,14 +769,7 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
             }}
           >
             Deseja realmente excluir o treino{" "}
-            <span
-              style={{
-                color: ORANGE,
-              }}
-            >
-              {workout.title}
-            </span>
-            ?
+            <span style={{ color: ORANGE }}>{workout.title}</span>?
             <br />
             <span style={{ color: "#a39d97" }}>
               Essa ação não pode ser desfeita.
@@ -787,20 +784,17 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
             onClick={onClose}
             className="w-32 rounded-full px-4 py-2.5 text-sm font-bold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: "#171412",
-              color: MUTED,
-              border: "1.5px solid rgba(255,255,255,0.12)",
-              boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
+              background: "rgba(255,255,255,0.04)",
+              color: TEXT,
+              border: "1.5px solid rgba(255,255,255,0.14)",
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.color = TEXT;
-              e.currentTarget.style.background = "#211d19";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.22)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.24)";
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.color = MUTED;
-              e.currentTarget.style.background = "#171412";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.14)";
             }}
           >
             Cancelar
@@ -811,17 +805,19 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
             onClick={onConfirm}
             className="inline-flex w-32 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: "#a61b1b",
+              background: "linear-gradient(180deg, #c22626 0%, #a61818 100%)",
               color: "#fff",
-              boxShadow: "0 3px 7px rgba(0,0,0,0.1)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.background = "#8f1717";
-              e.currentTarget.style.boxShadow = "0 4px 9px rgba(0,0,0,0.25)";
+              e.currentTarget.style.background =
+                "linear-gradient(180deg, #d13030 0%, #b82020 100%)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.background = "#a61b1b";
-              e.currentTarget.style.boxShadow = "0 3px 7px rgba(0,0,0,0.18)";
+              e.currentTarget.style.background =
+                "linear-gradient(180deg, #c22626 0%, #a61818 100%)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
             }}
           >
             Excluir

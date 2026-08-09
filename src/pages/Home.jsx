@@ -13,9 +13,9 @@ function Home() {
   const [todayWorkoutName, setTodayWorkoutName] = useState("");
   const [weekCount, setWeekCount] = useState(0);
   const [lastWorkout, setLastWorkout] = useState({
-    id: "",
+    id: null,
     name: "",
-    daysAgo: 0,
+    daysAgo: null,
   });
   const [streak, setStreak] = useState(0);
   const [trainedThisWeek, setTrainedThisWeek] = useState(false);

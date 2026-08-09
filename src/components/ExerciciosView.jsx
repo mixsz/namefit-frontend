@@ -9,12 +9,13 @@ import {
   ChevronDown,
   Check,
   WifiOff,
-  ArrowUpRight,
+  Info,
 } from "lucide-react";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import MuscleIcon from "./MuscleIcon";
 import ConnectionErrorState from "./ConnectionErrorState";
+import ExerciseDetail from "./ExerciseDetail";
 
 const CATEGORIES = [
   { key: "PEITO", label: "Peito", icon: "CHEST", groups: ["CHEST"] },
@@ -85,6 +86,7 @@ function ExerciciosView({ data, onAddToWorkout }) {
   const [query, setQuery] = useState(location.state?.searchQuery ?? "");
   const [activeCategory, setActiveCategory] = useState(null);
   const [modalExercise, setModalExercise] = useState(null);
+  const [detailExercise, setDetailExercise] = useState(null);
 
   useEffect(() => {
     if (location.state?.searchQuery) {
@@ -176,6 +178,7 @@ function ExerciciosView({ data, onAddToWorkout }) {
                       key={exercise.id}
                       exercise={exercise}
                       onAdd={() => setModalExercise(exercise)}
+                      onShowDetails={() => setDetailExercise(exercise)}
                     />
                   ))}
                 </div>
@@ -189,6 +192,13 @@ function ExerciciosView({ data, onAddToWorkout }) {
               workouts={workouts}
               onClose={() => setModalExercise(null)}
               onAddToWorkout={onAddToWorkout}
+            />
+          )}
+
+          {detailExercise && (
+            <ExerciseDetail
+              exercise={detailExercise}
+              onClose={() => setDetailExercise(null)}
             />
           )}
         </>
@@ -280,7 +290,7 @@ function ResultsCount({ count }) {
   );
 }
 
-function ExerciseCard({ exercise, onAdd }) {
+function ExerciseCard({ exercise, onAdd, onShowDetails }) {
   const [hover, setHover] = useState(false);
   const BASE = "#0e0b09";
 
@@ -288,7 +298,7 @@ function ExerciseCard({ exercise, onAdd }) {
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="flex h-44 flex-col justify-between rounded-xl p-6 transition-all"
+      className="relative flex h-44 flex-col justify-between rounded-xl p-6 transition-all"
       style={{
         background:
           "linear-gradient(135deg, rgba(200,60,10,0.20) 0%, rgba(140,35,5,0.08) 30%, #161210 60%, " +
@@ -298,7 +308,26 @@ function ExerciseCard({ exercise, onAdd }) {
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
       }}
     >
-      <div className="flex items-center gap-4">
+      <button
+        type="button"
+        onClick={() => onShowDetails(exercise)}
+        aria-label={"Ver descrição de " + exercise.name}
+        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full transition-all"
+        style={{
+          background: "transparent",
+          color: MUTED,
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.color = ORANGE;
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.color = MUTED;
+        }}
+      >
+        <Info size={17} strokeWidth={2.3} />
+      </button>
+
+      <div className="flex items-center gap-4 pr-8">
         <span
           className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl"
           style={{ background: FIELD, border: "1px solid " + BORDER }}
@@ -337,7 +366,7 @@ function ExerciseCard({ exercise, onAdd }) {
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.01em] transition-all"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-extrabold uppercase tracking-[0.04em] transition-all"
           style={{
             background: "transparent",
             color: ORANGE,
@@ -355,28 +384,6 @@ function ExerciseCard({ exercise, onAdd }) {
           <Plus size={14} strokeWidth={2.5} />
           Adicionar ao treino
         </button>
-
-        <Link
-          to={`/exercicios/${exercise.id}`}
-          state={{ exercise }}
-          aria-label={"Ver detalhes de " + exercise.name}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all"
-          style={{
-            background: FIELD,
-            border: "1.5px solid " + BORDER,
-            color: MUTED,
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.borderColor = ORANGE;
-            e.currentTarget.style.color = ORANGE;
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.borderColor = BORDER;
-            e.currentTarget.style.color = MUTED;
-          }}
-        >
-          <ArrowUpRight size={16} strokeWidth={2.5} />
-        </Link>
       </div>
     </div>
   );

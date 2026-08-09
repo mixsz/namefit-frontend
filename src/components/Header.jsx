@@ -173,8 +173,7 @@ function Header({ userName }) {
               role="menu"
               className="absolute right-0 mt-2 w-64 rounded-xl overflow-hidden py-2"
               style={{
-                background:
-                  "linear-gradient(0deg, #141210 0%, #17130f 100%, rgba(255,77,28,0.9) 100%)",
+                background: PANEL,
                 backdropFilter: "blur(16px)",
                 WebkitBackdropFilter: "blur(16px)",
                 border: "1px solid " + BORDER,

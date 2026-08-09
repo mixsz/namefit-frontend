@@ -118,7 +118,7 @@ function HomeView({ data }) {
                     unit="treinos"
                     label="Nesta semana"
                     showDivider={false}
-                    bg="linear-gradient(175deg, rgba(200,60,10,0.03) 0%, rgba(140,35,5,0.09) 30%, #161210 80%, #0e0b09 110%)"
+                    bg="linear-gradient(353deg, rgba(200,60,10,0.05) 0%, rgba(140,35,5,0.08) 1%, #161210 40%, #0e0b09 140%)"
                   />
                 </Link>
 
@@ -128,16 +128,18 @@ function HomeView({ data }) {
                 >
                   <SmallMetricCard
                     icon={<History size={18} />}
-                    value={lastWorkout.name}
+                    value={lastWorkout.name || "Nenhum"}
                     label={
-                      lastWorkout.daysAgo === 0
-                        ? "Último treino · hoje"
-                        : `Último treino · há ${lastWorkout.daysAgo} ${
-                            lastWorkout.daysAgo === 1 ? "dia" : "dias"
-                          }`
+                      !lastWorkout.id
+                        ? "Último treino"
+                        : lastWorkout.daysAgo === 0
+                          ? "Último treino · hoje"
+                          : `Último treino · há ${lastWorkout.daysAgo} ${
+                              lastWorkout.daysAgo === 1 ? "dia" : "dias"
+                            }`
                     }
                     compact
-                    bg="linear-gradient(190deg, rgba(200,60,10,0.08) 0%, rgba(140,35,5,0.08) 30%, #161210 80%, #0e0b09 110%)"
+                    bg="linear-gradient(183deg, rgba(200,60,10,0.05) 0%, rgba(140,35,5,0.08) 1%, #161210 40%, #0e0b09 140%)"
                   />
                 </Link>
               </div>
@@ -170,10 +172,9 @@ function StreakCard({ streak, trained }) {
     <div
       className="relative h-full flex flex-col overflow-hidden rounded-2xl p-5 transition-all"
       style={{
-        background:
-          trained
-            ? "linear-gradient(310deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.15) 0%, #161210 40%, #0e0b09 1000%)"
-            : "linear-gradient(310deg, rgba(200,60,10,0.0) 0%, rgba(140,35,5,0.1) 0%, #161210 0%, #0e0b09 1000%)",
+        background: trained
+          ? "linear-gradient(310deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.15) 0%, #161210 40%, #0e0b09 1000%)"
+          : "linear-gradient(310deg, rgba(200,60,10,0.0) 0%, rgba(140,35,5,0.1) 0%, #161210 0%, #0e0b09 1000%)",
         backgroundClip: "padding-box",
         border: "1px solid " + BORDER,
         minHeight: "100%",
@@ -262,8 +263,9 @@ function StatusCard({ trained, todayWorkoutName }) {
       onMouseLeave={() => !trained && setHover(false)}
       className="h-full relative overflow-hidden rounded-2xl p-6 md:p-7 transition-all"
       style={{
-        background:
-          "linear-gradient(0deg, rgba(200,60,10,0.06) 0%, rgba(140,35,5,0.02) 30%, #161210 60%, #0e0b09 1000%)",
+        background: trained
+          ? "linear-gradient(0deg, rgba(200,60,10,0.12) 0%, rgba(140,35,5,0.04) 40%, #161210 70%, #0e0b09 1000%)"
+          : "linear-gradient(0deg, rgba(200,60,10,0.06) 0%, rgba(140,35,5,0.02) 30%, #161210 60%, #0e0b09 1000%)",
         backgroundClip: "padding-box",
         border: "1.4px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
@@ -359,8 +361,7 @@ function SmallMetricCard({
           "linear-gradient(135deg, rgba(200,60,10,0.16) 0%, rgba(140,35,5,0.06) 30%, #161210 60%, #0e0b09 100%)",
         backgroundClip: "padding-box",
         border: "1px solid " + (active ? "rgba(255,77,28,0.35)" : BORDER),
-        boxShadow: active ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
-        transform: active ? "translateY(-2px)" : "translateY(0)",
+        boxShadow: active ? "0 8px 24px rgba(0,0,0,0.12)" : "none",
       }}
     >
       <div
@@ -671,12 +672,12 @@ function MiniWeekCalendar({ trainedWeekDays = [] }) {
             return (
               <div key={i} className="flex items-center justify-center">
                 <span
-                  className="h-7 w-7 rounded-full transition-all"
+                  className="h-5 w-5 rounded-full transition-all"
                   style={{
                     background: trained
-                      ? "linear-gradient(160deg, #ff6b42 0%, " +
+                      ? "linear-gradient(320deg, #ff6b42 0%, " +
                         ORANGE +
-                        " 50%)"
+                        " 60%)"
                       : "#161210",
                     border: isToday
                       ? "1.5px solid " + ORANGE
