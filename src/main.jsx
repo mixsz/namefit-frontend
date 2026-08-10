@@ -14,6 +14,7 @@ import Historico from "./pages/Historico.jsx";
 import Treinos from "./pages/Treinos.jsx";
 import TreinoDetalhe from "./pages/TreinoDetalhe.jsx";
 import Perfil from "./pages/Perfil.jsx";
+import Execucao from "./pages/Execucao.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 
@@ -67,9 +68,13 @@ const router = createBrowserRouter([
                 element: <TreinoDetalhe />,
               },
               {
+                path: "execucao/:id",
+                element: <Execucao />,
+              },
+              {
                 path: "perfil",
                 element: <Perfil />,
-              }
+              },
             ],
           },
         ],
