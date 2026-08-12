@@ -1,6 +1,6 @@
 import { CheckCircle2, XCircle, Info, X } from "lucide-react";
 import { ORANGE, PANEL, BORDER, TEXT, MUTED } from "../theme";
-import { useToast } from "../context/ToastContext";
+import { useToast } from "../hooks/useToast.js";
 
 const TYPE_STYLES = {
   success: { icon: CheckCircle2, color: ORANGE },

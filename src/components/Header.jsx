@@ -6,12 +6,14 @@ import {
   Pencil,
   LogOut,
   ChevronDown,
+  ChevronRight,
   Menu,
   X,
 } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
 import api from "../services/api.js";
+import { useActiveWorkout } from "../hooks/useActivateWorkout.js";
 
 const NAV_ITEMS = [
   { label: "Home", to: "/home" },
@@ -21,11 +23,28 @@ const NAV_ITEMS = [
 ];
 
 function Header({ userName }) {
+  const location = useLocation();
   const [username, setUsername] = useState("Teste Dentro dos States");
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef(null);
   const { logout } = useAuth();
+  const { activeWorkout } = useActiveWorkout();
+
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      document.documentElement.style.setProperty(
+        "--header-height",
+        `${el.offsetHeight}px`,
+      );
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     api
@@ -133,80 +152,82 @@ function Header({ userName }) {
           </span>
         </Link>
 
-        <div className="relative shrink-0 justify-self-end" ref={menuRef}>
-          <button
-            type="button"
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-haspopup="menu"
-            aria-expanded={menuOpen}
-            aria-label="Abrir menu de perfil"
-            className="flex items-center gap-2 p-1 pr-2 rounded-full transition-all"
-            style={{
-              background: menuOpen ? FIELD : "transparent",
-              border: "1.5px solid " + (menuOpen ? ORANGE : BORDER),
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = ORANGE;
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = menuOpen ? ORANGE : BORDER;
-            }}
-          >
-            <span
-              className="w-9 h-9 rounded-full flex items-center justify-center"
-              style={{ background: ORANGE }}
-            >
-              <User size={18} color={BG} strokeWidth={2.5} />
-            </span>
-            <ChevronDown
-              size={16}
-              color={MUTED}
+        <div className="flex items-center gap-2 shrink-0 justify-self-end">
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              aria-label="Abrir menu de perfil"
+              className="flex items-center gap-2 p-1 pr-2 rounded-full transition-all"
               style={{
-                transition: "transform 0.2s ease",
-                transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                background: menuOpen ? FIELD : "transparent",
+                border: "1.5px solid " + (menuOpen ? ORANGE : BORDER),
               }}
-            />
-          </button>
-
-          {menuOpen && (
-            <div
-              role="menu"
-              className="absolute right-0 mt-2 w-64 rounded-xl overflow-hidden py-2"
-              style={{
-                background: PANEL,
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                border: "1px solid " + BORDER,
-                boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+              onMouseOver={(e) => {
+                e.currentTarget.style.borderColor = ORANGE;
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.borderColor = menuOpen ? ORANGE : BORDER;
               }}
             >
-              <div
-                className="px-4 py-3 mb-1"
-                style={{ borderBottom: "1px solid " + BORDER }}
+              <span
+                className="w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ background: ORANGE }}
               >
-                <p className="text-sm font-medium truncate text-white">
-                  {username}
-                </p>
-              </div>
-
-              <DropdownItem
-                icon={<Pencil size={16} />}
-                label="Editar perfil"
-                as={Link}
-                to="/perfil"
-                onClick={() => setMenuOpen(false)}
-              />
-              <DropdownItem
-                icon={<LogOut size={16} />}
-                label="Sair"
-                danger
-                onClick={() => {
-                  setMenuOpen(false);
-                  logout();
+                <User size={18} color={BG} strokeWidth={2.5} />
+              </span>
+              <ChevronDown
+                size={16}
+                color={MUTED}
+                style={{
+                  transition: "transform 0.2s ease",
+                  transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)",
                 }}
               />
-            </div>
-          )}
+            </button>
+
+            {menuOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 mt-2 w-64 rounded-xl overflow-hidden py-2"
+                style={{
+                  background: PANEL,
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  border: "1px solid " + BORDER,
+                  boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+                }}
+              >
+                <div
+                  className="px-4 py-3 mb-1"
+                  style={{ borderBottom: "1px solid " + BORDER }}
+                >
+                  <p className="text-sm font-medium truncate text-white">
+                    {username}
+                  </p>
+                </div>
+
+                <DropdownItem
+                  icon={<Pencil size={16} />}
+                  label="Editar perfil"
+                  as={Link}
+                  to="/perfil"
+                  onClick={() => setMenuOpen(false)}
+                />
+                <DropdownItem
+                  icon={<LogOut size={16} />}
+                  label="Sair"
+                  danger
+                  onClick={() => {
+                    setMenuOpen(false);
+                    logout();
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -231,6 +252,38 @@ function Header({ userName }) {
             </NavLink>
           ))}
         </div>
+      )}
+      {activeWorkout && !location.pathname.startsWith("/execucao") && (
+        <Link
+          to={`/execucao/${activeWorkout.id}`}
+          className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-[0.04em] transition-all"
+          style={{
+            background: "rgba(255,77,28,0.12)",
+            borderTop: "1px solid rgba(255,77,28,0.25)",
+            color: ORANGE,
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.background = "rgba(255,77,28,0.18)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.background = "rgba(255,77,28,0.12)";
+          }}
+        >
+          <span className="relative flex h-2 w-2">
+            <span
+              className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+              style={{ background: ORANGE }}
+            />
+            <span
+              className="relative inline-flex h-2 w-2 rounded-full"
+              style={{ background: ORANGE }}
+            />
+          </span>
+          <span className="truncate">
+            Treino em andamento: {activeWorkout.title}
+          </span>
+          <ChevronRight size={14} strokeWidth={2.5} className="shrink-0" />
+        </Link>
       )}
     </header>
   );

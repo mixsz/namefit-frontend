@@ -20,10 +20,12 @@ import { Link } from "react-router-dom";
 import { formatLastTrained } from "../pages/Treinos.jsx";
 import { CARD_VARIANTS, hashId } from "../cardBackground.js";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
+import { useToast } from "../hooks/useToast";
 
 function TreinosView({ data }) {
   const {
     workouts = [],
+    activeWorkout,
     onCreate,
     onStart,
     onDelete,
@@ -34,6 +36,7 @@ function TreinosView({ data }) {
   } = data;
   const location = useLocation();
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [query, setQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -66,7 +69,7 @@ function TreinosView({ data }) {
         background:
           "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
         fontFamily: "'Barlow', sans-serif",
-        paddingTop: "90px",
+        paddingTop: "var(--header-height, 90px)",
       }}
     >
       <div className="mx-auto w-full max-w-6xl px-6 pb-16 md:px-10">
@@ -144,6 +147,8 @@ function TreinosView({ data }) {
                     onStart={onStart}
                     onRequestDelete={setDeleteTarget}
                     onReorder={onReorder}
+                    activeWorkout={activeWorkout}
+                    showToast={showToast}
                   />
                 ))}
               </div>
@@ -219,12 +224,19 @@ function WorkoutCard({
   onStart,
   onRequestDelete,
   onReorder,
+  activeWorkout,
+  showToast,
 }) {
   const [hover, setHover] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const variant = CARD_VARIANTS[hashId(workout.id) % CARD_VARIANTS.length];
+  const blocked = !!activeWorkout;
+
+  function warnBlocked() {
+    showToast?.("Finalize seu treino em andamento antes de fazer isso", "info");
+  }
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -309,22 +321,39 @@ function WorkoutCard({
               <DropdownItem
                 icon={<Play size={16} />}
                 label="Iniciar"
+                disabled={blocked}
                 onClick={() => {
                   setMenuOpen(false);
+                  if (blocked) {
+                    warnBlocked();
+                    return;
+                  }
                   onStart?.(workout.id);
                 }}
               />
               <Link
                 to={`/treinos/${workout.id}`}
                 state={{ isEditing: true }}
-                onClick={() => setMenuOpen(false)}
+                onClick={(e) => {
+                  setMenuOpen(false);
+                  if (blocked) {
+                    e.preventDefault();
+                    warnBlocked();
+                  }
+                }}
                 className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-normal transition-colors"
-                style={{ color: TEXT, background: "transparent" }}
+                style={{
+                  color: blocked ? MUTED : TEXT,
+                  background: "transparent",
+                  opacity: blocked ? 0.5 : 1,
+                }}
                 onMouseOver={(e) => {
+                  if (blocked) return;
                   e.currentTarget.style.background = FIELD;
                   e.currentTarget.style.color = ORANGE;
                 }}
                 onMouseOut={(e) => {
+                  if (blocked) return;
                   e.currentTarget.style.background = "transparent";
                   e.currentTarget.style.color = TEXT;
                 }}
@@ -337,8 +366,13 @@ function WorkoutCard({
                 icon={<Trash2 size={16} />}
                 label="Excluir"
                 danger
+                disabled={blocked}
                 onClick={() => {
                   setMenuOpen(false);
+                  if (blocked) {
+                    warnBlocked();
+                    return;
+                  }
                   onRequestDelete?.(workout);
                 }}
               />
@@ -423,7 +457,7 @@ function ReorderButton({ direction, disabled, onClick }) {
   );
 }
 
-function DropdownItem({ icon, label, danger, onClick }) {
+function DropdownItem({ icon, label, danger, disabled, onClick }) {
   const baseColor = danger ? "#ef4444" : TEXT;
   const hoverBg = danger ? "rgba(239,68,68,0.1)" : FIELD;
   const hoverColor = danger ? "#ef4444" : ORANGE;
@@ -434,12 +468,18 @@ function DropdownItem({ icon, label, danger, onClick }) {
       role="menuitem"
       onClick={onClick}
       className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-normal transition-colors"
-      style={{ color: baseColor, background: "transparent" }}
+      style={{
+        color: disabled ? MUTED : baseColor,
+        background: "transparent",
+        opacity: disabled ? 0.5 : 1,
+      }}
       onMouseOver={(e) => {
+        if (disabled) return;
         e.currentTarget.style.background = hoverBg;
         e.currentTarget.style.color = hoverColor;
       }}
       onMouseOut={(e) => {
+        if (disabled) return;
         e.currentTarget.style.background = "transparent";
         e.currentTarget.style.color = baseColor;
       }}

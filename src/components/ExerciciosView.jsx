@@ -16,6 +16,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import MuscleIcon from "./MuscleIcon";
 import ConnectionErrorState from "./ConnectionErrorState";
 import ExerciseDetail from "./ExerciseDetail";
+import { useToast } from "../hooks/useToast.js";
 
 const CATEGORIES = [
   { key: "PEITO", label: "Peito", icon: "CHEST", groups: ["CHEST"] },
@@ -76,12 +77,15 @@ function ExerciciosView({ data, onAddToWorkout }) {
   const {
     exercises = [],
     workouts = [],
+    activeWorkout,
     loading,
     connectionError,
     onRetry,
   } = data;
   const location = useLocation();
   const navigate = useNavigate();
+  const { showToast } = useToast();
+  const blocked = !!activeWorkout;
 
   const [query, setQuery] = useState(location.state?.searchQuery ?? "");
   const [activeCategory, setActiveCategory] = useState(null);
@@ -121,7 +125,7 @@ function ExerciciosView({ data, onAddToWorkout }) {
         background:
           "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
         fontFamily: "'Barlow', sans-serif",
-        paddingTop: "90px",
+        paddingTop: "var(--header-height, 90px)",
       }}
     >
       {loading ? (
@@ -177,8 +181,18 @@ function ExerciciosView({ data, onAddToWorkout }) {
                     <ExerciseCard
                       key={exercise.id}
                       exercise={exercise}
-                      onAdd={() => setModalExercise(exercise)}
+                      onAdd={() => {
+                        if (blocked) {
+                          showToast(
+                            "Finalize seu treino em andamento antes de fazer isso",
+                            "info",
+                          );
+                          return;
+                        }
+                        setModalExercise(exercise);
+                      }}
                       onShowDetails={() => setDetailExercise(exercise)}
+                      blocked={blocked}
                     />
                   ))}
                 </div>
@@ -290,7 +304,7 @@ function ResultsCount({ count }) {
   );
 }
 
-function ExerciseCard({ exercise, onAdd, onShowDetails }) {
+function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
   const [hover, setHover] = useState(false);
   const BASE = "#0e0b09";
 
@@ -371,12 +385,15 @@ function ExerciseCard({ exercise, onAdd, onShowDetails }) {
             background: "transparent",
             color: ORANGE,
             border: "1.5px solid " + ORANGE,
+            opacity: blocked ? 0.5 : 1,
           }}
           onMouseOver={(e) => {
+            if (blocked) return;
             e.currentTarget.style.background = ORANGE;
             e.currentTarget.style.color = BG;
           }}
           onMouseOut={(e) => {
+            if (blocked) return;
             e.currentTarget.style.background = "transparent";
             e.currentTarget.style.color = ORANGE;
           }}

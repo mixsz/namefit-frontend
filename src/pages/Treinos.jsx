@@ -2,7 +2,8 @@ import TreinosView from "../components/TreinosView";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "../context/ToastContext.jsx";
+import { useToast } from "../hooks/useToast.js";
+import { useActiveWorkout } from "../hooks/useActivateWorkout.js";
 
 export function formatLastTrained(dateStr) {
   if (!dateStr) return null;
@@ -27,6 +28,7 @@ function Treinos() {
   const [loading, setLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
   const { showToast } = useToast();
+  const { activeWorkout } = useActiveWorkout();
 
   useEffect(() => {
     fetchWorkouts();
@@ -111,6 +113,7 @@ function Treinos() {
     <TreinosView
       data={{
         workouts,
+        activeWorkout,
         loading,
         connectionError,
         onRetry: fetchWorkouts,

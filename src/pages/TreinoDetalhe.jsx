@@ -1,12 +1,16 @@
 import TreinoDetalheView from "../components/TreinoDetalheView";
-import { useToast } from "../context/ToastContext";
+import { useToast } from "../hooks/useToast.js";
+import { useActiveWorkout } from "../hooks/useActivateWorkout";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import api from "../services/api";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function TreinoDetalhe() {
+  const navigate = useNavigate();
   const { showToast } = useToast();
+  const { activeWorkout } = useActiveWorkout();
   const [loading, setLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
   const [workout, setWorkout] = useState(null);
@@ -79,6 +83,20 @@ function TreinoDetalhe() {
     } catch (error) {
       console.error("Error fetching all workouts:", error);
       throw error;
+    }
+  }
+
+  async function handleStartWorkout(workoutId) {
+    try {
+      const { data } = await api.post(`/workoutLog/${workoutId}`);
+      navigate(`/execucao/${data.id}`);
+    } catch (error) {
+      console.error("Erro ao iniciar treino:", error);
+      if (error.response?.status === 400) {
+        showToast(error.response.data, "error");
+      } else {
+        showToast("Erro ao iniciar treino, tente novamente", "error");
+      }
     }
   }
 
@@ -159,6 +177,7 @@ function TreinoDetalhe() {
       data={{
         workout,
         availableExercises,
+        activeWorkout,
         otherWorkoutTitles: allWorkouts
           .filter((w) => w.id !== params.id)
           .map((w) => w.title),
@@ -168,12 +187,11 @@ function TreinoDetalhe() {
         startInEdit: location.state?.isEditing ?? false,
         onSave: handleSave,
         onCancel: (hasChanges) => {
-          console.log("onCancel, houve mudança?", hasChanges);
           if (hasChanges) {
             showToast("Alterações descartadas", "info");
           }
         },
-        onStartWorkout: (id) => console.log("onStartWorkout:", id),
+        onStartWorkout: handleStartWorkout,
         onOpenExercise: (id) => console.log("onOpenExercise:", id),
       }}
     />

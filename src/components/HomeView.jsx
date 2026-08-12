@@ -31,6 +31,7 @@ function SectionLabel({ children }) {
 function HomeView({ data }) {
   const {
     username,
+    activeWorkout,
     hasWorkout,
     trained,
     todayWorkoutName,
@@ -42,6 +43,7 @@ function HomeView({ data }) {
     loading,
     connectionError,
     onRetry,
+    onGoToTreinos,
   } = data;
 
   return (
@@ -51,7 +53,7 @@ function HomeView({ data }) {
         background:
           "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
         fontFamily: "'Barlow', sans-serif",
-        paddingTop: "90px",
+        paddingTop: "var(--header-height, 90px)",
       }}
     >
       <div className="mx-auto w-full max-w-6xl px-6 pb-24 md:px-10">
@@ -97,6 +99,8 @@ function HomeView({ data }) {
                   <StatusCard
                     trained={trained}
                     todayWorkoutName={todayWorkoutName}
+                    onGoToTreinos={onGoToTreinos}
+                    activeWorkout={activeWorkout}
                   />
                 </div>
                 <div className="flex-1">
@@ -152,7 +156,10 @@ function HomeView({ data }) {
 
             <section className="mt-12">
               <SectionLabel>Monte algo novo</SectionLabel>
-              <BuildWorkoutCard />
+              <BuildWorkoutCard
+                onGoToTreinos={onGoToTreinos}
+                activeWorkout={activeWorkout}
+              />
             </section>
           </>
         )}
@@ -255,20 +262,41 @@ function StreakCard({ streak, trained }) {
   );
 }
 
-function StatusCard({ trained, todayWorkoutName }) {
+function StatusCard({
+  trained,
+  todayWorkoutName,
+  onGoToTreinos,
+  activeWorkout,
+}) {
   const [hover, setHover] = useState(false);
+  const clickable = !trained;
+  const blocked = clickable && !!activeWorkout;
+
   return (
     <div
-      onMouseEnter={() => !trained && setHover(true)}
-      onMouseLeave={() => !trained && setHover(false)}
+      onMouseEnter={() => clickable && !blocked && setHover(true)}
+      onMouseLeave={() => clickable && !blocked && setHover(false)}
+      onClick={() => clickable && onGoToTreinos?.()}
+      role={clickable ? "button" : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (clickable && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onGoToTreinos?.();
+        }
+      }}
       className="h-full relative overflow-hidden rounded-2xl p-6 md:p-7 transition-all"
       style={{
+        cursor: clickable ? "pointer" : "default",
+        opacity: blocked ? 0.5 : 1,
         background: trained
           ? "linear-gradient(0deg, rgba(200,60,10,0.12) 0%, rgba(140,35,5,0.04) 40%, #161210 70%, #0e0b09 1000%)"
           : "linear-gradient(0deg, rgba(200,60,10,0.06) 0%, rgba(140,35,5,0.02) 30%, #161210 60%, #0e0b09 1000%)",
         backgroundClip: "padding-box",
-        border: "1.4px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
-        boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
+        border:
+          "1.4px solid " +
+          (hover && !blocked ? "rgba(255,77,28,0.45)" : BORDER),
+        boxShadow: hover && !blocked ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
       }}
     >
       <div className="relative z-10 flex h-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -318,9 +346,8 @@ function StatusCard({ trained, todayWorkoutName }) {
           </div>
         </div>
 
-        {!trained && (
-          <Link
-            to="/treinos"
+        {clickable && (
+          <span
             className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
               background: hover ? ORANGE : "transparent",
@@ -330,7 +357,7 @@ function StatusCard({ trained, todayWorkoutName }) {
           >
             Ir para Treinos
             <ArrowRight size={16} strokeWidth={2.5} />
-          </Link>
+          </span>
         )}
       </div>
     </div>
@@ -488,21 +515,25 @@ function SuggestionCard({ suggestion }) {
   );
 }
 
-function BuildWorkoutCard() {
+function BuildWorkoutCard({ onGoToTreinos, activeWorkout }) {
   const [hover, setHover] = useState(false);
+  const blocked = !!activeWorkout;
+
   return (
-    <Link
-      to="/treinos"
-      state={{ openCreate: true }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className="flex flex-col gap-5 overflow-hidden rounded-2xl p-7 transition-all md:flex-row md:items-center md:justify-between"
+    <button
+      type="button"
+      onClick={() => onGoToTreinos?.({ openCreate: true })}
+      onMouseEnter={() => !blocked && setHover(true)}
+      onMouseLeave={() => !blocked && setHover(false)}
+      className="flex w-full flex-col gap-5 overflow-hidden rounded-2xl p-7 text-left transition-all md:flex-row md:items-center md:justify-between"
       style={{
+        opacity: blocked ? 0.5 : 1,
         background:
           "linear-gradient(320deg, rgba(200,60,10,0.14) 0%, rgba(140,35,5,0.11) 35%, #161210 65%, #0e0b09 115%)",
         backgroundClip: "padding-box",
-        border: "1px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
-        boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
+        border:
+          "1px solid " + (hover && !blocked ? "rgba(255,77,28,0.45)" : BORDER),
+        boxShadow: hover && !blocked ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
         transition: "all 0.2s ease",
       }}
     >
@@ -555,7 +586,7 @@ function BuildWorkoutCard() {
         <Plus size={16} strokeWidth={2.5} />
         Criar treino
       </span>
-    </Link>
+    </button>
   );
 }
 

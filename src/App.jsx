@@ -7,7 +7,7 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <Outlet />
+          <Outlet />
         <ToastContainer />
       </ToastProvider>
     </AuthProvider>

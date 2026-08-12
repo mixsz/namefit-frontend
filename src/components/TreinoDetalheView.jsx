@@ -24,6 +24,7 @@ import MuscleIcon from "./MuscleIcon";
 import { Link } from "react-router-dom";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
 import ExerciseDetail from "./ExerciseDetail.jsx";
+import { useToast } from "../hooks/useToast.js";
 
 function TreinoDetalheView({ data }) {
   const {
@@ -38,8 +39,12 @@ function TreinoDetalheView({ data }) {
     connectionError,
     onRetry,
     otherWorkoutTitles = [],
+    activeWorkout,
   } = data;
+
+  const { showToast } = useToast();
   const [isEditing, setIsEditing] = useState(startInEdit);
+  const blocked = !!activeWorkout;
 
   const [draftTitle, setDraftTitle] = useState(workout?.title ?? "");
   const [draftExercises, setDraftExercises] = useState(
@@ -50,6 +55,10 @@ function TreinoDetalheView({ data }) {
     (t) => t.trim().toLowerCase() === draftTitle.trim().toLowerCase(),
   );
 
+  function warnBlocked() {
+    showToast("Finalize seu treino em andamento antes de fazer isso", "info");
+  }
+
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   useEffect(() => {
@@ -58,6 +67,10 @@ function TreinoDetalheView({ data }) {
   }, [workout]);
 
   function enterEdit() {
+    if (blocked) {
+      warnBlocked();
+      return;
+    }
     setDraftTitle(workout?.title ?? "");
     setDraftExercises(workout?.exercises?.map((e) => ({ ...e })) ?? []);
     setIsEditing(true);
@@ -123,7 +136,7 @@ function TreinoDetalheView({ data }) {
         background:
           "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
         fontFamily: "'Barlow', sans-serif",
-        paddingTop: "90px",
+        paddingTop: "var(--header-height, 90px)",
       }}
     >
       <div className="mx-auto w-full max-w-4xl px-6 pb-16 md:px-10">
@@ -143,7 +156,11 @@ function TreinoDetalheView({ data }) {
                 isDuplicate={isDuplicateTitle}
               />
             ) : (
-              <ViewHeader title={workout?.title} onEdit={enterEdit} />
+              <ViewHeader
+                title={workout?.title}
+                onEdit={enterEdit}
+                blocked={blocked}
+              />
             )}
 
             <section className="mt-8">
@@ -204,8 +221,15 @@ function TreinoDetalheView({ data }) {
               />
             ) : (
               <ViewActions
-                onStart={() => onStartWorkout?.(workout.id)}
+                onStart={() => {
+                  if (blocked) {
+                    warnBlocked();
+                    return;
+                  }
+                  onStartWorkout?.(workout.id);
+                }}
                 disabled={viewExercises.length === 0}
+                blocked={blocked}
               />
             )}
           </>
@@ -289,7 +313,7 @@ function BackLink({ isEditing, onExitEdit }) {
   );
 }
 
-function ViewHeader({ title, onEdit }) {
+function ViewHeader({ title, onEdit, blocked }) {
   const [hover, setHover] = useState(false);
   return (
     <header className="mt-5 flex items-end justify-between gap-4">
@@ -308,13 +332,14 @@ function ViewHeader({ title, onEdit }) {
       <button
         type="button"
         onClick={onEdit}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
+        onMouseEnter={() => !blocked && setHover(true)}
+        onMouseLeave={() => !blocked && setHover(false)}
         className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold uppercase tracking-[0.05em] transition-all"
         style={{
-          background: hover ? "rgba(255,77,28,0.1)" : "transparent",
-          color: hover ? ORANGE : MUTED,
-          border: "1.5px solid " + (hover ? ORANGE : BORDER),
+          opacity: blocked ? 0.5 : 1,
+          background: hover && !blocked ? "rgba(255,77,28,0.1)" : "transparent",
+          color: hover && !blocked ? ORANGE : MUTED,
+          border: "1.5px solid " + (hover && !blocked ? ORANGE : BORDER),
         }}
       >
         <Pencil size={15} strokeWidth={2.5} />
@@ -437,21 +462,21 @@ function EditTable({
                 borderTop: i === 0 ? "none" : "1px solid " + BORDER,
               }}
             >
-          <button
-                  type="button"
-                  onClick={() => onRequestDelete(ex)}
-                  aria-label={"Remover " + ex.name}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all"
-                  style={{ background: "transparent", color: "#dc2626" }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.color = "#ff7a7a";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.color = "#dc2626";
-                  }}
-                >
-                  <Trash2 size={17} strokeWidth={2.4} />
-                </button>
+              <button
+                type="button"
+                onClick={() => onRequestDelete(ex)}
+                aria-label={"Remover " + ex.name}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all"
+                style={{ background: "transparent", color: "#dc2626" }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.color = "#ff7a7a";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.color = "#dc2626";
+                }}
+              >
+                <Trash2 size={17} strokeWidth={2.4} />
+              </button>
 
               <span
                 className="min-w-0 flex-1 truncate font-bold"
@@ -812,21 +837,22 @@ function EmptyRows() {
   );
 }
 
-function ViewActions({ onStart, disabled }) {
+function ViewActions({ onStart, disabled, blocked }) {
+  const isDisabled = disabled || blocked;
   return (
     <div className="mt-10 flex justify-center">
       <button
         type="button"
         onClick={onStart}
-        disabled={disabled}
-        className="inline-flex items-center justify-center gap-2 rounded-full px-12 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all disabled:opacity-50 sm:gap-2.5 sm:px-56 sm:py-4 sm:text-base"
+        className="inline-flex items-center justify-center gap-2 rounded-full px-12 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all sm:gap-2.5 sm:px-56 sm:py-4 sm:text-base"
         style={{
           background: ORANGE,
           color: BG,
+          opacity: isDisabled ? 0.5 : 1,
           boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
         }}
         onMouseOver={(e) => {
-          if (disabled) return;
+          if (isDisabled) return;
           e.currentTarget.style.background = "#ff6b42";
           e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
         }}

@@ -1,11 +1,17 @@
 import HomeView from "../components/HomeView";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { useActiveWorkout } from "../hooks/useActivateWorkout";
+import { useToast } from "../hooks/useToast.js";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Home() {
   const { username } = useAuth();
-  // console.log("Username: ", username);
+  const { activeWorkout } = useActiveWorkout();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+
   const [hasWorkout, setHasWorkout] = useState(false);
   const [trained, setTrained] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -20,6 +26,20 @@ function Home() {
   const [streak, setStreak] = useState(0);
   const [trainedThisWeek, setTrainedThisWeek] = useState(false);
   const [suggestion, setSuggestion] = useState({ name: "", muscleGroup: "" });
+
+  function goToTreinos(navigateOptions) {
+    if (activeWorkout) {
+      showToast(
+        "Finalize seu treino em andamento antes de acessar os treinos",
+        "info",
+      );
+      return;
+    }
+    navigate(
+      "/treinos",
+      navigateOptions ? { state: navigateOptions } : undefined,
+    );
+  }
 
   useEffect(() => {
     fetchAll();
@@ -216,6 +236,7 @@ function Home() {
     <HomeView
       data={{
         username,
+        activeWorkout,
         hasWorkout,
         trained,
         todayWorkoutName,
@@ -228,6 +249,7 @@ function Home() {
         loading,
         connectionError,
         onRetry: fetchAll,
+        onGoToTreinos: goToTreinos,
       }}
     />
   );

@@ -1,7 +1,8 @@
 import ExerciciosView from "../components/ExerciciosView";
 import api from "../services/api";
 import { useEffect, useState } from "react";
-import { useToast } from "../context/ToastContext.jsx";
+import { useToast } from "../hooks/useToast.js";
+import { useActiveWorkout } from "../hooks/useActivateWorkout";
 
 function Exercicios() {
   const [exercises, setExercises] = useState([]);
@@ -9,6 +10,7 @@ function Exercicios() {
   const [loading, setLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
   const { showToast } = useToast();
+  const { activeWorkout } = useActiveWorkout();
 
   useEffect(() => {
     fetchExercises();
@@ -71,7 +73,14 @@ function Exercicios() {
 
   return (
     <ExerciciosView
-      data={{ exercises, workouts, loading, connectionError, onRetry: fetchExercises }}
+      data={{
+        exercises,
+        workouts,
+        activeWorkout,
+        loading,
+        connectionError,
+        onRetry: fetchExercises,
+      }}
       onAddToWorkout={handleAddToWorkout}
     />
   );
