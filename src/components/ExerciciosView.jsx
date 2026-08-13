@@ -176,7 +176,7 @@ function ExerciciosView({ data, onAddToWorkout }) {
               {filtered.length === 0 ? (
                 <NoResults hasFilters={hasFilters} onClear={clearFilters} />
               ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {filtered.map((exercise) => (
                     <ExerciseCard
                       key={exercise.id}
@@ -312,7 +312,7 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="relative flex h-44 flex-col justify-between rounded-xl p-6 transition-all"
+      className="relative flex h-36 sm:h-44 flex-col justify-between rounded-xl p-3 sm:p-6 transition-all"
       style={{
         background:
           "linear-gradient(135deg, rgba(200,60,10,0.20) 0%, rgba(140,35,5,0.08) 30%, #161210 60%, " +
@@ -341,27 +341,26 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
         <Info size={17} strokeWidth={2.3} />
       </button>
 
-      <div className="flex items-center gap-4 pr-8">
+      <div className="flex items-center gap-2 sm:gap-4 pr-6 sm:pr-8">
         <span
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl"
+          className="flex h-11 w-11 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-xl"
           style={{ background: FIELD, border: "1px solid " + BORDER }}
         >
           <MuscleIcon group={exercise.muscleGroup} size={60} />
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 translate-y-1 sm:translate-y-0">
           <h3
-            className="truncate font-semibold"
+            className="truncate font-semibold text-lg sm:text-2xl"
             style={{
               color: TEXT,
               fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: "1.5rem",
               lineHeight: 1.3,
             }}
           >
             {exercise.name}
           </h3>
           <span
-            className="mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-[0.05em]"
+            className="mt-1 sm:mt-1.5 inline-block rounded-full px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-[0.05em]"
             style={{
               background: "transparent",
               color: "#e8956a",
@@ -380,7 +379,7 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-extrabold uppercase tracking-[0.04em] transition-all"
+          className="inline-flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-extrabold uppercase tracking-[0.04em] transition-all"
           style={{
             background: "transparent",
             color: ORANGE,
@@ -398,7 +397,8 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
             e.currentTarget.style.color = ORANGE;
           }}
         >
-          <Plus size={14} strokeWidth={2.5} />
+          <Plus size={12} className="sm:hidden" strokeWidth={2.5} />
+          <Plus size={14} className="hidden sm:block" strokeWidth={2.5} />
           Adicionar ao treino
         </button>
       </div>

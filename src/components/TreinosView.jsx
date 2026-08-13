@@ -452,7 +452,7 @@ function ReorderButton({ direction, disabled, onClick }) {
       }
       style={{ background: FIELD }}
     >
-      <Icon size={16} strokeWidth={2.5} />
+      <Icon size={16} strokeWidth={2.5} className="rotate-90 sm:rotate-0" />
     </button>
   );
 }

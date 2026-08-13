@@ -290,8 +290,8 @@ function StatusCard({
         cursor: clickable ? "pointer" : "default",
         opacity: blocked ? 0.5 : 1,
         background: trained
-          ? "linear-gradient(0deg, rgba(200,60,10,0.12) 0%, rgba(140,35,5,0.04) 40%, #161210 70%, #0e0b09 1000%)"
-          : "linear-gradient(0deg, rgba(200,60,10,0.06) 0%, rgba(140,35,5,0.02) 30%, #161210 60%, #0e0b09 1000%)",
+          ? "linear-gradient(0deg, rgba(200,60,10,0.08) 0%, rgba(140,35,5,0.02) 40%, #161210 70%, #0e0b09 1000%)"
+          : "linear-gradient(0deg, rgba(200,60,10,0.04) 0%, rgba(140,35,5,0.03) 0%, #161210 50%, #0e0b09 1000%)",
         backgroundClip: "padding-box",
         border:
           "1.4px solid " +
