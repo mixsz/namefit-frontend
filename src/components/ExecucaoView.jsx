@@ -278,7 +278,8 @@ function ExerciseRow({
     <div
       className="overflow-hidden rounded-2xl transition-all"
       style={{
-        background: PANEL,
+        background:
+          "radial-gradient(300% 600% at 100% -130%, rgba(255,110,50,0.06) 0%, rgba(180,60,15,0.01) 20%, #171310 45%, #0e0b09 100%)",
         border: "1.4px solid " + (done ? "rgba(255,77,28,0.45)" : BORDER),
       }}
     >

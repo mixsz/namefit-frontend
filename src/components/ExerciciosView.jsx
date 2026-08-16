@@ -15,7 +15,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import MuscleIcon from "./MuscleIcon";
 import ConnectionErrorState from "./ConnectionErrorState";
-import ExerciseDetail from "./ExerciseDetail";
+import ExercicioDetalhe from "./ExercicioDetalhe";
 import { useToast } from "../hooks/useToast.js";
 
 const CATEGORIES = [
@@ -210,7 +210,7 @@ function ExerciciosView({ data, onAddToWorkout }) {
           )}
 
           {detailExercise && (
-            <ExerciseDetail
+            <ExercicioDetalhe
               exercise={detailExercise}
               onClose={() => setDetailExercise(null)}
             />
