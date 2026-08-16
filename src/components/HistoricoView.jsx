@@ -10,7 +10,7 @@ import {
   CalendarDays,
 } from "lucide-react";
 import ConnectionErrorState from "./ConnectionErrorState";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const PERIODS = [
   { key: "ALL", label: "Todos" },
@@ -83,6 +83,7 @@ function HistoricoView({ data = {} }) {
   } = data;
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [sessions, setSessions] = useState(apiSessions);
   useEffect(() => {
@@ -135,7 +136,7 @@ function HistoricoView({ data = {} }) {
   const canLoadMore = visible < filtered.length;
 
   function handleOpenSession(session) {
-    console.log("Ver sessão", session.id);
+    navigate(`/historico/${session.id}`);
   }
 
   return (

@@ -23,7 +23,7 @@ import MuscleIcon from "./MuscleIcon";
 
 import { Link } from "react-router-dom";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
-import ExerciseDetail from "./ExerciseDetail.jsx";
+import ExercicioDetalhe from "./ExercicioDetalhe.jsx";
 import { useToast } from "../hooks/useToast.js";
 
 function TreinoDetalheView({ data }) {
@@ -264,7 +264,7 @@ function TreinoDetalheView({ data }) {
         />
       )}
       {detailExercise && (
-        <ExerciseDetail
+        <ExercicioDetalhe
           exercise={detailExercise}
           onClose={() => setDetailExercise(null)}
         />
@@ -458,7 +458,8 @@ function EditTable({
             <div
               className="flex items-center gap-2 px-4 py-2.5 sm:hidden"
               style={{
-                background: PANEL,
+                background:
+                  "radial-gradient(180% 600% at 100% -130%, rgba(255,110,50,0.06) 0%, rgba(180,60,15,0.02) 20%, #171310 45%, #0e0b09 100%)",
                 borderTop: i === 0 ? "none" : "1px solid " + BORDER,
               }}
             >
@@ -527,7 +528,8 @@ function EditTable({
             <div
               className="hidden items-center gap-3 px-5 py-3.5 sm:grid"
               style={{
-                background: PANEL,
+                background:
+                  "radial-gradient(180% 600% at 100% -130%, rgba(255,110,50,0.06) 0%, rgba(180,60,15,0.02) 20%, #171310 45%, #0e0b09 100%)",
                 gridTemplateColumns: EDIT_COLUMNS,
                 borderTop: i === 0 ? "none" : "1px solid " + BORDER,
               }}
@@ -640,7 +642,8 @@ function ViewTable({ exercises, onOpenExercise }) {
             key={ex.id}
             className="grid items-center gap-3 px-5 py-3.5"
             style={{
-              background: PANEL,
+              background:
+                "radial-gradient(180% 600% at 100% -130%, rgba(255,110,50,0.06) 0%, rgba(180,60,15,0.02) 20%, #171310 45%, #0e0b09 100%)",
               gridTemplateColumns: "1fr 72px 88px",
               borderTop: i === 0 ? "none" : "1px solid " + BORDER,
             }}
