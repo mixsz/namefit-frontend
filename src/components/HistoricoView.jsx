@@ -71,8 +71,6 @@ function matchesPeriod(date, period) {
   return date >= limit;
 }
 
-/* ------------------------------------------------------------------ */
-
 function HistoricoView({ data = {} }) {
   const {
     sessions: apiSessions = [],
@@ -182,7 +180,6 @@ function HistoricoView({ data = {} }) {
             <EmptyState onClear={clearFilters} hasFilters={false} />
           ) : (
             <>
-              {/* Barra de filtros */}
               <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
                 <div className="w-full sm:max-w-[190px]">
                   <Dropdown
@@ -224,7 +221,6 @@ function HistoricoView({ data = {} }) {
                 </div>
               </div>
 
-              {/* Contagem + toggle, na mesma altura */}
               <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                 <p
                   className="text-xs font-bold uppercase tracking-[0.12em]"
@@ -298,8 +294,6 @@ function HistoricoView({ data = {} }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-
 function SessionRow({ session, onClick }) {
   const [hover, setHover] = useState(false);
 
@@ -314,8 +308,9 @@ function SessionRow({ session, onClick }) {
         background:
           "radial-gradient(120% 140% at 100% 50%, rgba(200,90,40,0.20) 0%, rgba(140,60,30,0.10) 35%, #17130f 65%, #0e0b09 100%)",
         backgroundClip: "padding-box",
-        border: "1.5px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
-        transform: hover ? "translateY(-1px)" : "none",
+        border:
+          "1.5px solid " +
+          (hover ? "rgba(255,77,28,0.45)" : "rgba(255,255,255,0.04)"),
       }}
     >
       <div
