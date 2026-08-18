@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme";
 import {
   ChevronDown,
@@ -22,7 +22,6 @@ const PERIODS = [
 ];
 
 const DELETED_OPTION = "__DELETED__";
-const PAGE_SIZE = 5;
 
 const MONTHS = [
   "janeiro",
@@ -47,91 +46,42 @@ function formatDate(date) {
     : `${base} de ${date.getFullYear()}`;
 }
 
-function matchesPeriod(date, period) {
-  if (period === "ALL") return true;
-  const now = new Date();
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-
-  if (period === "TODAY") return date >= start;
-  if (period === "WEEK") {
-    const weekStart = new Date(start);
-    weekStart.setDate(start.getDate() - ((start.getDay() + 6) % 7));
-    return date >= weekStart;
-  }
-  if (period === "MONTH") {
-    return (
-      date.getMonth() === now.getMonth() &&
-      date.getFullYear() === now.getFullYear()
-    );
-  }
-  const limit = new Date(now);
-  if (period === "6M") limit.setMonth(limit.getMonth() - 6);
-  if (period === "1Y") limit.setFullYear(limit.getFullYear() - 1);
-  return date >= limit;
-}
-
 function HistoricoView({ data = {} }) {
   const {
-    sessions: apiSessions = [],
-    workouts: apiWorkouts = [],
+    sessions = [],
+    workouts: workoutsList = [],
     loading = false,
     connectionError = false,
     onRetry,
+    period = "ALL",
+    onPeriodChange,
+    workoutId = "ALL",
+    onWorkoutIdChange,
+    includeDeleted = false,
+    onIncludeDeletedChange,
+    totalElements = 0,
+    hasMore = false,
+    onLoadMore,
   } = data;
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [sessions, setSessions] = useState(apiSessions);
-  useEffect(() => {
-    setSessions(apiSessions);
-  }, [apiSessions]);
-
-  const workoutsList = apiWorkouts;
-
-  const [period, setPeriod] = useState("ALL");
-  const [workoutId, setWorkoutId] = useState("ALL");
-  const [includeDeleted, setIncludeDeleted] = useState(false);
-  const [visible, setVisible] = useState(PAGE_SIZE);
-  const [exhausted, setExhausted] = useState(false);
-
   useEffect(() => {
     if (location.state?.period) {
-      setPeriod(location.state.period);
+      onPeriodChange?.(location.state.period);
     }
   }, []);
 
   const onlyDeleted = workoutId === DELETED_OPTION;
-
-  const filtered = useMemo(() => {
-    return sessions
-      .filter((s) => {
-        if (!matchesPeriod(s.date, period)) return false;
-        if (onlyDeleted) return s.deleted;
-        if (workoutId !== "ALL" && s.workoutId !== workoutId) return false;
-        if (s.deleted && !includeDeleted) return false;
-        return true;
-      })
-      .sort((a, b) => b.date - a.date);
-  }, [sessions, period, workoutId, includeDeleted, onlyDeleted]);
-
-  const shown = filtered.slice(0, visible);
   const hasFilters = period !== "ALL" || workoutId !== "ALL" || includeDeleted;
-  const hasAnyHistory = sessions.length > 0;
+  const hasAnyHistory = sessions.length > 0 || hasFilters;
 
   function clearFilters() {
-    setPeriod("ALL");
-    setWorkoutId("ALL");
-    setIncludeDeleted(false);
-    setVisible(PAGE_SIZE);
+    onPeriodChange?.("ALL");
+    onWorkoutIdChange?.("ALL");
+    onIncludeDeletedChange?.(false);
   }
-
-  function loadMore() {
-    setVisible((v) => v + PAGE_SIZE);
-  }
-
-  const canLoadMore = visible < filtered.length;
 
   function handleOpenSession(session) {
     navigate(`/historico/${session.id}`);
@@ -186,10 +136,7 @@ function HistoricoView({ data = {} }) {
                     label="Período"
                     icon={<CalendarDays size={15} />}
                     value={period}
-                    onChange={(v) => {
-                      setPeriod(v);
-                      setVisible(PAGE_SIZE);
-                    }}
+                    onChange={(v) => onPeriodChange?.(v)}
                     options={PERIODS.map((p) => ({
                       value: p.key,
                       label: p.label,
@@ -202,10 +149,7 @@ function HistoricoView({ data = {} }) {
                     label="Treino"
                     icon={<Dumbbell size={15} />}
                     value={workoutId}
-                    onChange={(v) => {
-                      setWorkoutId(v);
-                      setVisible(PAGE_SIZE);
-                    }}
+                    onChange={(v) => onWorkoutIdChange?.(v)}
                     options={[
                       { value: "ALL", label: "Todos os treinos" },
                       ...workoutsList
@@ -226,8 +170,8 @@ function HistoricoView({ data = {} }) {
                   className="text-xs font-bold uppercase tracking-[0.12em]"
                   style={{ color: MUTED }}
                 >
-                  <span style={{ color: ORANGE }}>{filtered.length}</span>{" "}
-                  {filtered.length === 1
+                  <span style={{ color: ORANGE }}>{totalElements}</span>{" "}
+                  {totalElements === 1
                     ? "sessão encontrada"
                     : "sessões encontradas"}
                 </p>
@@ -236,21 +180,18 @@ function HistoricoView({ data = {} }) {
                   <Toggle
                     checked={onlyDeleted ? true : includeDeleted}
                     disabled={onlyDeleted}
-                    onChange={(v) => {
-                      setIncludeDeleted(v);
-                      setVisible(PAGE_SIZE);
-                    }}
+                    onChange={(v) => onIncludeDeletedChange?.(v)}
                   />
                 </div>
               </div>
 
               {/* Lista */}
-              {shown.length === 0 ? (
+              {sessions.length === 0 ? (
                 <EmptyState onClear={clearFilters} hasFilters={hasFilters} />
               ) : (
                 <>
                   <ul className="flex flex-col gap-3">
-                    {shown.map((session) => (
+                    {sessions.map((session) => (
                       <li key={session.id}>
                         <SessionRow
                           session={session}
@@ -260,11 +201,11 @@ function HistoricoView({ data = {} }) {
                     ))}
                   </ul>
 
-                  {canLoadMore && (
+                  {hasMore && (
                     <div className="mt-8 flex justify-center">
                       <button
                         type="button"
-                        onClick={loadMore}
+                        onClick={onLoadMore}
                         className="rounded-full px-6 py-3 text-sm font-bold uppercase tracking-[0.05em] transition-all"
                         style={{
                           background: "transparent",
