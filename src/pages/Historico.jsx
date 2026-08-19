@@ -44,6 +44,7 @@ function Historico() {
   const [totalElements, setTotalElements] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [connectionError, setConnectionError] = useState(false);
 
   const [period, setPeriod] = useState("ALL");
@@ -61,7 +62,11 @@ function Historico() {
   }, [period, workoutId, includeDeleted]);
 
   async function fetchHistory(targetPage, replace) {
-    setLoading(replace);
+    if (replace) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
     setConnectionError(false);
     try {
       const { start, end } = periodToRange(period);
@@ -108,6 +113,7 @@ function Historico() {
       if (error.code === "ERR_NETWORK") setConnectionError(true);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }
 
@@ -121,6 +127,7 @@ function Historico() {
         sessions,
         workouts,
         loading,
+        loadingMore,
         connectionError,
         onRetry: () => fetchHistory(0, true),
         period,

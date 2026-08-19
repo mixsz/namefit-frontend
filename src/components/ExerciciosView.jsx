@@ -7,6 +7,8 @@ import {
   Dumbbell,
   SlidersHorizontal,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Check,
   WifiOff,
   Info,
@@ -73,6 +75,8 @@ function matchesQuery(exercise, query) {
   );
 }
 
+const PAGE_SIZE = 12;
+
 function ExerciciosView({ data, onAddToWorkout }) {
   const {
     exercises = [],
@@ -91,6 +95,7 @@ function ExerciciosView({ data, onAddToWorkout }) {
   const [activeCategory, setActiveCategory] = useState(null);
   const [modalExercise, setModalExercise] = useState(null);
   const [detailExercise, setDetailExercise] = useState(null);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     if (location.state?.searchQuery) {
@@ -110,6 +115,21 @@ function ExerciciosView({ data, onAddToWorkout }) {
     });
   }, [exercises, activeGroups, query]);
 
+  useEffect(() => {
+    setPage(0);
+  }, [query, activeCategory]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice(
+    page * PAGE_SIZE,
+    page * PAGE_SIZE + PAGE_SIZE,
+  );
+
+  function handlePageChange(newPage) {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   const hasFilters = Boolean(query) || Boolean(activeCategory);
 
   function clearFilters() {
@@ -119,11 +139,11 @@ function ExerciciosView({ data, onAddToWorkout }) {
 
   return (
     <main
-      className="flex w-full flex-col overflow-hidden"
+      className="min-h-screen w-full"
       style={{
-        height: "100vh",
         background:
           "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
+        backgroundAttachment: "fixed",
         fontFamily: "'Barlow', sans-serif",
         paddingTop: "var(--header-height, 90px)",
       }}
@@ -140,7 +160,7 @@ function ExerciciosView({ data, onAddToWorkout }) {
         </div>
       ) : (
         <>
-          <div className="mx-auto w-full max-w-6xl shrink-0 px-6 md:px-10">
+          <div className="mx-auto w-full max-w-6xl px-6 pb-24 md:px-10">
             <header className="mb-8">
               <h1
                 className="font-bold leading-[0.95]"
@@ -169,15 +189,13 @@ function ExerciciosView({ data, onAddToWorkout }) {
             />
 
             <ResultsCount count={filtered.length} />
-          </div>
 
-          <div className="mx-auto flex w-full max-w-6xl min-h-0 flex-1 flex-col px-6 pb-6 md:px-10">
-            <div className="nf-scroll min-h-0 flex-1 overflow-y-auto pb-8 pt-1">
-              {filtered.length === 0 ? (
-                <NoResults hasFilters={hasFilters} onClear={clearFilters} />
-              ) : (
+            {filtered.length === 0 ? (
+              <NoResults hasFilters={hasFilters} onClear={clearFilters} />
+            ) : (
+              <>
                 <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                  {filtered.map((exercise) => (
+                  {paginated.map((exercise) => (
                     <ExerciseCard
                       key={exercise.id}
                       exercise={exercise}
@@ -196,8 +214,14 @@ function ExerciciosView({ data, onAddToWorkout }) {
                     />
                   ))}
                 </div>
-              )}
-            </div>
+
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
+            )}
           </div>
 
           {modalExercise && (
@@ -790,6 +814,105 @@ function EmptyWorkouts({ onClose }) {
       >
         Criar meu primeiro treino →
       </Link>
+    </div>
+  );
+}
+
+function getPageRange(page, totalPages, windowSize = 4) {
+  if (totalPages <= windowSize + 1) {
+    return Array.from({ length: totalPages }, (_, i) => i);
+  }
+
+  const siblings = Math.floor((windowSize - 1) / 2);
+  let left = Math.max(page - siblings, 1);
+  let right = left + windowSize - 1;
+
+  if (right > totalPages - 1) {
+    right = totalPages - 1;
+    left = Math.max(right - windowSize + 1, 1);
+  }
+
+  const range = [0];
+  if (left > 1) range.push("gap-left");
+  for (let i = left; i <= right; i++) range.push(i);
+
+  return range;
+}
+
+function Pagination({ page = 0, totalPages = 1, onPageChange }) {
+  if (totalPages <= 1) return null;
+
+  const pageRange = getPageRange(page, totalPages, 4);
+
+  return (
+    <div className="mt-10 flex justify-center">
+      <div className="inline-flex items-center gap-6 rounded-full px-4 py-3">
+        <button
+          type="button"
+          onClick={() => onPageChange(page - 1)}
+          disabled={page === 0}
+          aria-label="Página anterior"
+          className="flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:opacity-30 text-[var(--pg-muted)] bg-[var(--pg-field)] hover:enabled:text-[var(--pg-orange)] hover:enabled:bg-[var(--pg-orange-bg)]"
+          style={{
+            "--pg-muted": MUTED,
+            "--pg-field": FIELD,
+            "--pg-orange": ORANGE,
+            "--pg-orange-bg": "rgba(255,77,28,0.14)",
+          }}
+        >
+          <ChevronLeft size={16} />
+        </button>
+
+        <div className="flex items-center gap-1.5">
+          {pageRange.map((p) =>
+            typeof p === "string" ? (
+              <span
+                key={p}
+                className="flex w-5 translate-y-1 items-center justify-center text-sm select-none"
+                style={{ color: MUTED }}
+              >
+                ···
+              </span>
+            ) : (
+              <button
+                key={p}
+                type="button"
+                onClick={() => onPageChange(p)}
+                aria-current={p === page ? "page" : undefined}
+                className="flex w-5 items-center justify-center text-sm transition-colors"
+                style={{
+                  color: p === page ? ORANGE : MUTED,
+                  fontWeight: p === page ? 800 : 600,
+                }}
+                onMouseOver={(e) => {
+                  if (p !== page) e.currentTarget.style.color = TEXT;
+                }}
+                onMouseOut={(e) => {
+                  if (p !== page) e.currentTarget.style.color = MUTED;
+                }}
+              >
+                {p + 1}
+              </button>
+            ),
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => onPageChange(page + 1)}
+          disabled={page >= totalPages - 1}
+          aria-label="Próxima página"
+          className="flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:opacity-30 text-[var(--pg-muted)] bg-[var(--pg-field)] hover:enabled:text-[var(--pg-orange)] hover:enabled:bg-[var(--pg-orange-bg)]"
+          style={{
+            "--pg-muted": MUTED,
+            "--pg-field": FIELD,
+            "--pg-orange": ORANGE,
+            "--pg-orange-bg": "rgba(255,77,28,0.14)",
+          }}
+        >
+          <ChevronRight size={16} />
+        </button>
+      </div>
     </div>
   );
 }

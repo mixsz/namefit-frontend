@@ -51,6 +51,7 @@ function HistoricoView({ data = {} }) {
     sessions = [],
     workouts: workoutsList = [],
     loading = false,
+    loadingMore = false,
     connectionError = false,
     onRetry,
     period = "ALL",
@@ -75,6 +76,8 @@ function HistoricoView({ data = {} }) {
 
   const onlyDeleted = workoutId === DELETED_OPTION;
   const hasFilters = period !== "ALL" || workoutId !== "ALL" || includeDeleted;
+  const specificWorkout = workoutId !== "ALL" && workoutId !== DELETED_OPTION;
+  const toggleDisabled = onlyDeleted || specificWorkout;
   const hasAnyHistory = sessions.length > 0 || hasFilters;
 
   function clearFilters() {
@@ -130,8 +133,8 @@ function HistoricoView({ data = {} }) {
             <EmptyState onClear={clearFilters} hasFilters={false} />
           ) : (
             <>
-              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-4">
-                <div className="w-full sm:max-w-[190px]">
+              <div className="mb-6 flex flex-row gap-3 sm:gap-4 sm:items-end">
+                <div className="w-1/2 sm:w-full sm:max-w-[190px]">
                   <Dropdown
                     label="Período"
                     icon={<CalendarDays size={15} />}
@@ -144,7 +147,7 @@ function HistoricoView({ data = {} }) {
                   />
                 </div>
 
-                <div className="w-full sm:max-w-[210px]">
+                <div className="w-1/2 sm:w-full sm:max-w-[210px]">
                   <Dropdown
                     label="Treino"
                     icon={<Dumbbell size={15} />}
@@ -179,7 +182,7 @@ function HistoricoView({ data = {} }) {
                 <div style={{ transform: "translateX(-15px)" }}>
                   <Toggle
                     checked={onlyDeleted ? true : includeDeleted}
-                    disabled={onlyDeleted}
+                    disabled={toggleDisabled}
                     onChange={(v) => onIncludeDeletedChange?.(v)}
                   />
                 </div>
@@ -206,13 +209,15 @@ function HistoricoView({ data = {} }) {
                       <button
                         type="button"
                         onClick={onLoadMore}
-                        className="rounded-full px-6 py-3 text-sm font-bold uppercase tracking-[0.05em] transition-all"
+                        disabled={loadingMore}
+                        className="rounded-full px-6 py-3 text-sm font-bold uppercase tracking-[0.05em] transition-all disabled:cursor-not-allowed disabled:opacity-60"
                         style={{
                           background: "transparent",
                           color: MUTED,
                           border: "1.5px solid " + BORDER,
                         }}
                         onMouseOver={(e) => {
+                          if (loadingMore) return;
                           e.currentTarget.style.color = ORANGE;
                           e.currentTarget.style.borderColor = ORANGE;
                         }}
@@ -221,7 +226,7 @@ function HistoricoView({ data = {} }) {
                           e.currentTarget.style.borderColor = BORDER;
                         }}
                       >
-                        Carregar mais
+                        {loadingMore ? "Carregando..." : "Carregar mais"}
                       </button>
                     </div>
                   )}
