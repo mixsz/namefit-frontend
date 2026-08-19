@@ -293,10 +293,12 @@ function StatusCard({
         cursor: clickable ? "pointer" : "default",
         opacity: blocked ? 0.5 : 1,
         background: trained
-          ? "radial-gradient(140% 130% at 50% -10%, rgba(255,86,28,0.22) 0%, rgba(180,50,10,0.10) 30%, #161210 60%, #0e0b09 100%)"
+          ? "radial-gradient(140% 130% at 50% -10%, rgba(255,86,28, 0.09) 0%, rgba(140,35,5,0.05) 30%, #161210 55%, #0e0b09 100%)"
           : "radial-gradient(140% 130% at 50% -10%, rgba(255,86,28," +
-            (hover ? "0.16" : "0.10") +
-            ") 0%, rgba(140,35,5,0.05) 30%, #161210 55%, #0e0b09 100%)",
+            (hover ? "0.07" : "0.0") +
+            ") 0%, rgba(140,35,5," +
+            (hover ? "0.05" : "0.0") +
+            ") 30%, #161210 55%, #0e0b09 100%)",
         backgroundClip: "padding-box",
         border:
           "1.4px solid " +
