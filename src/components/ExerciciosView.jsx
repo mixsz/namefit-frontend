@@ -339,8 +339,13 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
       className="relative flex h-36 sm:h-44 flex-col justify-between rounded-xl p-3 sm:p-6 transition-all"
       style={{
         background:
-          "linear-gradient(135deg, rgba(200,60,10,0.20) 0%, rgba(140,35,5,0.08) 30%, #161210 60%, " +
-          BASE,
+          "linear-gradient(to bottom right, " +
+          BASE +
+          " -4%, #120f0d 3%, #161210 90%, rgba(240, 90, 20, 0.15) 93%, rgba(160, 45, 10, 0.18) 93%, rgba(160, 45, 10, 0.18) 94%, #161210 96%, #161210 100%), " +
+          "linear-gradient(to top left, " +
+          BASE +
+          " -4%, #120f0d 3%, #161210 90%, rgba(240, 90, 20, 0.15) 93%, rgba(160, 45, 10, 0.18) 93%, rgba(160, 45, 10, 0.18) 94%, #161210 96%, #161210 100%) padding-box",
+        backgroundBlendMode: "lighten",
         backgroundClip: "padding-box",
         border: "1px solid " + (hover ? "rgba(255,77,28,0.35)" : BORDER),
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
@@ -362,7 +367,7 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
           e.currentTarget.style.color = MUTED;
         }}
       >
-        <Info size={17} strokeWidth={2.3} />
+        <Info size={18} strokeWidth={2.3} />
       </button>
 
       <div className="flex items-center gap-2 sm:gap-4 pr-6 sm:pr-8">
@@ -384,7 +389,7 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
             {exercise.name}
           </h3>
           <span
-            className="mt-1 sm:mt-1.5 inline-block rounded-full px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-[0.05em]"
+            className="mt-1 sm:mt-1.5 inline-block -translate-y-0.5 sm:translate-y-0 rounded-full px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-[0.05em]"
             style={{
               background: "transparent",
               color: "#e8956a",
@@ -397,13 +402,13 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
       </div>
 
       <div
-        className="mt-5 flex items-center gap-2 pt-4"
+        className="mt-5 flex items-center justify-center gap-2 pt-4"
         style={{ borderTop: "1px solid " + BORDER }}
       >
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-extrabold uppercase tracking-[0.04em] transition-all"
+          className="inline-flex items-center justify-center gap-1.5 sm:gap-2 rounded-full px-8 sm:px-10 py-1.5 sm:py-2 text-[11px] sm:text-sm font-extrabold uppercase tracking-[0.01em] transition-all"
           style={{
             background: "transparent",
             color: ORANGE,
@@ -413,7 +418,7 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
           onMouseOver={(e) => {
             if (blocked) return;
             e.currentTarget.style.background = ORANGE;
-            e.currentTarget.style.color = BG;
+            e.currentTarget.style.color = PANEL;
           }}
           onMouseOut={(e) => {
             if (blocked) return;

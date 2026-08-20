@@ -508,7 +508,7 @@ function SuggestionCard({ suggestion }) {
         </div>
       </div>
       <span
-        className="relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold uppercase tracking-[0.05em] transition-all self-center"
+        className="relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all self-center"
         style={{
           background: hover ? ORANGE : "transparent",
           color: hover ? BG : ORANGE,

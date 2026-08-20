@@ -331,7 +331,7 @@ function Toggle({ checked, disabled, onChange }) {
         aria-checked={checked}
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
-        className="relative inline-flex shrink-0 rounded-full outline-none transition-all disabled:cursor-not-allowed"
+        className="relative inline-flex shrink-0 rounded-full outline-none transition-all"
         style={{
           width: 38,
           height: 21,
