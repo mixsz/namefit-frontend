@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme";
 import {
   Search,
@@ -14,13 +14,13 @@ import {
   Info,
 } from "lucide-react";
 
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import MuscleIcon from "./MuscleIcon";
 import ConnectionErrorState from "./ConnectionErrorState";
 import ExercicioDetalhe from "./ExercicioDetalhe";
 import { useToast } from "../hooks/useToast.js";
 
-const CATEGORIES = [
+export const CATEGORIES = [
   { key: "PEITO", label: "Peito", icon: "CHEST", groups: ["CHEST"] },
   {
     key: "COSTAS",
@@ -59,24 +59,6 @@ const CATEGORIES = [
   { key: "PESCOCO", label: "Pescoço", icon: "NECK", groups: ["NECK"] },
 ];
 
-function normalize(str = "") {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-}
-
-function matchesQuery(exercise, query) {
-  if (!query) return true;
-  const q = normalize(query);
-  return (
-    normalize(exercise.name).includes(q) ||
-    normalize(exercise.muscleGroupLabel).includes(q)
-  );
-}
-
-const PAGE_SIZE = 12;
-
 function ExerciciosView({ data, onAddToWorkout }) {
   const {
     exercises = [],
@@ -85,56 +67,31 @@ function ExerciciosView({ data, onAddToWorkout }) {
     loading,
     connectionError,
     onRetry,
+    query = "",
+    onQueryChange,
+    activeCategory = null,
+    onCategoryChange,
+    totalElements = 0,
+    page = 0,
+    totalPages = 1,
+    onPageChange,
   } = data;
-  const location = useLocation();
-  const navigate = useNavigate();
   const { showToast } = useToast();
   const blocked = !!activeWorkout;
 
-  const [query, setQuery] = useState(location.state?.searchQuery ?? "");
-  const [activeCategory, setActiveCategory] = useState(null);
   const [modalExercise, setModalExercise] = useState(null);
   const [detailExercise, setDetailExercise] = useState(null);
-  const [page, setPage] = useState(0);
-
-  useEffect(() => {
-    if (location.state?.searchQuery) {
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, []);
-
-  const category = CATEGORIES.find((c) => c.key === activeCategory);
-  const activeGroups = category ? category.groups : null;
-
-  const filtered = useMemo(() => {
-    return exercises.filter((ex) => {
-      const byCategory = activeGroups
-        ? activeGroups.includes(ex.muscleGroup)
-        : true;
-      return byCategory && matchesQuery(ex, query);
-    });
-  }, [exercises, activeGroups, query]);
-
-  useEffect(() => {
-    setPage(0);
-  }, [query, activeCategory]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice(
-    page * PAGE_SIZE,
-    page * PAGE_SIZE + PAGE_SIZE,
-  );
 
   function handlePageChange(newPage) {
-    setPage(newPage);
+    onPageChange?.(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   const hasFilters = Boolean(query) || Boolean(activeCategory);
 
   function clearFilters() {
-    setQuery("");
-    setActiveCategory(null);
+    onQueryChange?.("");
+    onCategoryChange?.(null);
   }
 
   return (
@@ -179,23 +136,23 @@ function ExerciciosView({ data, onAddToWorkout }) {
               </p>
             </header>
 
-            <SearchField value={query} onChange={setQuery} />
+            <SearchField value={query} onChange={onQueryChange} />
 
             <CategoryChips
               active={activeCategory}
               onToggle={(key) =>
-                setActiveCategory((prev) => (prev === key ? null : key))
+                onCategoryChange?.(activeCategory === key ? null : key)
               }
             />
 
-            <ResultsCount count={filtered.length} />
+            <ResultsCount count={totalElements} />
 
-            {filtered.length === 0 ? (
+            {exercises.length === 0 ? (
               <NoResults hasFilters={hasFilters} onClear={clearFilters} />
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                  {paginated.map((exercise) => (
+                  {exercises.map((exercise) => (
                     <ExerciseCard
                       key={exercise.id}
                       exercise={exercise}
@@ -341,10 +298,11 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
         background:
           "linear-gradient(to bottom right, " +
           BASE +
-          " -4%, #120f0d 3%, #161210 90%, rgba(240, 90, 20, 0.15) 93%, rgba(160, 45, 10, 0.18) 93%, rgba(160, 45, 10, 0.18) 94%, #161210 96%, #161210 100%), " +
+          " -4%, transparent 3%, transparent 90%, rgba(240, 90, 20, 0.15) 93%, rgba(160, 45, 10, 0.18) 93%, rgba(160, 45, 10, 0.18) 94%, transparent 96%, transparent 100%), " +
           "linear-gradient(to top left, " +
           BASE +
-          " -4%, #120f0d 3%, #161210 90%, rgba(240, 90, 20, 0.15) 93%, rgba(160, 45, 10, 0.18) 93%, rgba(160, 45, 10, 0.18) 94%, #161210 96%, #161210 100%) padding-box",
+          " -4%, transparent 3%, transparent 90%, rgba(240, 90, 20, 0.15) 93%, rgba(160, 45, 10, 0.18) 93%, rgba(160, 45, 10, 0.18) 94%, transparent 96%, transparent 100%), " +
+          "radial-gradient(180% 600% at 100% -130%, rgba(255, 110, 50, 0.06) 0%, rgba(180, 60, 15, 0.02) 20%, rgb(23, 19, 16) 45%, rgb(14, 11, 9) 100%)",
         backgroundBlendMode: "lighten",
         backgroundClip: "padding-box",
         border: "1px solid " + (hover ? "rgba(255,77,28,0.35)" : BORDER),

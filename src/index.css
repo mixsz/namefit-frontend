@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scrollbar-gutter: stable;
+}
+
 .nf-scroll::-webkit-scrollbar {
   width: 8px;
 }

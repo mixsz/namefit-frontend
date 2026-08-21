@@ -224,7 +224,7 @@ function LoginForm({ onSubmit, error }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 rounded-full font-extrabold text-sm tracking-[0.18em] uppercase transition-all mt-3"
+              className="w-full py-4 rounded-full font-extrabold text-sm tracking-[0.18em] uppercase transition-all mt-0"
               style={{
                 background: loading ? "#cc3a12" : ORANGE,
                 color: "#0c0a08",
