@@ -53,6 +53,7 @@ function HomeView({ data }) {
         background:
           "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
         fontFamily: "'Barlow', sans-serif",
+        backgroundAttachment: "fixed",
         paddingTop: "var(--header-height, 90px)",
       }}
     >

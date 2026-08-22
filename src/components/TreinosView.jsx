@@ -15,12 +15,15 @@ import {
   ArrowRight,
   AlertTriangle,
   WifiOff,
+  Lock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatLastTrained } from "../pages/Treinos.jsx";
 import { CARD_VARIANTS, hashId } from "../cardBackground.js";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
 import { useToast } from "../hooks/useToast";
+
+const MAX_WORKOUTS = 20;
 
 function TreinosView({ data }) {
   const {
@@ -41,6 +44,8 @@ function TreinosView({ data }) {
   const [query, setQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const atLimit = workouts.length >= MAX_WORKOUTS;
 
   const ordered = useMemo(
     () => [...workouts].sort((a, b) => a.position - b.position),
@@ -68,6 +73,7 @@ function TreinosView({ data }) {
       style={{
         background:
           "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
+        backgroundAttachment: "fixed",
         fontFamily: "'Barlow', sans-serif",
         paddingTop: "var(--header-height, 90px)",
       }}
@@ -108,26 +114,36 @@ function TreinosView({ data }) {
 
               <button
                 type="button"
-                onClick={() => setModalOpen(true)}
+                onClick={() => {
+                  if (atLimit) return;
+                  setModalOpen(true);
+                }}
+                disabled={atLimit}
                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
                 style={{
-                  background: ORANGE,
-                  color: BG,
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
+                  background: atLimit ? "#3a2a22" : ORANGE,
+                  color: atLimit ? "#7a6a60" : BG,
+                  boxShadow: atLimit ? "none" : "0 2px 8px rgba(0,0,0,0.35)",
                 }}
                 onMouseOver={(e) => {
+                  if (atLimit) return;
                   e.currentTarget.style.background = "#ff6b42";
                   e.currentTarget.style.boxShadow =
                     "0 4px 12px rgba(0,0,0,0.4)";
                 }}
                 onMouseOut={(e) => {
+                  if (atLimit) return;
                   e.currentTarget.style.background = ORANGE;
                   e.currentTarget.style.boxShadow =
                     "0 2px 8px rgba(0,0,0,0.35)";
                 }}
               >
-                <Plus size={16} strokeWidth={2.5} />
-                Criar treino
+                {atLimit ? (
+                  <Lock size={16} strokeWidth={2.5} />
+                ) : (
+                  <Plus size={16} strokeWidth={2.5} />
+                )}
+                {atLimit ? "Limite atingido" : "Criar treino"}
               </button>
             </header>
 
