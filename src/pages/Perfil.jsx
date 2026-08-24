@@ -1,5 +1,7 @@
+import PerfilView from "../components/PerfilView";
+
 function Perfil() {
-  return <div>Perfil</div>;
+  return <PerfilView />;
 }
 
 export default Perfil;
