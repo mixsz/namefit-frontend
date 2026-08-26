@@ -16,7 +16,6 @@ import {
   Check,
   Dumbbell,
   Minus,
-  WifiOff,
 } from "lucide-react";
 
 import MuscleIcon from "./MuscleIcon";
@@ -31,9 +30,7 @@ function TreinoDetalheView({ data }) {
     workout,
     onSave,
     onCancel,
-    onAddExercise,
     onStartWorkout,
-    onOpenExercise,
     startInEdit = false,
     loading,
     connectionError,
@@ -827,19 +824,6 @@ function ReorderArrow({ direction, disabled, onClick }) {
   );
 }
 
-function EmptyRows() {
-  return (
-    <div
-      className="flex flex-col items-center justify-center rounded-xl py-12 text-center"
-      style={{ background: PANEL, border: "1px dashed " + BORDER }}
-    >
-      <p className="text-sm" style={{ color: MUTED }}>
-        Nenhum exercício neste treino ainda.
-      </p>
-    </div>
-  );
-}
-
 function ViewActions({ onStart, disabled, blocked }) {
   const isDisabled = disabled || blocked;
   return (
@@ -1023,18 +1007,18 @@ function ConfirmDeleteModal({ exercise, onClose, onConfirm }) {
             onClick={onConfirm}
             className="inline-flex w-32 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: "linear-gradient(180deg, #c22626 0%, #a61818 100%)",
+              background: "linear-gradient(180deg, #922626 0%, #961818 100%)",
               color: "#fff",
               boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.background =
-                "linear-gradient(180deg, #d13030 0%, #b82020 100%)";
+                "linear-gradient(180deg, #a13030 0%, #982020 100%)";
               e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.background =
-                "linear-gradient(180deg, #c22626 0%, #a61818 100%)";
+                "linear-gradient(180deg, #922626 0%, #961818 100%)";
               e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
             }}
           >

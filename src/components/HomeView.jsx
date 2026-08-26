@@ -2,8 +2,6 @@ import { useState } from "react";
 import { ORANGE, BG, PANEL, FIELD, BORDER, MUTED, TEXT } from "../theme";
 import {
   Dumbbell,
-  Flame,
-  FlameKindling,
   CalendarCheck,
   History,
   ArrowRight,
@@ -431,9 +429,9 @@ function SmallMetricCard({
         <div
           className="my-2"
           style={{
-            width: 18,
+            width: 21,
             height: 2,
-            background: labelColor || "rgba(255,77,28,0.42)",
+            background: labelColor || "rgba(255,77,28,0.50)",
             borderRadius: 2,
           }}
         />
@@ -571,8 +569,8 @@ function BuildWorkoutCard({ onGoToTreinos, activeWorkout }) {
             className="my-2"
             style={{
               width: 22,
-              height: 2,
-              background: ORANGE,
+              height: 0.5,
+              background: "transparent",
               borderRadius: 2,
             }}
           />

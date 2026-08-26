@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme";
+import { ORANGE, BG, FIELD, BORDER, TEXT, MUTED } from "../theme";
 import {
   ArrowLeft,
-  AlertTriangle,
   Check,
   Trash2,
   X,

@@ -10,7 +10,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Check,
-  WifiOff,
   Info,
 } from "lucide-react";
 

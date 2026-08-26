@@ -14,7 +14,6 @@ import {
   X,
   ArrowRight,
   AlertTriangle,
-  WifiOff,
   Lock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -861,18 +860,18 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
             onClick={onConfirm}
             className="inline-flex w-32 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: "linear-gradient(180deg, #c22626 0%, #a61818 100%)",
+              background: "linear-gradient(180deg, #922626 0%, #961818 100%)",
               color: "#fff",
               boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.background =
-                "linear-gradient(180deg, #d13030 0%, #b82020 100%)";
+                "linear-gradient(180deg, #a13030 0%, #982020 100%)";
               e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.background =
-                "linear-gradient(180deg, #c22626 0%, #a61818 100%)";
+                "linear-gradient(180deg, #922626 0%, #961818 100%)";
               e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
             }}
           >

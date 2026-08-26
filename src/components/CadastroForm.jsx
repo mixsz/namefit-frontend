@@ -4,7 +4,6 @@ import {
   Eye,
   EyeOff,
   Dumbbell,
-  Flame,
   User,
   Mail,
   Lock,

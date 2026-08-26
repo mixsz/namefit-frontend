@@ -22,9 +22,9 @@ const NAV_ITEMS = [
   { label: "Histórico", to: "/historico" },
 ];
 
-function Header({ userName }) {
+function Header() {
   const location = useLocation();
-  const [username, setUsername] = useState("Teste Dentro dos States");
+  const [username, setUsername] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef(null);

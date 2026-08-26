@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme";
+import { ORANGE, PANEL, BORDER, TEXT, MUTED } from "../theme";
 import {
   ArrowLeft,
   CalendarDays,
   Clock,
   Check,
-  X,
   Dumbbell,
   History,
   Repeat,
