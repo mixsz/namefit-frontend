@@ -17,8 +17,8 @@ import {
   Lock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { formatLastTrained } from "../pages/Treinos.jsx";
-import { CARD_VARIANTS, hashId } from "../cardBackground.js";
+import { formatLastTrained } from "../utils/formatDate.js";
+import { CARD_VARIANTS, hashId } from "../constants/cardBackground.js";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
 import { useToast } from "../hooks/useToast";
 
@@ -62,6 +62,7 @@ function TreinosView({ data }) {
       setModalOpen(true);
       navigate(location.pathname, { replace: true, state: {} });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isEmpty = !loading && workouts.length === 0;

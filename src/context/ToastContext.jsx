@@ -1,12 +1,5 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from "react";
-
-export const ToastContext = createContext(null);
+import { useCallback, useRef, useState } from "react";
+import { ToastContext } from "./toastContext.js";
 
 let nextId = 1;
 

@@ -1,17 +1,12 @@
-import { createContext, useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "../services/api";
-
-export const ActiveWorkoutContext = createContext(null);
+import { ActiveWorkoutContext } from "./activeWorkoutContext.js";
 
 export function ActiveWorkoutProvider({ children }) {
   const [activeWorkout, setActiveWorkout] = useState(null);
   const [loadingActiveWorkout, setLoadingActiveWorkout] = useState(true);
 
-  useEffect(() => {
-    fetchActiveWorkout();
-  }, []);
-
-  async function fetchActiveWorkout() {
+  const fetchActiveWorkout = useCallback(async () => {
     try {
       const response = await api.get("/workoutLog/active");
       if (response.status === 200 && response.data) {
@@ -25,7 +20,11 @@ export function ActiveWorkoutProvider({ children }) {
     } finally {
       setLoadingActiveWorkout(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchActiveWorkout();
+  }, [fetchActiveWorkout]);
 
   return (
     <ActiveWorkoutContext.Provider

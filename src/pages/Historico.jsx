@@ -59,6 +59,7 @@ function Historico() {
 
   useEffect(() => {
     fetchHistory(0, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, workoutId, includeDeleted]);
 
   async function fetchHistory(targetPage, replace) {

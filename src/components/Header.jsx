@@ -3,7 +3,6 @@ import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme.js";
 import {
   Dumbbell,
   User,
-  Pencil,
   LogOut,
   ChevronDown,
   ChevronRight,
@@ -12,8 +11,8 @@ import {
 } from "lucide-react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
-import api from "../services/api.js";
-import { useActiveWorkout } from "../hooks/useActivateWorkout.js";
+import { useActiveWorkout } from "../hooks/useActiveWorkout.js";
+import { findAvatarOption } from "../constants/avatarOptions.js";
 
 const NAV_ITEMS = [
   { label: "Home", to: "/home" },
@@ -24,7 +23,8 @@ const NAV_ITEMS = [
 
 function Header() {
   const location = useLocation();
-  const [username, setUsername] = useState("");
+  const { username, avatarId } = useAuth();
+  const currentAvatar = findAvatarOption(avatarId);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef(null);
@@ -44,13 +44,6 @@ function Header() {
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    api
-      .get("/auth/me")
-      .then(({ data }) => setUsername(data.name))
-      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -176,7 +169,7 @@ function Header() {
                 className="w-9 h-9 rounded-full flex items-center justify-center"
                 style={{ background: ORANGE }}
               >
-                <User size={18} color={BG} strokeWidth={2.5} />
+                <currentAvatar.icon size={26} color={BG} strokeWidth={1.7} />
               </span>
               <ChevronDown
                 size={16}
@@ -210,8 +203,8 @@ function Header() {
                 </div>
 
                 <DropdownItem
-                  icon={<Pencil size={16} />}
-                  label="Editar perfil"
+                  icon={<User size={16} />}
+                  label="Meu perfil"
                   as={Link}
                   to="/perfil"
                   onClick={() => setMenuOpen(false)}

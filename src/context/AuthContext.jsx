@@ -1,16 +1,20 @@
-import { createContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import api from "../services/api.js";
-
-export const AuthContext = createContext();
+import { AuthContext } from "./authContext.js";
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [username, setUsername] = useState(null);
+  const [avatarId, setAvatarId] = useState(null);
 
   useEffect(() => {
     if (token) {
-      api.get("/auth/me")
-        .then(({ data }) => setUsername(data.name))
+      api
+        .get("/auth/me")
+        .then(({ data }) => {
+          setUsername(data.name);
+          setAvatarId(data.avatarId ?? null);
+        })
         .catch(() => {});
     }
   }, [token]);
@@ -26,10 +30,18 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("refreshToken");
     setToken(null);
     setUsername(null);
+    setAvatarId(null);
+  }
+
+  function updateUser(partial) {
+    if (partial.name !== undefined) setUsername(partial.name);
+    if (partial.avatarId !== undefined) setAvatarId(partial.avatarId);
   }
 
   return (
-    <AuthContext.Provider value={{ token, username, login, logout }}>
+    <AuthContext.Provider
+      value={{ token, username, avatarId, login, logout, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

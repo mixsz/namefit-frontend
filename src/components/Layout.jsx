@@ -1,6 +1,6 @@
 import Header from "./Header.jsx";
 import { Outlet } from "react-router-dom";
-import { ActiveWorkoutProvider } from "../context/ActivateWorkout.jsx";
+import { ActiveWorkoutProvider } from "../context/ActiveWorkout.jsx";
 
 function Layout() {
   return (

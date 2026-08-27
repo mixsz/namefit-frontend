@@ -1,7 +1,7 @@
 import HomeView from "../components/HomeView";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useActiveWorkout } from "../hooks/useActivateWorkout";
+import { useActiveWorkout } from "../hooks/useActiveWorkout";
 import { useToast } from "../hooks/useToast.js";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -43,6 +43,7 @@ function Home() {
 
   useEffect(() => {
     fetchAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchAll() {

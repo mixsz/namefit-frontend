@@ -14,7 +14,7 @@ function Cadastro() {
       return;
     }
     try {
-      const { data } = await api.post("auth/register", {
+      await api.post("auth/register", {
         name,
         email,
         password,

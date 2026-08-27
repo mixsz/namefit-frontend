@@ -1,6 +1,6 @@
 import TreinoDetalheView from "../components/TreinoDetalheView";
 import { useToast } from "../hooks/useToast.js";
-import { useActiveWorkout } from "../hooks/useActivateWorkout";
+import { useActiveWorkout } from "../hooks/useActiveWorkout";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import api from "../services/api";
@@ -21,6 +21,7 @@ function TreinoDetalhe() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   async function fetchData() {

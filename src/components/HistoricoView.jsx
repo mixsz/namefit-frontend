@@ -72,6 +72,7 @@ function HistoricoView({ data = {} }) {
     if (location.state?.period) {
       onPeriodChange?.(location.state.period);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onlyDeleted = workoutId === DELETED_OPTION;

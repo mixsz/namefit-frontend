@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate, useBlocker } from "react-router-dom";
 import api from "../services/api";
 import { useToast } from "../hooks/useToast.js";
-import { useActiveWorkout } from "../hooks/useActivateWorkout";
+import { useActiveWorkout } from "../hooks/useActiveWorkout";
 
 function Execucao() {
   const navigate = useNavigate();
@@ -33,6 +33,7 @@ function Execucao() {
 
   useEffect(() => {
     fetchWorkout();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchWorkout() {

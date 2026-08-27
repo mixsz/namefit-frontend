@@ -1,8 +1,9 @@
-import ExerciciosView, { CATEGORIES } from "../components/ExerciciosView";
+import ExerciciosView from "../components/ExerciciosView.jsx";
+import { CATEGORIES } from "../constants/exerciseCategories.js";
 import api from "../services/api";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "../hooks/useToast.js";
-import { useActiveWorkout } from "../hooks/useActivateWorkout";
+import { useActiveWorkout } from "../hooks/useActiveWorkout";
 
 const PAGE_SIZE = 12;
 const DEBOUNCE_MS = 250;
@@ -29,6 +30,7 @@ function Exercicios() {
   useEffect(() => {
     fetchWorkouts();
     fetchExercises(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -37,6 +39,7 @@ function Exercicios() {
       return;
     }
     fetchExercises(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory]);
 
   useEffect(() => {
@@ -48,6 +51,7 @@ function Exercicios() {
       fetchExercises(0);
     }, DEBOUNCE_MS);
     return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   async function fetchWorkouts() {

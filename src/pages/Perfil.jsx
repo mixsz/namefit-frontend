@@ -8,8 +8,8 @@ export default function Perfil() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
-  const { logout } = useAuth();
   const { showToast } = useToast();
+  const { logout, updateUser } = useAuth();
 
   const fetchProfile = useCallback(async () => {
     setLoading(true);
@@ -32,6 +32,7 @@ export default function Perfil() {
     try {
       const { data } = await api.put("/user/name", { name: newName });
       setProfile((prev) => ({ ...prev, name: data.name }));
+      updateUser({ name: data.name });
       showToast("Nome atualizado", "success");
     } catch (error) {
       const message = error.response?.data || "Erro ao atualizar nome";
@@ -47,6 +48,7 @@ export default function Perfil() {
     try {
       const { data } = await api.put("/user/avatar", { avatarId });
       setProfile((prev) => ({ ...prev, avatarId: data.avatarId }));
+      updateUser({ avatarId: data.avatarId });
       showToast("Avatar atualizado", "success");
     } catch (error) {
       const message = error.response?.data || "Erro ao atualizar avatar";
@@ -58,8 +60,16 @@ export default function Perfil() {
     }
   }
 
-  async function handleSavePassword({ currentPassword, newPassword }) {
-    await api.put("/user/password", { currentPassword, newPassword });
+  async function handleSavePassword({
+    currentPassword,
+    newPassword,
+    confirmNewPassword,
+  }) {
+    await api.put("/user/password", {
+      currentPassword,
+      newPassword,
+      confirmNewPassword,
+    });
     showToast("Senha atualizada", "success");
   }
 

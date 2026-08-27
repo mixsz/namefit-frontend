@@ -1,66 +1,53 @@
-"use client";
-
 import { useState, useRef, useEffect } from "react";
 import { ORANGE, BG, FIELD, BORDER, TEXT, MUTED } from "../theme";
 import {
-  Apple,
-  Bird,
-  Bug,
   Calendar,
-  Cat,
   Check,
-  Crown,
-  Dog,
   Dumbbell,
-  Fish,
-  Flame,
-  Flower,
+  Eye,
+  EyeOff,
   KeyRound,
   Lock,
   Mail,
   Pencil,
-  Rabbit,
-  Rocket,
-  Snail,
-  Squirrel,
   Star,
   TrendingUp,
-  Turtle,
   User,
   X,
-  Zap,
   Image as ImageIcon,
 } from "lucide-react";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
+import { avatarOptions, findAvatarOption } from "../constants/avatarOptions.js";
 
-const avatarOptions = [
-  { id: "USER", name: "Pessoa", icon: User },
-  { id: "CAT", name: "Gato", icon: Cat },
-  { id: "BIRD", name: "Pássaro", icon: Bird },
-  { id: "FISH", name: "Peixe", icon: Fish },
-  { id: "RABBIT", name: "Coelho", icon: Rabbit },
-  { id: "TURTLE", name: "Tartaruga", icon: Turtle },
-  { id: "FLAME", name: "Fogo", icon: Flame },
-  { id: "ROCKET", name: "Foguete", icon: Rocket },
-  { id: "CROWN", name: "Coroa", icon: Crown },
-  { id: "ZAP", name: "Raio", icon: Zap },
-  { id: "STAR", name: "Estrela", icon: Star },
-  { id: "BUG", name: "Inseto", icon: Bug },
-  { id: "SQUIRREL", name: "Esquilo", icon: Squirrel },
-  { id: "APPLE", name: "Maçã", icon: Apple },
-  { id: "ROSE", name: "Rosa", icon: Flower }, // ícone visual só, id continua ROSE
-  { id: "PANDA", name: "Panda", icon: Dog }, // ícone visual só, id continua PANDA
-  { id: "SNAIL", name: "Caracol", icon: Snail },
-];
+const NAME_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
+const PASSWORD_PATTERN =
+  /^(?=.*[0-9])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).*$/;
 
-function findAvatarOption(id) {
-  return avatarOptions.find((opt) => opt.id === id) ?? avatarOptions[0];
+function getNameError(value) {
+  if (!value.trim()) return "Nome é obrigatório.";
+  if (!NAME_PATTERN.test(value)) return "O nome deve conter apenas letras.";
+  return "";
+}
+
+function getNewPasswordError(value) {
+  if (!value) return "Nova senha é obrigatória.";
+  if (value.length < 8) return "A senha deve ter pelo menos 8 caracteres.";
+  if (!PASSWORD_PATTERN.test(value))
+    return "A senha deve conter um número, uma letra maiúscula e um caractere especial.";
+  return "";
+}
+
+function getConfirmPasswordError(value, newPassword) {
+  if (!value) return "Confirmação é obrigatória.";
+  if (value !== newPassword) return "As senhas não coincidem.";
+  return "";
 }
 
 export default function PerfilView({
   data,
   loading,
   connectionError,
+  onRetry,
   onSaveName,
   onSaveAvatar,
   onSavePassword,
@@ -76,6 +63,15 @@ export default function PerfilView({
     confirmPassword: "",
   });
   const [passwordError, setPasswordError] = useState("");
+
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+
+  const [invalidFields, setInvalidFields] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+  const [formErrorMessage, setFormErrorMessage] = useState("");
 
   const currentAvatar = data
     ? findAvatarOption(data.avatarId)
@@ -98,6 +94,16 @@ export default function PerfilView({
     }
   }
 
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+
+  function toggleShowPassword(field) {
+    setShowPasswords((p) => ({ ...p, [field]: !p[field] }));
+  }
+
   function openPasswordModal() {
     setPasswordForm({
       currentPassword: "",
@@ -105,20 +111,56 @@ export default function PerfilView({
       confirmPassword: "",
     });
     setPasswordError("");
+    setAttemptedSubmit(false);
+    setInvalidFields({ current: false, new: false, confirm: false });
+    setFormErrorMessage("");
+    setShowPasswords({ current: false, new: false, confirm: false });
     setModal("password");
   }
 
+  function updatePasswordField(field, value) {
+    setPasswordForm((p) => ({ ...p, [field]: value }));
+    if (passwordError) setPasswordError("");
+  }
+
+  const newPasswordError = getNewPasswordError(passwordForm.newPassword);
+  const confirmPasswordError = getConfirmPasswordError(
+    passwordForm.confirmPassword,
+    passwordForm.newPassword,
+  );
+  const isPasswordFormValid =
+    passwordForm.currentPassword.trim() !== "" &&
+    !newPasswordError &&
+    !confirmPasswordError;
+
   async function savePassword() {
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError("As senhas não coincidem");
+    if (!isPasswordFormValid) {
+      setAttemptedSubmit(true);
+      const currentInvalid = !passwordForm.currentPassword.trim();
+
+      if (currentInvalid) {
+        setInvalidFields({ current: true, new: false, confirm: false });
+        setFormErrorMessage("Senha atual é obrigatória.");
+      } else if (newPasswordError) {
+        setInvalidFields({ current: false, new: true, confirm: false });
+        setFormErrorMessage(newPasswordError);
+      } else {
+        setInvalidFields({ current: false, new: false, confirm: true });
+        setFormErrorMessage(confirmPasswordError);
+      }
       return;
     }
+
+    setFormErrorMessage("");
+    setInvalidFields({ current: false, new: false, confirm: false });
+
     setSaving(true);
     setPasswordError("");
     try {
       await onSavePassword({
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
+        confirmNewPassword: passwordForm.confirmPassword,
       });
       setModal(null);
     } catch (error) {
@@ -137,14 +179,6 @@ export default function PerfilView({
       month: "long",
       year: "numeric",
     });
-  }
-
-  const NAME_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
-
-  function getNameError(value) {
-    if (!value.trim()) return "Nome é obrigatório.";
-    if (!NAME_PATTERN.test(value)) return "O nome deve conter apenas letras.";
-    return "";
   }
 
   const nameError = getNameError(draftName);
@@ -190,7 +224,7 @@ export default function PerfilView({
             <p style={{ color: MUTED }}>Carregando perfil...</p>
           </div>
         ) : connectionError ? (
-          <ConnectionErrorState onRetry={() => window.location.reload()} />
+          <ConnectionErrorState onRetry={onRetry} />
         ) : (
           <>
             <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -470,62 +504,132 @@ export default function PerfilView({
       {modal === "password" && (
         <Modal title="Alterar senha" onClose={() => setModal(null)} icon={Lock}>
           <div className="grid gap-3">
-            <label
-              className="text-xs font-bold uppercase tracking-[0.12em]"
-              style={{ color: MUTED }}
-            >
-              Senha atual
-              <input
-                type="password"
-                value={passwordForm.currentPassword}
-                onChange={(e) =>
-                  setPasswordForm((p) => ({
-                    ...p,
-                    currentPassword: e.target.value,
-                  }))
-                }
-                className="mt-2 w-full rounded-xl border bg-[#201a15] px-4 py-2 text-sm outline-none focus:border-[#FF4D1C]"
-                style={{ borderColor: BORDER, color: TEXT }}
-              />
-            </label>
-            <label
-              className="text-xs font-bold uppercase tracking-[0.12em]"
-              style={{ color: MUTED }}
-            >
-              Nova senha
-              <input
-                type="password"
-                value={passwordForm.newPassword}
-                onChange={(e) =>
-                  setPasswordForm((p) => ({
-                    ...p,
-                    newPassword: e.target.value,
-                  }))
-                }
-                className="mt-2 w-full rounded-xl border bg-[#201a15] px-4 py-2 text-sm outline-none focus:border-[#FF4D1C]"
-                style={{ borderColor: BORDER, color: TEXT }}
-              />
-            </label>
-            <label
-              className="text-xs font-bold uppercase tracking-[0.12em]"
-              style={{ color: MUTED }}
-            >
-              Confirmar nova senha
-              <input
-                type="password"
-                value={passwordForm.confirmPassword}
-                onChange={(e) =>
-                  setPasswordForm((p) => ({
-                    ...p,
-                    confirmPassword: e.target.value,
-                  }))
-                }
-                className="mt-2 w-full rounded-xl border bg-[#201a15] px-4 py-2 text-sm outline-none focus:border-[#FF4D1C]"
-                style={{ borderColor: BORDER, color: TEXT }}
-              />
-            </label>
+            <div>
+              <label
+                className="text-xs font-bold uppercase tracking-[0.12em]"
+                style={{ color: MUTED }}
+                htmlFor="current-password"
+              >
+                Senha atual
+              </label>
+              <div className="relative mt-2">
+                <input
+                  id="current-password"
+                  type={showPasswords.current ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={passwordForm.currentPassword}
+                  onChange={(e) =>
+                    updatePasswordField("currentPassword", e.target.value)
+                  }
+                  className="w-full rounded-xl border bg-[#201a15] px-4 py-2 pr-11 text-sm outline-none focus:border-[#FF4D1C]"
+                  style={{
+                    borderColor: invalidFields.current ? "#ef4444" : BORDER,
+                    color: TEXT,
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => toggleShowPassword("current")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 opacity-40 transition-opacity hover:opacity-80"
+                  style={{ color: MUTED }}
+                  tabIndex={-1}
+                >
+                  {showPasswords.current ? (
+                    <EyeOff size={16} />
+                  ) : (
+                    <Eye size={16} />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="text-xs font-bold uppercase tracking-[0.12em]"
+                style={{ color: MUTED }}
+                htmlFor="new-password"
+              >
+                Nova senha
+              </label>
+              <div className="relative mt-2">
+                <input
+                  id="new-password"
+                  type={showPasswords.new ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={passwordForm.newPassword}
+                  onChange={(e) =>
+                    updatePasswordField("newPassword", e.target.value)
+                  }
+                  className="w-full rounded-xl border bg-[#201a15] px-4 py-2 pr-11 text-sm outline-none focus:border-[#FF4D1C]"
+                  style={{
+                    borderColor: invalidFields.new ? "#ef4444" : BORDER,
+                    color: TEXT,
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => toggleShowPassword("new")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 opacity-40 transition-opacity hover:opacity-80"
+                  style={{ color: MUTED }}
+                  tabIndex={-1}
+                >
+                  {showPasswords.new ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="text-xs font-bold uppercase tracking-[0.12em]"
+                style={{ color: MUTED }}
+                htmlFor="confirm-password"
+              >
+                Confirmar nova senha
+              </label>
+              <div className="relative mt-2">
+                <input
+                  id="confirm-password"
+                  type={showPasswords.confirm ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) =>
+                    updatePasswordField("confirmPassword", e.target.value)
+                  }
+                  className="w-full rounded-xl border bg-[#201a15] px-4 py-2 pr-11 text-sm outline-none focus:border-[#FF4D1C]"
+                  style={{
+                    borderColor: invalidFields.confirm ? "#ef4444" : BORDER,
+                    color: TEXT,
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => toggleShowPassword("confirm")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 opacity-40 transition-opacity hover:opacity-80"
+                  style={{ color: MUTED }}
+                  tabIndex={-1}
+                >
+                  {showPasswords.confirm ? (
+                    <EyeOff size={16} />
+                  ) : (
+                    <Eye size={16} />
+                  )}
+                </button>
+              </div>
+            </div>
+            {attemptedSubmit && formErrorMessage && (
+              <p
+                className="mt-2 text-xs font-semibold"
+                style={{ color: "#ff5c5c" }}
+              >
+                {formErrorMessage}
+              </p>
+            )}
+
             {passwordError && (
-              <p className="text-xs" style={{ color: "#cf4444" }}>
+              <p
+                className="mt-2 text-xs font-semibold"
+                style={{ color: "#ff5c5c" }}
+              >
                 {passwordError}
               </p>
             )}
