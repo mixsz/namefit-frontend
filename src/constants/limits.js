@@ -1,0 +1,1 @@
+export const MAX_EXERCISES_PER_WORKOUT = 15;

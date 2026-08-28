@@ -6,6 +6,7 @@ import {
   Pencil,
   Trash2,
   Plus,
+  Lock,
   ChevronUp,
   ChevronDown,
   Info,
@@ -16,14 +17,16 @@ import {
   Check,
   Dumbbell,
   Minus,
+  LogOut,
 } from "lucide-react";
 
 import MuscleIcon from "./MuscleIcon";
 
-import { Link } from "react-router-dom";
+import { Link, useBlocker } from "react-router-dom";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
 import ExercicioDetalhe from "./ExercicioDetalhe.jsx";
 import { useToast } from "../hooks/useToast.js";
+import { MAX_EXERCISES_PER_WORKOUT } from "../constants/limits.js";
 
 function TreinoDetalheView({ data }) {
   const {
@@ -114,13 +117,58 @@ function TreinoDetalheView({ data }) {
     });
   }
 
+  const [discardModalOpen, setDiscardModalOpen] = useState(false);
+
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      isEditing &&
+      hasChanges(workout, draftTitle, draftExercises) &&
+      currentLocation.pathname !== nextLocation.pathname,
+  );
+
+  useEffect(() => {
+    if (blocker.state === "blocked") {
+      setDiscardModalOpen(true);
+    }
+  }, [blocker.state]);
+
   function handleCancel() {
     const changed = hasChanges(workout, draftTitle, draftExercises);
+    if (changed) {
+      setDiscardModalOpen(true);
+      return;
+    }
+    setIsEditing(false);
+    onCancel?.(false);
+  }
+
+  function confirmDiscard() {
     setDraftTitle(workout?.title ?? "");
     setDraftExercises(workout?.exercises?.map((e) => ({ ...e })) ?? []);
     setIsEditing(false);
-    onCancel?.(changed);
+    setDiscardModalOpen(false);
+    onCancel?.(true);
+    if (blocker.state === "blocked") {
+      blocker.proceed();
+    }
   }
+
+  async function handleSaveFromModal() {
+    if (draftTitle.trim().length === 0 || isDuplicateTitle) return;
+    await handleSave();
+    setDiscardModalOpen(false);
+    if (blocker.state === "blocked") {
+      blocker.proceed();
+    }
+  }
+
+  function handleCloseDiscardModal() {
+    setDiscardModalOpen(false);
+    if (blocker.state === "blocked") {
+      blocker.reset();
+    }
+  }
+
   const [pickerOpen, setPickerOpen] = useState(false);
   const [detailExercise, setDetailExercise] = useState(null);
 
@@ -185,22 +233,43 @@ function TreinoDetalheView({ data }) {
                 <div className="mt-4 flex justify-start">
                   <button
                     type="button"
-                    onClick={() => setPickerOpen(true)}
+                    onClick={() => {
+                      if (draftExercises.length >= MAX_EXERCISES_PER_WORKOUT) {
+                        showToast(
+                          `Você só pode ter no máximo ${MAX_EXERCISES_PER_WORKOUT} exercícios por treino`,
+                          "info",
+                        );
+                        return;
+                      }
+                      setPickerOpen(true);
+                    }}
                     className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold uppercase tracking-[0.05em] transition-all sm:px-5 sm:py-3 sm:text-sm"
                     style={{
                       background: "transparent",
                       color: ORANGE,
                       border: "1.5px solid " + ORANGE,
+                      opacity:
+                        draftExercises.length >= MAX_EXERCISES_PER_WORKOUT
+                          ? 0.5
+                          : 1,
                     }}
                     onMouseOver={(e) => {
+                      if (draftExercises.length >= MAX_EXERCISES_PER_WORKOUT)
+                        return;
                       e.currentTarget.style.background = "rgba(255,77,28,0.1)";
                     }}
                     onMouseOut={(e) => {
                       e.currentTarget.style.background = "transparent";
                     }}
                   >
-                    <Plus size={14} strokeWidth={2.5} />
-                    Adicionar exercício
+                    {draftExercises.length >= MAX_EXERCISES_PER_WORKOUT ? (
+                      <Lock size={14} strokeWidth={2.5} />
+                    ) : (
+                      <Plus size={14} strokeWidth={2.5} />
+                    )}
+                    {draftExercises.length >= MAX_EXERCISES_PER_WORKOUT
+                      ? "Limite atingido"
+                      : "Adicionar exercício"}
                   </button>
                 </div>
               )}
@@ -244,6 +313,7 @@ function TreinoDetalheView({ data }) {
         <ExercisePickerModal
           exercises={data.availableExercises ?? []}
           existingIds={draftExercises.map((e) => e.exerciseId)}
+          isFull={draftExercises.length >= MAX_EXERCISES_PER_WORKOUT}
           onClose={() => setPickerOpen(false)}
           onConfirm={(exercise) => {
             setDraftExercises((prev) => [
@@ -264,6 +334,13 @@ function TreinoDetalheView({ data }) {
         <ExercicioDetalhe
           exercise={detailExercise}
           onClose={() => setDetailExercise(null)}
+        />
+      )}
+      {discardModalOpen && (
+        <DiscardChangesModal
+          onClose={handleCloseDiscardModal}
+          onSave={handleSaveFromModal}
+          onDiscard={confirmDiscard}
         />
       )}
     </main>
@@ -1007,19 +1084,17 @@ function ConfirmDeleteModal({ exercise, onClose, onConfirm }) {
             onClick={onConfirm}
             className="inline-flex w-32 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: "linear-gradient(180deg, #922626 0%, #961818 100%)",
-              color: "#fff",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
+              background: "rgba(239,68,68,0.14)",
+              color: "#ef4444",
+              border: "1.5px solid rgba(239,68,68,0.35)",
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.background =
-                "linear-gradient(180deg, #a13030 0%, #982020 100%)";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
+              e.currentTarget.style.background = "rgba(239,68,68,0.22)";
+              e.currentTarget.style.borderColor = "rgba(239,68,68,0.55)";
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.background =
-                "linear-gradient(180deg, #922626 0%, #961818 100%)";
-              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
+              e.currentTarget.style.background = "rgba(239,68,68,0.14)";
+              e.currentTarget.style.borderColor = "rgba(239,68,68,0.35)";
             }}
           >
             Remover
@@ -1030,7 +1105,13 @@ function ConfirmDeleteModal({ exercise, onClose, onConfirm }) {
   );
 }
 
-function ExercisePickerModal({ exercises, existingIds, onClose, onConfirm }) {
+function ExercisePickerModal({
+  exercises,
+  existingIds,
+  isFull,
+  onClose,
+  onConfirm,
+}) {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
 
@@ -1136,7 +1217,7 @@ function ExercisePickerModal({ exercises, existingIds, onClose, onConfirm }) {
                 <li key={ex.id}>
                   <button
                     type="button"
-                    disabled={disabled}
+                    disabled={disabled || isFull}
                     onClick={() => setSelectedId(ex.id)}
                     className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all"
                     style={{
@@ -1213,7 +1294,7 @@ function ExercisePickerModal({ exercises, existingIds, onClose, onConfirm }) {
           <button
             type="button"
             onClick={handleConfirm}
-            disabled={!selectedId}
+            disabled={!selectedId || isFull}
             className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all disabled:cursor-not-allowed disabled:opacity-50"
             style={{
               background: ORANGE,
@@ -1222,6 +1303,123 @@ function ExercisePickerModal({ exercises, existingIds, onClose, onConfirm }) {
             }}
           >
             Adicionar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DiscardChangesModal({ onSave, onDiscard, onClose }) {
+  const primaryRef = useRef(null);
+
+  useEffect(() => {
+    primaryRef.current?.focus();
+    function handleEsc(e) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center px-4"
+      style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="discard-modal-title"
+        className="relative w-full max-w-md overflow-hidden rounded-2xl p-6"
+        style={{
+          background: "linear-gradient(180deg, #141210 0%, #17130f 100%)",
+          border: "1px solid " + BORDER,
+          boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
+        }}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Fechar"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg transition-all"
+          style={{ background: "transparent", color: MUTED }}
+          onMouseOver={(e) => (e.currentTarget.style.color = TEXT)}
+          onMouseOut={(e) => (e.currentTarget.style.color = MUTED)}
+        >
+          <X size={20} strokeWidth={2.5} />
+        </button>
+
+        <div className="flex items-start gap-3 pr-8">
+          <div
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: "rgba(255,77,28,0.14)", color: ORANGE }}
+          >
+            <LogOut size={20} strokeWidth={2.3} />
+          </div>
+          <div>
+            <h2
+              id="discard-modal-title"
+              className="font-bold"
+              style={{
+                color: TEXT,
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: "1.7rem",
+                lineHeight: 1.05,
+              }}
+            >
+              Salvar alterações?
+            </h2>
+            <p className="mt-1.5 text-sm" style={{ color: MUTED }}>
+              Você tem alterações não salvas neste treino. Salve para manter o
+              progresso ou descarte para sair sem salvar.
+            </p>
+          </div>
+        </div>
+
+        <div className="my-5" style={{ borderTop: "1px solid " + BORDER }} />
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onDiscard}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.05em] transition-all"
+            style={{
+              background: "transparent",
+              color: "#ef4444",
+              border: "1.5px solid rgba(239,68,68,0.5)",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = "rgba(239,68,68,0.1)";
+              e.currentTarget.style.borderColor = "#ef4444";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.borderColor = "rgba(239,68,68,0.5)";
+            }}
+          >
+            <Trash2 size={16} strokeWidth={2.4} />
+            Descartar
+          </button>
+
+          <button
+            ref={primaryRef}
+            type="button"
+            onClick={onSave}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
+            style={{
+              background: ORANGE,
+              color: BG,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.background = "#ff6b42")}
+            onMouseOut={(e) => (e.currentTarget.style.background = ORANGE)}
+          >
+            <Save size={18} strokeWidth={2.6} />
+            Salvar
           </button>
         </div>
       </div>

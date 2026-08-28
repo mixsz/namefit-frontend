@@ -19,6 +19,7 @@ import ConnectionErrorState from "./ConnectionErrorState";
 import ExercicioDetalhe from "./ExercicioDetalhe";
 import { useToast } from "../hooks/useToast.js";
 import { CATEGORIES } from "../constants/exerciseCategories.js";
+import { MAX_EXERCISES_PER_WORKOUT } from "../constants/limits.js";
 
 function ExerciciosView({ data, onAddToWorkout }) {
   const {
@@ -26,6 +27,7 @@ function ExerciciosView({ data, onAddToWorkout }) {
     workouts = [],
     activeWorkout,
     loading,
+    searching = false,
     connectionError,
     onRetry,
     query = "",
@@ -36,6 +38,8 @@ function ExerciciosView({ data, onAddToWorkout }) {
     page = 0,
     totalPages = 1,
     onPageChange,
+    onClearFilters,
+    onClearQuery,
   } = data;
   const { showToast } = useToast();
   const blocked = !!activeWorkout;
@@ -51,8 +55,47 @@ function ExerciciosView({ data, onAddToWorkout }) {
   const hasFilters = Boolean(query) || Boolean(activeCategory);
 
   function clearFilters() {
-    onQueryChange?.("");
-    onCategoryChange?.(null);
+    onClearFilters?.();
+  }
+
+  if (loading) {
+    return (
+      <main
+        className="min-h-screen w-full"
+        style={{
+          background:
+            "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
+          backgroundAttachment: "fixed",
+          fontFamily: "'Barlow', sans-serif",
+          paddingTop: "var(--header-height, 90px)",
+        }}
+      >
+        <div className="mx-auto w-full max-w-6xl px-6 md:px-10">
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <p style={{ color: MUTED }}>Carregando exercícios...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (connectionError) {
+    return (
+      <main
+        className="min-h-screen w-full"
+        style={{
+          background:
+            "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
+          backgroundAttachment: "fixed",
+          fontFamily: "'Barlow', sans-serif",
+          paddingTop: "var(--header-height, 90px)",
+        }}
+      >
+        <div className="mx-auto w-full max-w-6xl px-6 md:px-10">
+          <ConnectionErrorState onRetry={onRetry} />
+        </div>
+      </main>
+    );
   }
 
   return (
@@ -66,104 +109,101 @@ function ExerciciosView({ data, onAddToWorkout }) {
         paddingTop: "var(--header-height, 90px)",
       }}
     >
-      {loading ? (
-        <div className="mx-auto w-full max-w-6xl px-6 md:px-10">
-          <div className="flex min-h-[60vh] items-center justify-center">
-            <p style={{ color: MUTED }}>Carregando exercícios...</p>
-          </div>
-        </div>
-      ) : connectionError ? (
-        <div className="mx-auto w-full max-w-6xl px-6 md:px-10">
-          <ConnectionErrorState onRetry={onRetry} />
-        </div>
-      ) : (
-        <>
-          <div className="mx-auto w-full max-w-6xl px-6 pb-24 md:px-10">
-            <header className="mb-8">
-              <h1
-                className="font-bold leading-[0.95]"
-                style={{
-                  color: TEXT,
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: "clamp(2.4rem, 5vw, 3.6rem)",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                Exercícios
-              </h1>
-              <p className="mt-2 text-sm" style={{ color: MUTED }}>
-                Explore o catálogo, filtre por grupo muscular e adicione o que
-                quiser aos seus treinos.
-              </p>
-            </header>
+      <div className="mx-auto w-full max-w-6xl px-6 pb-24 md:px-10">
+        <header className="mb-8">
+          <h1
+            className="font-bold leading-[0.95]"
+            style={{
+              color: TEXT,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: "clamp(2.4rem, 5vw, 3.6rem)",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Exercícios
+          </h1>
+          <p className="mt-2 text-sm" style={{ color: MUTED }}>
+            Explore o catálogo, filtre por grupo muscular e adicione o que
+            quiser aos seus treinos.
+          </p>
+        </header>
 
-            <SearchField value={query} onChange={onQueryChange} />
+        <SearchField
+          value={query}
+          onChange={onQueryChange}
+          onClear={onClearQuery}
+        />
 
-            <CategoryChips
-              active={activeCategory}
-              onToggle={(key) =>
-                onCategoryChange?.(activeCategory === key ? null : key)
-              }
-            />
+        <CategoryChips
+          active={activeCategory}
+          onToggle={(key) =>
+            onCategoryChange?.(activeCategory === key ? null : key)
+          }
+        />
 
-            <ResultsCount count={totalElements} />
+        <ResultsCount count={totalElements} />
 
-            {exercises.length === 0 ? (
-              <NoResults hasFilters={hasFilters} onClear={clearFilters} />
-            ) : (
-              <>
-                <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                  {exercises.map((exercise) => (
-                    <ExerciseCard
-                      key={exercise.id}
-                      exercise={exercise}
-                      onAdd={() => {
-                        if (blocked) {
-                          showToast(
-                            "Finalize seu treino em andamento antes de fazer isso",
-                            "info",
-                          );
-                          return;
-                        }
-                        setModalExercise(exercise);
-                      }}
-                      onShowDetails={() => setDetailExercise(exercise)}
-                      blocked={blocked}
-                    />
-                  ))}
-                </div>
+        <div
+          style={{
+            opacity: searching ? 0.5 : 1,
+            transition: "opacity 0.15s ease",
+          }}
+        >
+          {exercises.length === 0 ? (
+            <NoResults hasFilters={hasFilters} onClear={clearFilters} />
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {exercises.map((exercise) => (
+                  <ExerciseCard
+                    key={exercise.id}
+                    exercise={exercise}
+                    onAdd={() => {
+                      if (blocked) {
+                        showToast(
+                          "Finalize seu treino em andamento antes de fazer isso",
+                          "info",
+                        );
+                        return;
+                      }
+                      setModalExercise(exercise);
+                    }}
+                    onShowDetails={() => setDetailExercise(exercise)}
+                    blocked={blocked}
+                  />
+                ))}
+              </div>
 
-                <Pagination
-                  page={page}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </>
-            )}
-          </div>
-
-          {modalExercise && (
-            <AddToWorkoutModal
-              exercise={modalExercise}
-              workouts={workouts}
-              onClose={() => setModalExercise(null)}
-              onAddToWorkout={onAddToWorkout}
-            />
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </>
           )}
+        </div>
+      </div>
 
-          {detailExercise && (
-            <ExercicioDetalhe
-              exercise={detailExercise}
-              onClose={() => setDetailExercise(null)}
-            />
-          )}
-        </>
+      {modalExercise && (
+        <AddToWorkoutModal
+          exercise={modalExercise}
+          workouts={workouts}
+          onClose={() => setModalExercise(null)}
+          onAddToWorkout={onAddToWorkout}
+        />
+      )}
+
+      {detailExercise && (
+        <ExercicioDetalhe
+          exercise={detailExercise}
+          onClose={() => setDetailExercise(null)}
+        />
       )}
     </main>
   );
 }
 
-function SearchField({ value, onChange }) {
+function SearchField({ value, onChange, onClear }) {
   const [focused, setFocused] = useState(false);
   return (
     <div
@@ -187,7 +227,7 @@ function SearchField({ value, onChange }) {
       {value && (
         <button
           type="button"
-          onClick={() => onChange("")}
+          onClick={() => onClear?.()}
           aria-label="Limpar busca"
           className="rounded-md p-1 opacity-50 transition-opacity hover:opacity-90"
           style={{ color: MUTED }}
@@ -487,14 +527,22 @@ function AddToWorkoutModal({ exercise, workouts, onClose, onAddToWorkout }) {
               value={workoutId}
               onChange={setWorkoutId}
               placeholder="Selecione um treino"
-              options={workouts.map((w) => ({
-                value: w.id,
-                label: w.title,
-                disabled: w.exerciseIds?.includes(exercise.id),
-                hint: w.exerciseIds?.includes(exercise.id)
-                  ? "já adicionado"
-                  : null,
-              }))}
+              options={workouts.map((w) => {
+                const alreadyAdded = w.exerciseIds?.includes(exercise.id);
+                const exerciseCount = w.exerciseIds?.length ?? 0;
+                const isFull =
+                  !alreadyAdded && exerciseCount >= MAX_EXERCISES_PER_WORKOUT;
+                return {
+                  value: w.id,
+                  label: w.title,
+                  disabled: alreadyAdded || isFull,
+                  hint: alreadyAdded
+                    ? "já adicionado"
+                    : isFull
+                      ? "limite atingido"
+                      : null,
+                };
+              })}
             />
 
             <div className="grid grid-cols-2 gap-4">

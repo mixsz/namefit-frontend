@@ -4,11 +4,16 @@ import api from "../services/api";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "../hooks/useToast.js";
 import { useActiveWorkout } from "../hooks/useActiveWorkout";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 12;
 const DEBOUNCE_MS = 250;
 
 function Exercicios() {
+  const location = useLocation();
+  const initialQuery = location.state?.searchQuery ?? "";
+  const navigate = useNavigate();
+
   const [exercises, setExercises] = useState([]);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -16,9 +21,11 @@ function Exercicios() {
 
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [connectionError, setConnectionError] = useState(false);
+  const hasLoadedOnce = useRef(false);
 
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [activeCategory, setActiveCategory] = useState(null);
 
   const { showToast } = useToast();
@@ -28,6 +35,9 @@ function Exercicios() {
   const skipQueryEffect = useRef(true);
 
   useEffect(() => {
+    if (location.state?.searchQuery) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
     fetchWorkouts();
     fetchExercises(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,16 +83,21 @@ function Exercicios() {
     }
   }
 
-  async function fetchExercises(targetPage) {
-    setLoading(exercises.length === 0);
+  async function fetchExercises(targetPage, overrides = {}) {
+    const effectiveQuery = overrides.query ?? query;
+    const effectiveCategory =
+      overrides.category !== undefined ? overrides.category : activeCategory;
+
+    setLoading(!hasLoadedOnce.current);
+    if (hasLoadedOnce.current) setSearching(true);
     setConnectionError(false);
     try {
-      const category = CATEGORIES.find((c) => c.key === activeCategory);
+      const category = CATEGORIES.find((c) => c.key === effectiveCategory);
 
       const searchParams = new URLSearchParams();
       searchParams.set("page", targetPage);
       searchParams.set("size", PAGE_SIZE);
-      if (query) searchParams.set("name", query);
+      if (effectiveQuery) searchParams.set("name", effectiveQuery);
       if (category) {
         category.groups.forEach((g) => searchParams.append("muscleGroups", g));
       }
@@ -93,12 +108,28 @@ function Exercicios() {
       setTotalElements(res.data.totalElements);
       setTotalPages(res.data.totalPages);
       setPage(res.data.number);
+      hasLoadedOnce.current = true;
     } catch (error) {
       console.error("Error fetching exercises:", error);
       if (error.code === "ERR_NETWORK") setConnectionError(true);
     } finally {
       setLoading(false);
+      setSearching(false);
     }
+  }
+
+  function clearAllFilters() {
+    skipQueryEffect.current = true;
+    skipCategoryEffect.current = true;
+    setQuery("");
+    setActiveCategory(null);
+    fetchExercises(0, { query: "", category: null });
+  }
+
+  function clearQueryOnly() {
+    skipQueryEffect.current = true;
+    setQuery("");
+    fetchExercises(0, { query: "" });
   }
 
   function handlePageChange(newPage) {
@@ -124,7 +155,9 @@ function Exercicios() {
       );
     } catch (error) {
       console.error("Error adding exercise to workout:", error);
-      showToast("Erro ao adicionar exercício, tente novamente", "error");
+      const message =
+        error.response?.data || "Erro ao adicionar exercício, tente novamente";
+      showToast(message, "error");
     }
   }
 
@@ -135,6 +168,7 @@ function Exercicios() {
         workouts,
         activeWorkout,
         loading,
+        searching,
         connectionError,
         onRetry: () => fetchExercises(page),
         query,
@@ -145,6 +179,8 @@ function Exercicios() {
         page,
         totalPages,
         onPageChange: handlePageChange,
+        onClearFilters: clearAllFilters,
+        onClearQuery: clearQueryOnly,
       }}
       onAddToWorkout={handleAddToWorkout}
     />

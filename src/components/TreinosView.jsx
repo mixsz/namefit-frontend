@@ -861,19 +861,17 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
             onClick={onConfirm}
             className="inline-flex w-32 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: "linear-gradient(180deg, #922626 0%, #961818 100%)",
-              color: "#fff",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
+              background: "rgba(239,68,68,0.14)",
+              color: "#ef4444",
+              border: "1.5px solid rgba(239,68,68,0.35)",
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.background =
-                "linear-gradient(180deg, #a13030 0%, #982020 100%)";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)";
+              e.currentTarget.style.background = "rgba(239,68,68,0.22)";
+              e.currentTarget.style.borderColor = "rgba(239,68,68,0.55)";
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.background =
-                "linear-gradient(180deg, #922626 0%, #961818 100%)";
-              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.35)";
+              e.currentTarget.style.background = "rgba(239,68,68,0.14)";
+              e.currentTarget.style.borderColor = "rgba(239,68,68,0.35)";
             }}
           >
             Excluir
