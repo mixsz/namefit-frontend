@@ -66,7 +66,7 @@ function HomeView({ data }) {
           <EmptyState />
         ) : (
           <>
-            <header className="mb-10">
+            <header className="mb-6 sm:mb-10">
               <h1
                 className="font-bold leading-[0.95]"
                 style={{
@@ -92,7 +92,25 @@ function HomeView({ data }) {
               </p>
             </header>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <section className="sm:hidden sm:mt-0 mt-8">
+              <SectionLabel>Seu dia</SectionLabel>
+              <StatusCard
+                trained={trained}
+                todayWorkoutName={todayWorkoutName}
+                onGoToTreinos={onGoToTreinos}
+                activeWorkout={activeWorkout}
+              />
+            </section>
+
+            <section className="mt-9 sm:hidden">
+              <SectionLabel>Frequência</SectionLabel>
+              <div className="flex flex-col gap-3">
+                <StreakCard streak={streak} trained={trainedThisWeek} />
+                <MiniWeekCalendar trainedWeekDays={data.trainedWeekDays} />
+              </div>
+            </section>
+
+            <div className="hidden sm:grid sm:grid-cols-3 sm:gap-4">
               <div className="flex h-full flex-col gap-4 sm:col-span-2">
                 <div className="flex-1">
                   <StatusCard
@@ -111,7 +129,7 @@ function HomeView({ data }) {
               </div>
             </div>
 
-            <section className="mt-8">
+            <section className="mt-9 sm:mt-8">
               <SectionLabel>Estatísticas</SectionLabel>
               <div className="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Link
@@ -151,12 +169,12 @@ function HomeView({ data }) {
               </div>
             </section>
 
-            <section className="mt-12">
+            <section className="mt-9 sm:mt-8">
               <SectionLabel>Sugestão de agora</SectionLabel>
               <SuggestionCard suggestion={suggestion} />
             </section>
 
-            <section className="mt-12">
+            <section className="mt-9 sm:mt-8">
               <SectionLabel>Monte algo novo</SectionLabel>
               <BuildWorkoutCard
                 onGoToTreinos={onGoToTreinos}
@@ -179,7 +197,7 @@ function StreakCard({ streak, trained }) {
 
   return (
     <div
-      className="relative h-full flex flex-col overflow-hidden rounded-2xl p-5 transition-all"
+      className="relative h-full flex flex-col overflow-hidden rounded-2xl p-4 sm:p-5 transition-all"
       style={{
         background: trained
           ? "linear-gradient(310deg, rgba(255,86,28,0.23) 0%, rgba(180,60,15,0.14) 30%, #161210 60%, #0e0b09 100%)"
@@ -189,74 +207,152 @@ function StreakCard({ streak, trained }) {
         minHeight: "100%",
       }}
     >
-      <div className="mt-3">
-        <h3
-          className="font-bold uppercase leading-none"
-          style={{
-            color: trained ? ORANGE : TEXT,
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: "1.4rem",
-            letterSpacing: "0.01em",
-          }}
-        >
-          Ofensiva semanal
-        </h3>
-        <p className="mt-2 text-sm" style={{ color: MUTED }}>
-          {trained
-            ? "Você conseguiu essa semana, continue treinando!"
-            : "Treine hoje para manter sua sequência viva."}
-        </p>
+      <div className="flex sm:hidden flex-row items-start gap-4">
+        <div className="flex-1 pt-1">
+          <h3
+            className="font-bold uppercase leading-none"
+            style={{
+              color: trained ? ORANGE : TEXT,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: "1rem",
+              letterSpacing: "0.01em",
+            }}
+          >
+            Ofensiva semanal
+          </h3>
+          <p className="mt-2 text-xs" style={{ color: MUTED }}>
+            {trained
+              ? "Você conseguiu essa semana, continue treinando!"
+              : "Treine hoje para manter sua sequência viva."}
+          </p>
+        </div>
+        <div className="relative z-10 flex shrink-0 items-center justify-center">
+          <div className="relative flex h-24 w-24 items-center justify-center">
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 128 128"
+              className="absolute inset-0 -rotate-90"
+            >
+              <circle
+                cx="64"
+                cy="64"
+                r={radius}
+                fill="none"
+                stroke={BORDER}
+                strokeWidth="6"
+              />
+              <circle
+                cx="64"
+                cy="64"
+                r={radius}
+                fill="none"
+                stroke={accent}
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={dashoffset}
+                style={{
+                  transition: "stroke-dashoffset 0.6s ease",
+                }}
+              />
+            </svg>
+            <div className="flex flex-col items-center leading-none">
+              <span
+                className="font-bold leading-none"
+                style={{
+                  color: trained ? ORANGE : TEXT,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: "1.35rem",
+                }}
+              >
+                {streak}
+              </span>
+              <span
+                className="font-semibold leading-none"
+                style={{
+                  color: trained ? "rgba(255,150,90,0.8)" : MUTED,
+                  fontSize: "0.7rem",
+                  marginTop: "3px",
+                }}
+              >
+                {streak === 1 ? "semana" : "semanas"}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="relative z-10 flex flex-1 items-center justify-center py-3">
-        <div className="relative flex h-32 w-32 items-center justify-center">
-          <svg
-            width="128"
-            height="128"
-            viewBox="0 0 128 128"
-            className="absolute inset-0 -rotate-90"
+      <div className="hidden sm:contents">
+        <div className="mt-3">
+          <h3
+            className="font-bold uppercase leading-none"
+            style={{
+              color: trained ? ORANGE : TEXT,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: "1.4rem",
+              letterSpacing: "0.01em",
+            }}
           >
-            <circle
-              cx="64"
-              cy="64"
-              r={radius}
-              fill="none"
-              stroke={BORDER}
-              strokeWidth="6"
-            />
-            <circle
-              cx="64"
-              cy="64"
-              r={radius}
-              fill="none"
-              stroke={accent}
-              strokeWidth="6"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={dashoffset}
-              style={{
-                transition: "stroke-dashoffset 0.6s ease",
-              }}
-            />
-          </svg>
-          <div className="flex flex-col items-center">
-            <span
-              className="font-bold leading-none"
-              style={{
-                color: trained ? ORANGE : TEXT,
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: "2.4rem",
-                lineHeight: 1,
-              }}
+            Ofensiva semanal
+          </h3>
+          <p className="mt-2 text-sm" style={{ color: MUTED }}>
+            {trained
+              ? "Você conseguiu essa semana, continue treinando!"
+              : "Treine hoje para manter sua sequência viva."}
+          </p>
+        </div>
+
+        <div className="relative z-10 flex flex-1 items-center justify-center py-3">
+          <div className="relative flex h-32 w-32 items-center justify-center">
+            <svg
+              width="128"
+              height="128"
+              viewBox="0 0 128 128"
+              className="absolute inset-0 -rotate-90"
             >
-              {streak}
-            </span>
-            <span
-              className="text-sm font-semibold"
-              style={{ color: trained ? "rgba(255,150,90,0.8)" : MUTED }}
-            >
-              {streak === 1 ? "semana" : "semanas"}
-            </span>
+              <circle
+                cx="64"
+                cy="64"
+                r={radius}
+                fill="none"
+                stroke={BORDER}
+                strokeWidth="6"
+              />
+              <circle
+                cx="64"
+                cy="64"
+                r={radius}
+                fill="none"
+                stroke={accent}
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={dashoffset}
+                style={{
+                  transition: "stroke-dashoffset 0.6s ease",
+                }}
+              />
+            </svg>
+            <div className="flex flex-col items-center">
+              <span
+                className="font-bold leading-none"
+                style={{
+                  color: trained ? ORANGE : TEXT,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: "2.4rem",
+                  lineHeight: 1,
+                }}
+              >
+                {streak}
+              </span>
+              <span
+                className="text-sm font-semibold"
+                style={{ color: trained ? "rgba(255,150,90,0.8)" : MUTED }}
+              >
+                {streak === 1 ? "semana" : "semanas"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -287,7 +383,7 @@ function StatusCard({
           onGoToTreinos?.();
         }
       }}
-      className="h-full relative overflow-hidden rounded-2xl p-6 md:p-7 transition-all"
+      className="h-full relative overflow-hidden rounded-2xl p-4 sm:p-6 md:p-7 transition-all"
       style={{
         cursor: clickable ? "pointer" : "default",
         opacity: blocked ? 0.5 : 1,
@@ -306,9 +402,9 @@ function StatusCard({
       }}
     >
       <div className="relative z-10 flex h-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-3 sm:gap-4">
           <div
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all"
+            className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl transition-all"
             style={{
               background: trained
                 ? "rgba(255,77,28,0.14)"
@@ -334,17 +430,16 @@ function StatusCard({
           </div>
           <div>
             <h2
-              className="font-bold"
+              className="font-bold text-[1.1rem] sm:text-[1.7rem]"
               style={{
                 color: TEXT,
                 fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: "1.7rem",
                 lineHeight: 1.1,
               }}
             >
               {trained ? "Você já treinou hoje!" : "Ainda não treinou hoje..."}
             </h2>
-            <p className="mt-2 text-sm" style={{ color: MUTED }}>
+            <p className="mt-2 text-xs sm:text-sm" style={{ color: MUTED }}>
               {trained
                 ? `O treino ${todayWorkoutName} foi insano!`
                 : "Que tal começar agora? A consistência transforma esforço em resultado!"}
@@ -354,7 +449,7 @@ function StatusCard({
 
         {clickable && (
           <span
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
               background: hover ? ORANGE : "transparent",
               color: hover ? BG : ORANGE,
@@ -458,14 +553,13 @@ function SuggestionCard({ suggestion }) {
       state={{ searchQuery: suggestion.name }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl p-6 transition-all sm:flex-row sm:items-center"
+      className="group relative flex flex-col items-start justify-between gap-4 overflow-hidden rounded-2xl p-5 sm:p-6 transition-all sm:flex-row sm:items-center min-h-[120px] sm:min-h-[150px]"
       style={{
         background:
           "linear-gradient(40deg, #0e0b09 0%, #161210 28%, #161210 30%, rgba(240,90,20,0.15) 55%, rgba(160,45,10,0.13) 65%, #161210 80%, #0e0b09 95%)",
         border: "1px solid " + (hover ? "rgba(255,77,28,0.45)" : BORDER),
         backgroundClip: "padding-box",
         boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
-        minHeight: "150px",
       }}
     >
       <div className="relative z-10 flex items-center gap-6 min-w-0">
@@ -488,11 +582,10 @@ function SuggestionCard({ suggestion }) {
             Sugestão de exercício
           </span>
           <h3
-            className="mt-2 font-extrabold"
+            className="mt-2 font-extrabold text-[1.4rem] sm:text-[2rem]"
             style={{
               color: TEXT,
               fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: "2rem",
               lineHeight: 1,
             }}
           >
@@ -507,7 +600,7 @@ function SuggestionCard({ suggestion }) {
         </div>
       </div>
       <span
-        className="relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all self-center"
+        className="relative z-10 inline-flex w-[70%] sm:w-auto shrink-0 items-center justify-center gap-2 rounded-full px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all self-center"
         style={{
           background: hover ? ORANGE : "transparent",
           color: hover ? BG : ORANGE,
@@ -531,7 +624,7 @@ function BuildWorkoutCard({ onGoToTreinos, activeWorkout }) {
       onClick={() => onGoToTreinos?.({ openCreate: true })}
       onMouseEnter={() => !blocked && setHover(true)}
       onMouseLeave={() => !blocked && setHover(false)}
-      className="flex w-full flex-col gap-5 overflow-hidden rounded-2xl p-7 text-left transition-all md:flex-row md:items-center md:justify-between"
+      className="flex w-full flex-col gap-4 sm:gap-5 overflow-hidden rounded-2xl p-5 sm:p-7 text-left transition-all md:flex-row md:items-center md:justify-between"
       style={{
         opacity: blocked ? 0.5 : 1,
         background:
@@ -555,11 +648,10 @@ function BuildWorkoutCard({ onGoToTreinos, activeWorkout }) {
         </div>
         <div>
           <h3
-            className="font-bold"
+            className="font-bold text-[1.4rem] sm:text-[1.9rem]"
             style={{
               color: TEXT,
               fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: "1.9rem",
               lineHeight: 1,
             }}
           >
@@ -582,7 +674,7 @@ function BuildWorkoutCard({ onGoToTreinos, activeWorkout }) {
       </div>
 
       <span
-        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
+        className="inline-flex w-[70%] sm:w-auto shrink-0 items-center justify-center gap-2 self-center rounded-full px-5 py-2 sm:px-6 sm:py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
         style={{
           background: hover ? ORANGE : "transparent",
           color: hover ? BG : ORANGE,

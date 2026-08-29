@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, Dumbbell, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
-import {ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED} from "../theme.js";
+import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme.js";
 
 function LoginForm({ onSubmit, error }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,9 +21,25 @@ function LoginForm({ onSubmit, error }) {
 
   return (
     <div
-      className="min-h-screen w-full flex"
+      className="min-h-screen w-full flex relative"
       style={{ background: BG, fontFamily: "'Barlow', sans-serif" }}
     >
+      <div className="absolute inset-0 lg:hidden">
+        <img
+          src="/gym.avif"
+          alt="academia"
+          className="absolute inset-0 h-full w-full object-cover object-top"
+          style={{ opacity: 0.32 }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(12,10,8,0.35) 0%, rgba(12,10,8,0.75) 45%, rgba(12,10,8,0.97) 80%)",
+          }}
+        />
+      </div>
+
       <div
         className="hidden lg:flex flex-col justify-between w-[58%] relative overflow-hidden p-14"
         style={{ background: PANEL }}
@@ -91,104 +107,74 @@ function LoginForm({ onSubmit, error }) {
         </div>
       </div>
 
-      <div
-        className="flex-1 flex flex-col items-center justify-center px-6 sm:px-12 lg:px-20 py-12 relative"
-        style={{
-          background:
-            "radial-gradient(circle at 50% 0%, #221c17 0%, #0c0a08 80%)",
-        }}
-      >
+      <div className="flex-1 flex flex-col items-center justify-center px-6 sm:px-10 lg:px-20 py-10 lg:py-12 relative z-10">
+        <div
+          className="hidden lg:block absolute inset-0 -z-10"
+          style={{
+            background:
+              "radial-gradient(circle at 50% 0%, #221c17 0%, #0c0a08 80%)",
+          }}
+        />
+
         <div className="relative z-10 w-full max-w-[420px]">
-          <div className="flex lg:hidden items-center gap-3 mb-10">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ background: ORANGE }}
-            >
-              <Dumbbell size={20} color={BG} strokeWidth={2.5} />
-            </div>
-            <span
-              className="text-2xl font-extrabold tracking-widest"
-              style={{
-                color: TEXT,
-                fontFamily: "'Barlow Condensed', sans-serif",
-              }}
-            >
-              NAME<span style={{ color: ORANGE }}>FIT</span>
-            </span>
-          </div>
-
-          <div className="mb-10">
-            <h2
-              className="font-extrabold leading-tight"
-              style={{
-                color: TEXT,
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: "2.8rem",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              HORA DE TREINAR
-            </h2>
-            <p className="mt-2 text-sm" style={{ color: MUTED }}>
-              Acesse sua conta para continuar acompanhando seus treinos.
-            </p>
-          </div>
-
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-5"
-            noValidate
-          >
-            <div className="flex flex-col gap-2">
-              <label
-                htmlFor="email"
-                className="text-xs font-bold uppercase tracking-[0.15em]"
-                style={{ color: "#a09890" }}
+          <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-[#161210]/80 to-[#0e0b09]/80 backdrop-blur-md shadow-[0_24px_60px_rgba(0,0,0,0.5)] px-6 pt-10 pb-6 sm:px-8 sm:pt-12 sm:pb-8 lg:rounded-none lg:border-0 lg:bg-none lg:backdrop-blur-none lg:shadow-none lg:p-0">
+            <div className="flex lg:hidden items-center justify-center gap-3 mb-12">
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                style={{ background: ORANGE }}
               >
-                E-mail
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full rounded-xl px-5 py-4 text-sm outline-none transition-all"
+                <Dumbbell size={28} color={BG} strokeWidth={2.5} />
+              </div>
+              <span
+                className="text-4xl font-extrabold tracking-widest"
                 style={{
-                  background: FIELD,
-                  border: "1.5px solid " + BORDER,
                   color: TEXT,
+                  fontFamily: "'Barlow Condensed', sans-serif",
                 }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = ORANGE;
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = BORDER;
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              />
+              >
+                NAME<span style={{ color: ORANGE }}>FIT</span>
+              </span>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label
-                htmlFor="password"
-                className="text-xs font-bold uppercase tracking-[0.15em]"
-                style={{ color: "#a09890" }}
+            <div className="mb-8 text-center lg:text-left">
+              <h2
+                className="font-extrabold leading-tight"
+                style={{
+                  color: TEXT,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: "clamp(2rem, 6vw, 2.8rem)",
+                  letterSpacing: "-0.01em",
+                }}
               >
-                Senha
-              </label>
-              <div className="relative">
+                HORA DE TREINAR
+              </h2>
+              <p className="mt-2 text-sm" style={{ color: MUTED }}>
+                Acesse sua conta para continuar acompanhando seus treinos.
+              </p>
+            </div>
+
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-5"
+              noValidate
+            >
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="email"
+                  className="text-xs font-bold uppercase tracking-[0.15em]"
+                  style={{ color: "#a09890" }}
+                >
+                  E-mail
+                </label>
                 <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full rounded-xl px-5 py-4 pr-12 text-sm outline-none transition-all"
+                  className="w-full rounded-xl px-4 sm:px-5 py-3.5 sm:py-4 text-sm outline-none transition-all"
                   style={{
                     background: FIELD,
                     border: "1.5px solid " + BORDER,
@@ -202,66 +188,100 @@ function LoginForm({ onSubmit, error }) {
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg transition-opacity opacity-40 hover:opacity-80"
-                  style={{ color: "#9ca3af" }}
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
               </div>
-            </div>
-            <div className="min-h-[20px]">
-              {error && (
-                <p className="text-sm" style={{ color: "#ef4444" }}>
-                  {error}
-                </p>
-              )}
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 rounded-full font-extrabold text-sm tracking-[0.18em] uppercase transition-all mt-0"
-              style={{
-                background: loading ? "#cc3a12" : ORANGE,
-                color: "#0c0a08",
-                boxShadow: loading ? "none" : "0 2px 8px rgba(0,0,0,0.35)",
-                transform: loading ? "scale(0.98)" : "scale(1)",
-              }}
-              onMouseOver={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.background = "#ff6b42";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(0,0,0,0.4)";
-                }
-              }}
-              onMouseOut={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.background = ORANGE;
-                  e.currentTarget.style.boxShadow =
-                    "0 2px 8px rgba(0,0,0,0.35)";
-                }
-              }}
-            >
-              {loading ? "Entrando..." : "Entrar"}
-            </button>
-          </form>
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="password"
+                  className="text-xs font-bold uppercase tracking-[0.15em]"
+                  style={{ color: "#a09890" }}
+                >
+                  Senha
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full rounded-xl px-4 sm:px-5 py-3.5 sm:py-4 pr-12 text-sm outline-none transition-all"
+                    style={{
+                      background: FIELD,
+                      border: "1.5px solid " + BORDER,
+                      color: TEXT,
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = ORANGE;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = BORDER;
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg transition-opacity opacity-40 hover:opacity-80"
+                    style={{ color: "#9ca3af" }}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              <div className="min-h-[0px]">
+                {error && (
+                  <p className="text-sm" style={{ color: "#ef4444" }}>
+                    {error}
+                  </p>
+                )}
+              </div>
 
-          <p className="text-center text-sm mt-8" style={{ color: MUTED }}>
-            Não possui conta?{"  "}
-            <Link
-              to="/cadastro"
-              className="font-medium transition-colors underline"
-              style={{ color: ORANGE }}
-              onMouseOver={(e) => (e.currentTarget.style.color = "#ff6b42")}
-              onMouseOut={(e) => (e.currentTarget.style.color = ORANGE)}
-            >
-              Cadastre-se
-            </Link>
-          </p>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 sm:py-4 rounded-full font-extrabold text-sm tracking-[0.18em] uppercase transition-all mt-0"
+                style={{
+                  background: loading ? "#cc3a12" : ORANGE,
+                  color: "#0c0a08",
+                  boxShadow: loading ? "none" : "0 2px 8px rgba(0,0,0,0.35)",
+                  transform: loading ? "scale(0.98)" : "scale(1)",
+                }}
+                onMouseOver={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.background = "#ff6b42";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(0,0,0,0.4)";
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.background = ORANGE;
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(0,0,0,0.35)";
+                  }
+                }}
+              >
+                {loading ? "Entrando..." : "Entrar"}
+              </button>
+            </form>
+
+            <p className="text-center text-sm mt-8" style={{ color: MUTED }}>
+              Não possui conta?{"  "}
+              <Link
+                to="/cadastro"
+                className="font-medium transition-colors underline"
+                style={{ color: ORANGE }}
+                onMouseOver={(e) => (e.currentTarget.style.color = "#ff6b42")}
+                onMouseOut={(e) => (e.currentTarget.style.color = ORANGE)}
+              >
+                Cadastre-se
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

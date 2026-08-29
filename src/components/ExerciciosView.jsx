@@ -367,7 +367,7 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center justify-center gap-1.5 sm:gap-2 rounded-full px-8 sm:px-10 py-1.5 sm:py-2 text-[11px] sm:text-sm font-extrabold uppercase tracking-[0.01em] transition-all"
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap rounded-full px-8 sm:px-10 py-1.5 sm:py-2 text-[11px] sm:text-sm font-extrabold uppercase tracking-[0.01em] transition-all"
           style={{
             background: "transparent",
             color: ORANGE,
