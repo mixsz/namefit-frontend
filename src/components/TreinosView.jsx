@@ -861,16 +861,16 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
             onClick={onConfirm}
             className="inline-flex w-32 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
             style={{
-              background: "rgba(239,68,68,0.14)",
+              background: "rgba(239,68,68,0.1)",
               color: "#ef4444",
               border: "1.5px solid rgba(239,68,68,0.35)",
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.background = "rgba(239,68,68,0.22)";
+              e.currentTarget.style.background = "rgba(239,68,68,0.2)";
               e.currentTarget.style.borderColor = "rgba(239,68,68,0.55)";
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.background = "rgba(239,68,68,0.14)";
+              e.currentTarget.style.background = "rgba(239,68,68,0.1)";
               e.currentTarget.style.borderColor = "rgba(239,68,68,0.35)";
             }}
           >

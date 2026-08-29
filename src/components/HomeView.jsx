@@ -582,7 +582,7 @@ function SuggestionCard({ suggestion }) {
             Sugestão de exercício
           </span>
           <h3
-            className="mt-2 font-extrabold text-[1.4rem] sm:text-[2rem]"
+            className="mt-1 sm:mt-2 font-extrabold text-[1.4rem] sm:text-[2rem]"
             style={{
               color: TEXT,
               fontFamily: "'Barlow Condensed', sans-serif",
@@ -658,7 +658,7 @@ function BuildWorkoutCard({ onGoToTreinos, activeWorkout }) {
             Monte seu próprio treino
           </h3>
           <div
-            className="my-2"
+            className="my-1.5 sm:my-2"
             style={{
               width: 22,
               height: 0.5,

@@ -241,7 +241,12 @@ function SearchField({ value, onChange, onClear }) {
 
 function CategoryChips({ active, onToggle }) {
   return (
-    <div className="mt-5 flex flex-wrap gap-2.5">
+    <div
+      className="mt-5 flex flex-wrap justify-center gap-1.5 sm:justify-start sm:gap-2.5 max-h-24 overflow-y-auto pr-1 sm:max-h-none sm:overflow-visible sm:pr-0"
+      style={{
+        WebkitOverflowScrolling: "touch",
+      }}
+    >
       {CATEGORIES.map((cat) => {
         const isActive = active === cat.key;
         return (
@@ -250,12 +255,12 @@ function CategoryChips({ active, onToggle }) {
             type="button"
             onClick={() => onToggle(cat.key)}
             aria-pressed={isActive}
-            className="inline-flex items-center gap-2 rounded-full py-2 pl-2 pr-4 text-sm transition-all"
+            className="inline-flex shrink-0 items-center gap-1 sm:gap-2 rounded-full py-1 sm:py-2 pl-1 sm:pl-2 pr-2.5 sm:pr-4 text-xs sm:text-sm transition-all"
             style={{
-              background: isActive ? "rgba(255,77,28,0.14)" : PANEL,
+              background: isActive ? "rgba(255,77,28,0.03)" : PANEL,
               border: "1.5px solid " + (isActive ? ORANGE : BORDER),
               color: isActive ? ORANGE : "#c9c4bf",
-              fontWeight: isActive ? 700 : 550,
+              fontWeight: isActive ? 560 : 550,
             }}
             onMouseOver={(e) => {
               if (!isActive)
@@ -265,7 +270,12 @@ function CategoryChips({ active, onToggle }) {
               if (!isActive) e.currentTarget.style.borderColor = BORDER;
             }}
           >
-            <MuscleIcon group={cat.icon} size={26} />
+            <span className="sm:hidden">
+              <MuscleIcon group={cat.icon} size={20} />
+            </span>
+            <span className="hidden sm:inline-flex">
+              <MuscleIcon group={cat.icon} size={26} />
+            </span>
             {cat.label}
           </button>
         );
