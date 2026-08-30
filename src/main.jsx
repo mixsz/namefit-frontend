@@ -8,6 +8,7 @@ import Login from "./pages/Login.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import PublicRoute from "./components/PublicRoute.jsx";
+import AdminRoute from "./components/AdminRoute.jsx";
 import Layout from "./components/Layout.jsx";
 import Exercicios from "./pages/Exercicios.jsx";
 import Historico from "./pages/Historico.jsx";
@@ -16,6 +17,7 @@ import TreinoDetalhe from "./pages/TreinoDetalhe.jsx";
 import Perfil from "./pages/Perfil.jsx";
 import Execucao from "./pages/Execucao.jsx";
 import HistoricoDetalhe from "./pages/HistoricoDetalhe.jsx";
+import Admin from "./pages/Admin.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 
@@ -79,6 +81,15 @@ const router = createBrowserRouter([
               {
                 path: "historico/:id",
                 element: <HistoricoDetalhe />,
+              },
+              {
+                element: <AdminRoute />,
+                children: [
+                  {
+                    path: "admin",
+                    element: <Admin />,
+                  },
+                ],
               },
             ],
           },

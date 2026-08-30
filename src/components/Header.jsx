@@ -23,7 +23,7 @@ const NAV_ITEMS = [
 
 function Header() {
   const location = useLocation();
-  const { username, avatarId } = useAuth();
+  const { username, avatarId, role } = useAuth();
   const currentAvatar = findAvatarOption(avatarId);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -32,6 +32,11 @@ function Header() {
   const { activeWorkout } = useActiveWorkout();
 
   const headerRef = useRef(null);
+
+  const navItems =
+    role === "ADMIN"
+      ? [...NAV_ITEMS, { label: "Admin", to: "/admin" }]
+      : NAV_ITEMS;
 
   useEffect(() => {
     const el = headerRef.current;
@@ -68,6 +73,7 @@ function Header() {
 
   return (
     <header
+      ref={headerRef}
       className="fixed top-0 left-0 right-0 z-50"
       style={{
         background:
@@ -83,7 +89,7 @@ function Header() {
         style={{ height: "66px" }}
       >
         <nav className="hidden md:flex items-center gap-1 justify-self-start">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -169,7 +175,7 @@ function Header() {
                 className="w-9 h-9 rounded-full flex items-center justify-center"
                 style={{ background: ORANGE }}
               >
-                <currentAvatar.icon size={26} color={BG} strokeWidth={1.7} />
+                <currentAvatar.icon size={24} color={BG} strokeWidth={1.5} />
               </span>
               <ChevronDown
                 size={16}
@@ -229,7 +235,7 @@ function Header() {
           className="md:hidden px-4 pb-4 flex flex-col gap-1"
           style={{ borderTop: "1px solid " + BORDER }}
         >
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}

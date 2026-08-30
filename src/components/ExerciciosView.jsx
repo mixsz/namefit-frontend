@@ -4,7 +4,6 @@ import {
   Search,
   X,
   Plus,
-  Dumbbell,
   SlidersHorizontal,
   ChevronDown,
   ChevronLeft,
@@ -220,7 +219,7 @@ function SearchField({ value, onChange, onClear }) {
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        placeholder="Buscar por exercício ou grupo muscular..."
+        placeholder="Buscar exercício por nome..."
         className="w-full bg-transparent text-sm outline-none"
         style={{ color: TEXT }}
       />
@@ -775,26 +774,20 @@ function Dropdown({ label, value, onChange, options, placeholder }) {
 function EmptyWorkouts({ onClose }) {
   return (
     <div className="flex flex-col items-center py-4 text-center">
-      <div
-        className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
-        style={{ background: FIELD, border: "1px solid " + BORDER }}
-      >
-        <Dumbbell size={26} color={ORANGE} strokeWidth={2.2} />
-      </div>
       <p className="text-sm" style={{ color: TEXT, fontWeight: 600 }}>
         Você ainda não tem treinos criados.
       </p>
       <p className="mt-1.5 max-w-xs text-sm" style={{ color: MUTED }}>
-        Crie um treino para poder adicionar exercícios a ele.
+        Crie um treino para poder adicionar exercícios.
       </p>
       <Link
         to="/treinos"
         state={{ openCreate: true }}
         onClick={onClose}
-        className="mt-6 inline-flex items-center gap-1.5 text-sm font-extrabold uppercase tracking-[0.08em] transition-colors"
+        className="mt-8 inline-flex items-center gap-1.5 text-sm font-extrabold uppercase tracking-[0.08em] transition-colors"
         style={{ color: ORANGE }}
       >
-        Criar meu primeiro treino →
+        Criar meu primeiro treino
       </Link>
     </div>
   );
