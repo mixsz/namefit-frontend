@@ -399,7 +399,7 @@ function WorkoutCard({
 
       <div className="mt-5">
         <h3
-          className="font-bold"
+          className="-ml-1 truncate pb-2 pl-1"
           style={{
             color: TEXT,
             fontFamily: "'Barlow Condensed', sans-serif",
@@ -410,7 +410,7 @@ function WorkoutCard({
           {workout.title}
         </h3>
         <div
-          className="mt-2 mb-3"
+          className="mb-3"
           style={{ width: 28, height: 2, background: ORANGE, borderRadius: 2 }}
         />
         <p className="text-xs" style={{ color: MUTED }}>
@@ -819,7 +819,7 @@ function ConfirmDeleteModal({ workout, onClose, onConfirm }) {
 
           <p
             id="confirm-delete-desc"
-            className="mt-3 max-w-xs text-center text-sm leading-relaxed"
+            className="mt-3 max-w-xs text-center text-sm leading-relaxed break-words"
             style={{
               color: "#a39d97",
             }}

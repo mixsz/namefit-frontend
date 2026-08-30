@@ -1,14 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ORANGE, BG, FIELD, BORDER, TEXT, MUTED } from "../theme";
-import {
-  ArrowLeft,
-  Check,
-  Trash2,
-  X,
-  LogOut,
-  Plus,
-  Minus,
-} from "lucide-react";
+import { ArrowLeft, Check, Trash2, X, LogOut, Plus, Minus } from "lucide-react";
 import ConnectionErrorState from "./ConnectionErrorState.jsx";
 
 function ExecucaoView({
@@ -139,9 +131,9 @@ function ExecucaoView({
               >
                 Treino em execução
               </p>
-              <div className="flex items-end justify-between gap-4">
+              <div className="-mb-2 flex min-w-0 items-end justify-between gap-4">
                 <h1
-                  className="ml-2 font-bold leading-[0.95] sm:ml-0"
+                  className="ml-1 min-w-0 flex-1 truncate pb-2 pl-1 font-bold leading-[0.95] sm:ml-0"
                   style={{
                     color: TEXT,
                     fontFamily: "'Barlow Condensed', sans-serif",
@@ -152,7 +144,7 @@ function ExecucaoView({
                   {workout.title}
                 </h1>
                 <span
-                  className="ml-2 shrink-0 rounded-full px-3 py-1.5 text-sm font-bold"
+                  className="ml-2 mb-2 shrink-0 rounded-full px-3 py-1.5 text-sm font-bold"
                   style={{
                     background: FIELD,
                     color: doneCount === total ? ORANGE : MUTED,
@@ -166,8 +158,12 @@ function ExecucaoView({
               </div>
 
               <div
-                className="mt-4 h-1.5 w-full overflow-hidden rounded-full"
-                style={{ background: FIELD }}
+                className="h-1.5 w-full overflow-hidden rounded-full"
+                style={{
+                  background: FIELD,
+                  marginTop: "22px",
+                  marginBottom: "-6px",
+                }}
               >
                 <div
                   className="h-full rounded-full"

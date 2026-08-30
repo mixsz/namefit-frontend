@@ -390,9 +390,9 @@ function BackLink({ isEditing, onExitEdit }) {
 function ViewHeader({ title, onEdit, blocked }) {
   const [hover, setHover] = useState(false);
   return (
-    <header className="mt-5 flex items-end justify-between gap-4">
+    <header className="mt-5 -mb-2 flex items-end justify-between gap-4">
       <h1
-        className="ml-2 font-bold leading-[0.95] sm:ml-0"
+        className="ml-1 min-w-0 flex-1 truncate pb-2 pl-1 font-bold leading-[0.95] sm:ml-0"
         style={{
           color: TEXT,
           fontFamily: "'Barlow Condensed', sans-serif",
@@ -408,7 +408,7 @@ function ViewHeader({ title, onEdit, blocked }) {
         onClick={onEdit}
         onMouseEnter={() => !blocked && setHover(true)}
         onMouseLeave={() => !blocked && setHover(false)}
-        className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold uppercase tracking-[0.05em] transition-all"
+        className="mb-2 inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold uppercase tracking-[0.05em] transition-all"
         style={{
           opacity: blocked ? 0.5 : 1,
           background: hover && !blocked ? "rgba(255,77,28,0.1)" : "transparent",
@@ -1042,7 +1042,7 @@ function ConfirmDeleteModal({ exercise, onClose, onConfirm }) {
 
           <p
             id="confirm-delete-exercise-desc"
-            className="mt-3 max-w-xs text-center text-sm leading-relaxed"
+            className="mt-3 max-w-xs text-center text-sm leading-relaxed break-words"
             style={{
               color: "#a39d97",
             }}

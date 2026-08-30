@@ -271,9 +271,9 @@ function SessionRow({ session, onClick }) {
       </div>
 
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="-mb-2 -ml-1 flex items-center gap-2">
           <h3
-            className="truncate text-lg font-bold leading-tight"
+            className="min-w-0 truncate pb-2 pl-1 text-lg font-bold leading-tight"
             style={{
               color: TEXT,
               fontFamily: "'Barlow Condensed', sans-serif",
@@ -284,7 +284,7 @@ function SessionRow({ session, onClick }) {
           </h3>
           {session.deleted && (
             <span
-              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] ml-3"
+              className="-mt-1 ml-1 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]"
               style={{
                 color: "#c98a76",
                 background: "transparent",
@@ -462,6 +462,7 @@ function Dropdown({ label, value, onChange, options, placeholder, icon }) {
           <ChevronDown
             size={16}
             color={open ? ORANGE : MUTED}
+            className="shrink-0"
             style={{
               transition: "transform 0.18s ease",
               transform: open ? "rotate(180deg)" : "rotate(0deg)",
@@ -502,7 +503,7 @@ function Dropdown({ label, value, onChange, options, placeholder, icon }) {
                         onChange(opt.value);
                         setOpen(false);
                       }}
-                      className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm transition-colors"
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors"
                       style={{
                         color: textColor,
                         background: isSelected
@@ -520,9 +521,16 @@ function Dropdown({ label, value, onChange, options, placeholder, icon }) {
                           e.currentTarget.style.background = "transparent";
                       }}
                     >
-                      <span className="truncate">{opt.label}</span>
+                      <span className="min-w-0 flex-1 truncate">
+                        {opt.label}
+                      </span>
                       {isSelected && (
-                        <Check size={16} color={ORANGE} strokeWidth={2.6} />
+                        <Check
+                          size={16}
+                          color={ORANGE}
+                          strokeWidth={2.6}
+                          className="shrink-0"
+                        />
                       )}
                     </button>
                   </li>

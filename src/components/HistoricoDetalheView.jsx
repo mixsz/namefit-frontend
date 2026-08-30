@@ -283,32 +283,18 @@ function HistoricoDetalheView({ data = {} }) {
               <BackLink label="Voltar" />
             </div>
 
-            <header className="mb-8">
-              <div className="flex flex-wrap items-center gap-3">
-                <h1
-                  className="font-bold leading-[0.95]"
-                  style={{
-                    color: TEXT,
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontSize: "clamp(2.4rem, 5vw, 3.6rem)",
-                    letterSpacing: "-0.01em",
-                  }}
-                >
-                  {session.workoutName}
-                </h1>
-                {session.deleted && (
-                  <span
-                    className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]"
-                    style={{
-                      color: "#c98a76",
-                      background: "transparent",
-                      border: "1px solid rgba(200,90,50,0.3)",
-                    }}
-                  >
-                    Treino excluído
-                  </span>
-                )}
-              </div>
+            <header className="mb-6">
+              <h1
+                className="min-w-0 truncate pb-2 pl-1 font-bold leading-[0.95]"
+                style={{
+                  color: TEXT,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: "clamp(2.4rem, 5vw, 3.6rem)",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {session.workoutName}
+              </h1>
 
               <div
                 className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm"
@@ -320,9 +306,10 @@ function HistoricoDetalheView({ data = {} }) {
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Clock size={14} />
-                  {formatTime(session.startTime)} –{" "}
+                  {formatTime(session.startTime)} -{" "}
                   {formatTime(session.endTime)}
                 </span>
+                {session.deleted && <span>(Treino excluído)</span>}
               </div>
             </header>
 

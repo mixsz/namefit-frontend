@@ -501,17 +501,17 @@ function AddToWorkoutModal({ exercise, workouts, onClose, onAddToWorkout }) {
           boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
         }}
       >
-        <div className="mb-5 flex items-start justify-between">
-          <div className="flex items-center gap-3">
+        <div className="mb-5 flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
               style={{ background: FIELD }}
             >
               <MuscleIcon group={exercise.muscleGroup} size={34} />
             </span>
-            <div>
+            <div className="min-w-0">
               <h2
-                className="font-bold"
+                className="truncate font-bold"
                 style={{
                   color: TEXT,
                   fontFamily: "'Barlow Condensed', sans-serif",
@@ -691,12 +691,13 @@ function Dropdown({ label, value, onChange, options, placeholder }) {
             color: selected ? TEXT : MUTED,
           }}
         >
-          <span className="truncate">
+          <span className="min-w-0 truncate">
             {selected ? selected.label : placeholder || "Selecione"}
           </span>
           <ChevronDown
             size={18}
             color={open ? ORANGE : MUTED}
+            className="shrink-0"
             style={{
               transition: "transform 0.18s ease",
               transform: open ? "rotate(180deg)" : "rotate(0deg)",
@@ -735,7 +736,7 @@ function Dropdown({ label, value, onChange, options, placeholder }) {
                         onChange(opt.value);
                         setOpen(false);
                       }}
-                      className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm transition-colors disabled:cursor-not-allowed"
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors disabled:cursor-not-allowed"
                       style={{
                         color: opt.disabled
                           ? "#6b645d"
@@ -757,11 +758,11 @@ function Dropdown({ label, value, onChange, options, placeholder }) {
                           e.currentTarget.style.background = "transparent";
                       }}
                     >
-                      <span className="flex items-center gap-2 truncate">
-                        {opt.label}
+                      <span className="flex min-w-0 flex-1 items-center gap-2">
+                        <span className="-ml-1 truncate pl-1">{opt.label}</span>
                         {opt.hint && (
                           <span
-                            className="text-xs font-semibold"
+                            className="shrink-0 text-xs font-semibold"
                             style={{ color: "#6b645d" }}
                           >
                             ({opt.hint})
@@ -769,7 +770,12 @@ function Dropdown({ label, value, onChange, options, placeholder }) {
                         )}
                       </span>
                       {isSelected && (
-                        <Check size={16} color={ORANGE} strokeWidth={2.6} />
+                        <Check
+                          size={16}
+                          color={ORANGE}
+                          strokeWidth={2.6}
+                          className="shrink-0"
+                        />
                       )}
                     </button>
                   </li>

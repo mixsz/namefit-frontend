@@ -148,7 +148,7 @@ function HomeView({ data }) {
                 </Link>
                 <Link
                   to={`/historico/${lastWorkout.id}`}
-                  className="block h-full"
+                  className="block h-full min-w-0"
                 >
                   <SmallMetricCard
                     icon={<History size={18} />}
@@ -401,8 +401,8 @@ function StatusCard({
         boxShadow: hover && !blocked ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
       }}
     >
-      <div className="relative z-10 flex h-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-start gap-3 sm:gap-4">
+      <div className="relative z-10 flex h-full min-w-0 flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex min-w-0 items-start gap-3 sm:gap-4">
           <div
             className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl transition-all"
             style={{
@@ -428,7 +428,7 @@ function StatusCard({
               />
             )}
           </div>
-          <div>
+          <div className="min-w-0">
             <h2
               className="font-bold text-[1.1rem] sm:text-[1.7rem]"
               style={{
@@ -439,7 +439,10 @@ function StatusCard({
             >
               {trained ? "Você já treinou hoje!" : "Ainda não treinou hoje..."}
             </h2>
-            <p className="mt-2 text-xs sm:text-sm" style={{ color: MUTED }}>
+            <p
+              className="mt-2 break-words text-xs sm:text-sm"
+              style={{ color: MUTED }}
+            >
               {trained
                 ? `O treino ${todayWorkoutName} foi concluído. Mais um passo na sua evolução!`
                 : "Que tal começar agora? A consistência transforma esforço em resultado!"}
@@ -502,9 +505,9 @@ function SmallMetricCard({
       >
         {icon}
       </div>
-      <div className="flex items-baseline gap-2">
+      <div className="-mb-2 -ml-1 flex min-w-0 items-baseline gap-2">
         <span
-          className="font-bold"
+          className="truncate pb-2 pl-1 font-bold"
           style={{
             color: TEXT,
             fontFamily: "'Barlow Condensed', sans-serif",
@@ -544,7 +547,6 @@ function SmallMetricCard({
     </div>
   );
 }
-
 function SuggestionCard({ suggestion }) {
   const [hover, setHover] = useState(false);
   return (
