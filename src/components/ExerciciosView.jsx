@@ -206,7 +206,7 @@ function SearchField({ value, onChange, onClear }) {
   const [focused, setFocused] = useState(false);
   return (
     <div
-      className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all"
+      className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all h-[38px] sm:h-[46px]"
       style={{
         background: FIELD,
         border: "1.5px solid " + (focused ? ORANGE : BORDER),
@@ -223,17 +223,19 @@ function SearchField({ value, onChange, onClear }) {
         className="w-full bg-transparent text-sm outline-none"
         style={{ color: TEXT }}
       />
-      {value && (
-        <button
-          type="button"
-          onClick={() => onClear?.()}
-          aria-label="Limpar busca"
-          className="rounded-md p-1 opacity-50 transition-opacity hover:opacity-90"
-          style={{ color: MUTED }}
-        >
-          <X size={16} />
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={onClear}
+        aria-label="Limpar busca"
+        className="rounded-md p-1 transition-opacity hover:opacity-90"
+        style={{
+          color: MUTED,
+          opacity: value ? 0.5 : 0,
+          pointerEvents: value ? "auto" : "none",
+        }}
+      >
+        <X size={16} />
+      </button>
     </div>
   );
 }
@@ -323,7 +325,7 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
         type="button"
         onClick={() => onShowDetails(exercise)}
         aria-label={"Ver descrição de " + exercise.name}
-        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full transition-all"
+        className="absolute right-0 top-0 sm:right-1 sm:top-1 flex h-8 w-8 items-center justify-center rounded-full transition-all"
         style={{
           background: "transparent",
           color: MUTED,
@@ -335,7 +337,8 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
           e.currentTarget.style.color = MUTED;
         }}
       >
-        <Info size={18} strokeWidth={2.3} />
+        <Info size={17} strokeWidth={2.1} className="sm:hidden" />
+        <Info size={19} strokeWidth={2.1} className="hidden sm:block" />
       </button>
 
       <div className="flex items-center gap-2 sm:gap-4 pr-6 sm:pr-8">
@@ -343,11 +346,20 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
           className="flex h-11 w-11 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-xl"
           style={{ background: FIELD, border: "1px solid " + BORDER }}
         >
-          <MuscleIcon group={exercise.muscleGroup} size={60} />
+          <MuscleIcon
+            group={exercise.muscleGroup}
+            size={35}
+            className="sm:hidden"
+          />
+          <MuscleIcon
+            group={exercise.muscleGroup}
+            size={52}
+            className="hidden sm:block"
+          />
         </span>
         <div className="min-w-0 translate-y-1 sm:translate-y-0">
           <h3
-            className="truncate font-semibold text-lg sm:text-2xl"
+            className="truncate font-semibold text-base sm:text-2xl"
             style={{
               color: TEXT,
               fontFamily: "'Barlow Condensed', sans-serif",
@@ -357,7 +369,7 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
             {exercise.name}
           </h3>
           <span
-            className="mt-1 sm:mt-1.5 inline-block -translate-y-0.5 sm:translate-y-0 rounded-full px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-[0.05em]"
+            className="mt-1 sm:mt-1.5 inline-block -translate-y-0.5 sm:translate-y-0 rounded-full px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-xs font-bold uppercase tracking-[0.05em]"
             style={{
               background: "transparent",
               color: "#e8956a",

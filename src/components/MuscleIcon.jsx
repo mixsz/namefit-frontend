@@ -3,14 +3,14 @@ import { Dumbbell } from "lucide-react";
 import { ORANGE } from "../theme";
 import { MUSCLE_ICONS } from "../constants/muscleIcons.js";
 
-function MuscleIcon({ group, size = 40 }) {
+function MuscleIcon({ group, size = 40, className = "" }) {
   const [errored, setErrored] = useState(false);
   const src = MUSCLE_ICONS[group];
 
   if (errored || !src) {
     return (
       <span
-        className="flex items-center justify-center rounded-lg"
+        className={"flex items-center justify-center rounded-lg " + className}
         style={{
           width: size,
           height: size,
@@ -31,6 +31,7 @@ function MuscleIcon({ group, size = 40 }) {
       width={size}
       height={size}
       onError={() => setErrored(true)}
+      className={className}
       style={{ width: size, height: size, objectFit: "contain" }}
     />
   );

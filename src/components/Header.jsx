@@ -44,7 +44,7 @@ function Header() {
     const observer = new ResizeObserver(() => {
       document.documentElement.style.setProperty(
         "--header-height",
-        `${el.offsetHeight}px`,
+        `${el.offsetHeight + 28}px`,
       );
     });
     observer.observe(el);

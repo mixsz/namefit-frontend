@@ -102,7 +102,7 @@ function HomeView({ data }) {
               />
             </section>
 
-            <section className="mt-9 sm:hidden">
+            <section className="mt-7 sm:hidden">
               <SectionLabel>Frequência</SectionLabel>
               <div className="flex flex-col gap-3">
                 <StreakCard streak={streak} trained={trainedThisWeek} />
@@ -441,7 +441,7 @@ function StatusCard({
             </h2>
             <p className="mt-2 text-xs sm:text-sm" style={{ color: MUTED }}>
               {trained
-                ? `O treino ${todayWorkoutName} foi insano!`
+                ? `O treino ${todayWorkoutName} foi concluído. Mais um passo na sua evolução!`
                 : "Que tal começar agora? A consistência transforma esforço em resultado!"}
             </p>
           </div>

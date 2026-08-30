@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import AdminView from "../components/AdminView";
 import { useToast } from "../hooks/useToast.js";
+import { CATEGORIES } from "../constants/exerciseCategories.js";
 import api from "../services/api";
 
 const PAGE_SIZE = 12;
@@ -14,7 +15,7 @@ function Admin() {
 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [muscleGroup, setMuscleGroup] = useState(null);
+  const [category, setCategory] = useState(null);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
@@ -30,14 +31,15 @@ function Admin() {
     const requestId = ++fetchIdRef.current;
     setLoading(true);
     setConnectionError(false);
+    const selectedCategory = CATEGORIES.find((c) => c.key === category);
     try {
       const response = await api.get("/exercise/search", {
         params: {
           page,
           size: PAGE_SIZE,
           name: debouncedQuery || undefined,
-          muscleGroups: muscleGroup ? [muscleGroup] : undefined,
-          sort: ["muscleGroup,asc", "name,asc"],
+          muscleGroups: selectedCategory ? selectedCategory.groups : undefined,
+          sort: ["name,asc"],
         },
         paramsSerializer: { indexes: null },
       });
@@ -52,7 +54,7 @@ function Admin() {
     } finally {
       if (requestId === fetchIdRef.current) setLoading(false);
     }
-  }, [page, debouncedQuery, muscleGroup]);
+  }, [page, debouncedQuery, category]);
 
   useEffect(() => {
     fetchExercises();
@@ -63,8 +65,8 @@ function Admin() {
     setPage(0);
   }
 
-  function handleMuscleGroupChange(value) {
-    setMuscleGroup(value);
+  function handleCategoryChange(value) {
+    setCategory(value);
     setPage(0);
   }
 
@@ -95,8 +97,8 @@ function Admin() {
         onRetry: fetchExercises,
         query,
         onQueryChange: handleQueryChange,
-        muscleGroup,
-        onMuscleGroupChange: handleMuscleGroupChange,
+        category,
+        onCategoryChange: handleCategoryChange,
         page,
         totalPages,
         totalElements,

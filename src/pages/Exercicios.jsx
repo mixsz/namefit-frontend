@@ -97,6 +97,7 @@ function Exercicios() {
       const searchParams = new URLSearchParams();
       searchParams.set("page", targetPage);
       searchParams.set("size", PAGE_SIZE);
+      searchParams.set("sort", "name,asc");
       if (effectiveQuery) searchParams.set("name", effectiveQuery);
       if (category) {
         category.groups.forEach((g) => searchParams.append("muscleGroups", g));

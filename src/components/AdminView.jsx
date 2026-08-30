@@ -12,6 +12,7 @@ import {
   Check,
   AlertTriangle,
 } from "lucide-react";
+import { CATEGORIES } from "../constants/exerciseCategories.js";
 import ConnectionErrorState from "./ConnectionErrorState";
 
 const MUSCLE_GROUPS = [
@@ -46,8 +47,8 @@ function AdminView({ data }) {
     onRetry,
     query = "",
     onQueryChange,
-    muscleGroup,
-    onMuscleGroupChange,
+    category,
+    onCategoryChange,
     page = 0,
     totalPages = 1,
     totalElements = 0,
@@ -100,7 +101,7 @@ function AdminView({ data }) {
             "radial-gradient(circle at 50% -10%, #201a15 0%, #0c0a08 60%)",
           backgroundAttachment: "fixed",
           fontFamily: "'Barlow', sans-serif",
-          paddingTop: "calc(var(--header-height, 90px) + 28px)",
+          paddingTop: "var(--header-height, 90px)",
         }}
       >
         <div className="mx-auto w-full max-w-6xl px-6 md:px-10">
@@ -199,10 +200,7 @@ function AdminView({ data }) {
             />
           </div>
           <div className="sm:w-[220px]">
-            <MuscleDropdown
-              value={muscleGroup}
-              onChange={onMuscleGroupChange}
-            />
+            <CategoryDropdown value={category} onChange={onCategoryChange} />
           </div>
         </div>
 
@@ -350,7 +348,7 @@ function SearchField({ value, onChange, onClear }) {
   const [focused, setFocused] = useState(false);
   return (
     <div
-      className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all"
+      className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all h-[38px] sm:h-[46px]"
       style={{
         background: FIELD,
         border: "1.5px solid " + (focused ? ORANGE : BORDER),
@@ -382,10 +380,10 @@ function SearchField({ value, onChange, onClear }) {
   );
 }
 
-function MuscleDropdown({ value, onChange }) {
+function CategoryDropdown({ value, onChange }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
-  const selected = MUSCLE_GROUPS.find((m) => m.value === value);
+  const selected = CATEGORIES.find((c) => c.key === value);
 
   useEffect(() => {
     if (!open) return;
@@ -445,8 +443,7 @@ function MuscleDropdown({ value, onChange }) {
                 }}
                 onMouseOver={(e) => {
                   if (value)
-                    e.currentTarget.style.background =
-                      "rgba(255,255,255,0.05)";
+                    e.currentTarget.style.background = "rgba(255,255,255,0.05)";
                 }}
                 onMouseOut={(e) => {
                   if (value) e.currentTarget.style.background = "transparent";
@@ -456,35 +453,35 @@ function MuscleDropdown({ value, onChange }) {
                 {!value && <Check size={16} color={ORANGE} strokeWidth={2.6} />}
               </button>
             </li>
-            {MUSCLE_GROUPS.map((m) => (
-              <li key={m.value}>
+            {CATEGORIES.map((cat) => (
+              <li key={cat.key}>
                 <button
                   type="button"
                   onClick={() => {
-                    onChange(m.value);
+                    onChange(cat.key);
                     setOpen(false);
                   }}
                   className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm transition-colors"
                   style={{
-                    color: value === m.value ? ORANGE : TEXT,
+                    color: value === cat.key ? ORANGE : TEXT,
                     background:
-                      value === m.value
+                      value === cat.key
                         ? "rgba(255,77,28,0.12)"
                         : "transparent",
-                    fontWeight: value === m.value ? 700 : 500,
+                    fontWeight: value === cat.key ? 700 : 500,
                   }}
                   onMouseOver={(e) => {
-                    if (value !== m.value)
+                    if (value !== cat.key)
                       e.currentTarget.style.background =
                         "rgba(255,255,255,0.05)";
                   }}
                   onMouseOut={(e) => {
-                    if (value !== m.value)
+                    if (value !== cat.key)
                       e.currentTarget.style.background = "transparent";
                   }}
                 >
-                  {m.label}
-                  {value === m.value && (
+                  {cat.label}
+                  {value === cat.key && (
                     <Check size={16} color={ORANGE} strokeWidth={2.6} />
                   )}
                 </button>
@@ -674,8 +671,7 @@ function ExerciseFormModal({ exercise, onClose, onSubmit }) {
                           }}
                           onMouseOut={(e) => {
                             if (muscleGroup !== m.value)
-                              e.currentTarget.style.background =
-                                "transparent";
+                              e.currentTarget.style.background = "transparent";
                           }}
                         >
                           {m.label}
@@ -744,7 +740,7 @@ function ExerciseFormModal({ exercise, onClose, onSubmit }) {
             <button
               type="submit"
               disabled={!isValid || saving}
-              className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all disabled:opacity-50"
               style={{
                 background: ORANGE,
                 color: BG,
@@ -853,7 +849,10 @@ function ConfirmDeleteModal({ exercise, onCancel, onConfirm }) {
             id="confirm-delete-exercise-desc"
             className="mt-3 flex max-w-xs flex-col items-center gap-2"
           >
-            <p className="text-center text-sm leading-relaxed" style={{ color: MUTED }}>
+            <p
+              className="text-center text-sm leading-relaxed"
+              style={{ color: MUTED }}
+            >
               Deseja realmente excluir{" "}
               <span style={{ color: ORANGE }}>{exercise.name}</span> do
               catálogo? Essa ação não pode ser desfeita.

@@ -1151,7 +1151,7 @@ function ExercisePickerModal({
         aria-label="Escolher exercício"
         className="flex w-full max-w-md flex-col overflow-hidden rounded-2xl"
         style={{
-          maxHeight: "80vh",
+          height: "80vh",
           background:
             "radial-gradient(circle at 50% -100%, #241d17 0%, #100d0a 75%)",
           border: "1px solid " + BORDER,
@@ -1193,7 +1193,7 @@ function ExercisePickerModal({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar exercício..."
+              placeholder="Buscar exercício ou grupo muscular..."
               className="w-full bg-transparent text-sm outline-none"
               style={{ color: TEXT }}
               autoFocus
