@@ -542,12 +542,12 @@ function EditTable({
                 onClick={() => onRequestDelete(ex)}
                 aria-label={"Remover " + ex.name}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all"
-                style={{ background: "transparent", color: "#dc2626" }}
+                style={{ background: "transparent", color: "#ff4444" }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.color = "#ff7a7a";
                 }}
                 onMouseOut={(e) => {
-                  e.currentTarget.style.color = "#dc2626";
+                  e.currentTarget.style.color = "#ff4444";
                 }}
               >
                 <Trash2 size={17} strokeWidth={2.4} />
@@ -617,12 +617,12 @@ function EditTable({
                   onClick={() => onRequestDelete(ex)}
                   aria-label={"Remover " + ex.name}
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all"
-                  style={{ background: "transparent", color: "#dc2626" }}
+                  style={{ background: "transparent", color: "#ff4444" }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.color = "#ff7a7a";
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.color = "#dc2626";
+                    e.currentTarget.style.color = "#ff4444";
                   }}
                 >
                   <Trash2 size={20} strokeWidth={2.4} />

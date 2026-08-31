@@ -43,12 +43,15 @@ function AdminView({ data }) {
   const {
     exercises = [],
     loading,
+    searching = false,
     connectionError,
     onRetry,
     query = "",
     onQueryChange,
+    onClearQuery,
     category,
     onCategoryChange,
+    onClearFilters,
     page = 0,
     totalPages = 1,
     totalElements = 0,
@@ -61,6 +64,7 @@ function AdminView({ data }) {
   const [formOpen, setFormOpen] = useState(false);
   const [editingExercise, setEditingExercise] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const hasFilters = Boolean(query) || Boolean(category);
 
   function openCreate() {
     setEditingExercise(null);
@@ -196,7 +200,7 @@ function AdminView({ data }) {
             <SearchField
               value={query}
               onChange={onQueryChange}
-              onClear={() => onQueryChange?.("")}
+              onClear={onClearQuery}
             />
           </div>
           <div className="sm:w-[220px]">
@@ -214,112 +218,127 @@ function AdminView({ data }) {
             : "exercícios encontrados"}
         </p>
 
-        {exercises.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <>
-            <div
-              className="overflow-hidden rounded-2xl"
-              style={{ border: "1px solid " + BORDER }}
-            >
+        <div
+          style={{
+            opacity: searching ? 0.5 : 1,
+            transition: "opacity 0.15s ease",
+          }}
+        >
+          {exercises.length === 0 ? (
+            <EmptyState hasFilters={hasFilters} onClear={onClearFilters} />
+          ) : (
+            <>
               <div
-                className="hidden grid-cols-[1fr_160px_160px] gap-4 px-5 py-3 text-xs font-bold uppercase tracking-[0.1em] sm:grid"
-                style={{ background: FIELD, color: MUTED }}
+                className="overflow-hidden rounded-2xl"
+                style={{ border: "1px solid " + BORDER }}
               >
-                <span>Exercício</span>
-                <span className="text-center">Grupo muscular</span>
-                <div className="flex justify-end pr-1">
-                  <span className="w-[80px] text-center">Ações</span>
+                <div
+                  className="hidden grid-cols-[1fr_160px_160px] gap-4 px-5 py-3 text-xs font-bold uppercase tracking-[0.1em] sm:grid"
+                  style={{ background: FIELD, color: MUTED }}
+                >
+                  <span>Exercício</span>
+                  <span className="text-center">Grupo muscular</span>
+                  <div className="flex justify-end pr-1">
+                    <span className="w-[80px] text-center">Ações</span>
+                  </div>
                 </div>
+
+                <ul>
+                  {exercises.map((exercise, index) => (
+                    <li
+                      key={exercise.id}
+                      className="flex flex-col gap-3 px-5 py-4 sm:grid sm:grid-cols-[1fr_160px_160px] sm:items-center sm:gap-4"
+                      style={{
+                        borderTop: index === 0 ? "none" : "1px solid " + BORDER,
+                        background: PANEL,
+                      }}
+                    >
+                      <div className="min-w-0">
+                        <p
+                          className="truncate font-semibold"
+                          style={{ color: TEXT }}
+                        >
+                          {exercise.name}
+                        </p>
+                        <p
+                          className="mt-0.5 truncate text-xs"
+                          style={{ color: MUTED }}
+                        >
+                          {exercise.description}
+                        </p>
+                      </div>
+
+                      <div className="flex sm:justify-center">
+                        <span
+                          className="text-xs font-bold uppercase tracking-[0.05em]"
+                          style={{ color: "#959595" }}
+                        >
+                          {exercise.muscleGroupLabel ??
+                            muscleLabel(exercise.muscleGroup)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 sm:justify-end sm:pr-1">
+                        <button
+                          type="button"
+                          onClick={() => openEdit(exercise)}
+                          aria-label={"Editar " + exercise.name}
+                          className="flex h-9 w-9 items-center justify-center rounded-lg transition-all"
+                          style={{
+                            color: "#af4d1c",
+                            background: FIELD,
+                            border: "1px solid " + BORDER,
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background =
+                              "rgba(255,77,28,0.12)";
+                            e.currentTarget.style.borderColor =
+                              "rgba(255,77,28,0.1)";
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = FIELD;
+                            e.currentTarget.style.borderColor = BORDER;
+                          }}
+                        >
+                          <Pencil size={15} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteTarget(exercise)}
+                          aria-label={"Excluir " + exercise.name}
+                          className="flex h-9 w-9 items-center justify-center rounded-lg transition-all"
+                          style={{
+                            color: "#bf4444",
+                            background: FIELD,
+                            border: "1px solid " + BORDER,
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background =
+                              "rgba(239,68,68,0.12)";
+                            e.currentTarget.style.borderColor =
+                              "rgba(239,68,68,0.1)";
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = FIELD;
+                            e.currentTarget.style.borderColor = BORDER;
+                          }}
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
-              <ul>
-                {exercises.map((exercise, index) => (
-                  <li
-                    key={exercise.id}
-                    className="flex flex-col gap-3 px-5 py-4 sm:grid sm:grid-cols-[1fr_160px_160px] sm:items-center sm:gap-4"
-                    style={{
-                      borderTop: index === 0 ? "none" : "1px solid " + BORDER,
-                      background: PANEL,
-                    }}
-                  >
-                    <div className="min-w-0">
-                      <p
-                        className="truncate font-semibold"
-                        style={{ color: TEXT }}
-                      >
-                        {exercise.name}
-                      </p>
-                      <p
-                        className="mt-0.5 truncate text-xs"
-                        style={{ color: MUTED }}
-                      >
-                        {exercise.description}
-                      </p>
-                    </div>
-
-                    <div className="flex sm:justify-center">
-                      <span
-                        className="text-xs font-bold uppercase tracking-[0.05em]"
-                        style={{ color: "#959595" }}
-                      >
-                        {exercise.muscleGroupLabel ??
-                          muscleLabel(exercise.muscleGroup)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 sm:justify-end sm:pr-1">
-                      <button
-                        type="button"
-                        onClick={() => openEdit(exercise)}
-                        aria-label={"Editar " + exercise.name}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
-                        style={{
-                          color: MUTED,
-                          background: FIELD,
-                          border: "1px solid " + BORDER,
-                        }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.color = ORANGE)
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.color = MUTED)
-                        }
-                      >
-                        <Pencil size={15} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeleteTarget(exercise)}
-                        aria-label={"Excluir " + exercise.name}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
-                        style={{
-                          color: MUTED,
-                          background: FIELD,
-                          border: "1px solid " + BORDER,
-                        }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.color = "#ef4444")
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.color = MUTED)
-                        }
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </>
+          )}
+        </div>
       </div>
 
       {formOpen && (
@@ -927,7 +946,7 @@ function ConfirmDeleteModal({ exercise, onCancel, onConfirm }) {
   );
 }
 
-function EmptyState() {
+function EmptyState({ hasFilters, onClear }) {
   return (
     <div
       className="mt-2 flex flex-col items-center justify-center rounded-2xl py-16 text-center"
@@ -936,6 +955,16 @@ function EmptyState() {
       <p className="text-sm" style={{ color: MUTED }}>
         Nenhum exercício encontrado.
       </p>
+      {hasFilters && (
+        <button
+          type="button"
+          onClick={onClear}
+          className="mt-4 text-sm font-bold transition-colors"
+          style={{ color: ORANGE }}
+        >
+          Limpar filtros
+        </button>
+      )}
     </div>
   );
 }

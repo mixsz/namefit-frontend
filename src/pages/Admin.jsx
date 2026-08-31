@@ -11,7 +11,9 @@ function Admin() {
 
   const [exercises, setExercises] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [connectionError, setConnectionError] = useState(false);
+  const hasLoadedOnce = useRef(false);
 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -29,7 +31,8 @@ function Admin() {
 
   const fetchExercises = useCallback(async () => {
     const requestId = ++fetchIdRef.current;
-    setLoading(true);
+    setLoading(!hasLoadedOnce.current);
+    if (hasLoadedOnce.current) setSearching(true);
     setConnectionError(false);
     const selectedCategory = CATEGORIES.find((c) => c.key === category);
     try {
@@ -47,12 +50,16 @@ function Admin() {
       setExercises(response.data.content);
       setTotalPages(response.data.totalPages);
       setTotalElements(response.data.totalElements);
+      hasLoadedOnce.current = true;
     } catch (error) {
       if (requestId !== fetchIdRef.current) return;
       console.error("Erro ao buscar exercícios:", error);
       if (error.code === "ERR_NETWORK") setConnectionError(true);
     } finally {
-      if (requestId === fetchIdRef.current) setLoading(false);
+      if (requestId === fetchIdRef.current) {
+        setLoading(false);
+        setSearching(false);
+      }
     }
   }, [page, debouncedQuery, category]);
 
@@ -88,11 +95,25 @@ function Admin() {
     fetchExercises();
   }
 
+  function handleClearQuery() {
+    setQuery("");
+    setDebouncedQuery("");
+    setPage(0);
+  }
+
+  function handleClearFilters() {
+    setQuery("");
+    setDebouncedQuery("");
+    setCategory(null);
+    setPage(0);
+  }
+
   return (
     <AdminView
       data={{
         exercises,
         loading,
+        searching,
         connectionError,
         onRetry: fetchExercises,
         query,
@@ -106,6 +127,8 @@ function Admin() {
         onCreate: handleCreate,
         onUpdate: handleUpdate,
         onDelete: handleDelete,
+        onClearQuery: handleClearQuery,
+        onClearFilters: handleClearFilters,
       }}
     />
   );

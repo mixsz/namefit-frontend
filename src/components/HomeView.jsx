@@ -201,7 +201,7 @@ function StreakCard({ streak, trained }) {
       style={{
         background: trained
           ? "linear-gradient(310deg, rgba(255,86,28,0.23) 0%, rgba(180,60,15,0.14) 30%, #161210 60%, #0e0b09 100%)"
-          : "linear-gradient(310deg, rgba(255,86,28,0.14) 0%, rgba(140,35,5,0.06) 0%, #161210 45%, #0e0b09 10000%)",
+          : "linear-gradient(310deg, rgba(255,86,28,0.14) 0%, rgba(140,35,5,0.06) 0%, #161210 0%, #0e0b09 10000%)",
         backgroundClip: "padding-box",
         border: "1px solid " + BORDER,
         minHeight: "100%",

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ORANGE, BG, PANEL, FIELD, BORDER, TEXT, MUTED } from "../theme.js";
+import { ORANGE, BG, FIELD, BORDER, TEXT, MUTED } from "../theme.js";
 import {
   Dumbbell,
   User,
@@ -72,219 +72,248 @@ function Header() {
   }, []);
 
   return (
-    <header
-      ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-50"
-      style={{
-        background:
-          "linear-gradient(0deg, #141210 0%, #17130f 30%, rgba(255,77,28,0.05) 100%)",
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
-        boxShadow: "0 1px 12px rgba(0,0,0,0.75)",
-        fontFamily: "'Barlow', sans-serif",
-      }}
-    >
-      <div
-        className="px-8 grid grid-cols-3 items-center"
-        style={{ height: "66px" }}
+    <>
+      <header
+        ref={headerRef}
+        className="fixed top-0 left-0 right-0 z-50"
+        style={{
+          background:
+            "linear-gradient(0deg, #141210 0%, #17130f 30%, rgba(255,77,28,0.05) 100%)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          boxShadow: "0 1px 12px rgba(0,0,0,0.75)",
+          fontFamily: "'Barlow', sans-serif",
+        }}
       >
-        <nav className="hidden md:flex items-center gap-1 justify-self-start">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className="relative px-4 py-2 rounded-xl text-base transition-all"
-              style={({ isActive }) => ({
-                color: isActive ? ORANGE : "#c9c4bf",
-                fontWeight: 550,
-                background: "transparent",
-                boxShadow: "none",
-                letterSpacing: "0.01em",
-              })}
-              onMouseOver={(e) => {
-                if (e.currentTarget.getAttribute("aria-current") !== "page") {
-                  e.currentTarget.style.color = "#ffffff";
-                }
-              }}
-              onMouseOut={(e) => {
-                if (e.currentTarget.getAttribute("aria-current") !== "page") {
-                  e.currentTarget.style.color = "#c9c4bf";
-                }
-              }}
+        <div
+          className="px-8 grid grid-cols-3 items-center"
+          style={{ height: "66px" }}
+        >
+          <nav className="hidden md:flex items-center gap-1 justify-self-start">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className="relative px-4 py-2 rounded-xl text-base transition-all"
+                style={({ isActive }) => ({
+                  color: isActive ? ORANGE : "#c9c4bf",
+                  fontWeight: 550,
+                  background: "transparent",
+                  boxShadow: "none",
+                  letterSpacing: "0.01em",
+                })}
+                onMouseOver={(e) => {
+                  if (e.currentTarget.getAttribute("aria-current") !== "page") {
+                    e.currentTarget.style.color = "#ffffff";
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (e.currentTarget.getAttribute("aria-current") !== "page") {
+                    e.currentTarget.style.color = "#c9c4bf";
+                  }
+                }}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen((v) => !v)}
+            aria-haspopup="menu"
+            aria-expanded={mobileNavOpen}
+            aria-label={mobileNavOpen ? "Fechar menu" : "Abrir menu"}
+            className="md:hidden justify-self-start p-2 rounded-lg"
+            style={{ color: TEXT }}
+          >
+            {mobileNavOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+
+          <Link
+            to="/home"
+            className="flex items-center gap-3 shrink-0 justify-self-center"
+            aria-label="NameFit - ir para Home"
+          >
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: ORANGE }}
             >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <button
-          type="button"
-          onClick={() => setMobileNavOpen((v) => !v)}
-          aria-haspopup="menu"
-          aria-expanded={mobileNavOpen}
-          aria-label={mobileNavOpen ? "Fechar menu" : "Abrir menu"}
-          className="md:hidden justify-self-start p-2 rounded-lg"
-          style={{ color: TEXT }}
-        >
-          {mobileNavOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-
-        <Link
-          to="/home"
-          className="flex items-center gap-3 shrink-0 justify-self-center"
-          aria-label="NameFit - ir para Home"
-        >
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{ background: ORANGE }}
-          >
-            <Dumbbell size={18} color={BG} strokeWidth={2.5} />
-          </div>
-          <span
-            className="text-2xl font-extrabold tracking-widest"
-            style={{
-              color: "#ffffff",
-              fontFamily: "'Barlow Condensed', sans-serif",
-            }}
-          >
-            NAME<span style={{ color: ORANGE }}>FIT</span>
-          </span>
-        </Link>
-
-        <div className="flex items-center gap-2 shrink-0 justify-self-end">
-          <div className="relative" ref={menuRef}>
-            <button
-              type="button"
-              onClick={() => setMenuOpen((v) => !v)}
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              aria-label="Abrir menu de perfil"
-              className="flex items-center gap-2 p-1 pr-2 rounded-full transition-all"
+              <Dumbbell size={18} color={BG} strokeWidth={2.5} />
+            </div>
+            <span
+              className="text-2xl font-extrabold tracking-widest"
               style={{
-                background: menuOpen ? FIELD : "transparent",
-                border: "1.5px solid " + (menuOpen ? ORANGE : BORDER),
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.borderColor = ORANGE;
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.borderColor = menuOpen ? ORANGE : BORDER;
+                color: "#ffffff",
+                fontFamily: "'Barlow Condensed', sans-serif",
               }}
             >
-              <span
-                className="w-9 h-9 rounded-full flex items-center justify-center"
-                style={{ background: ORANGE }}
-              >
-                <currentAvatar.icon size={24} color={BG} strokeWidth={1.5} />
-              </span>
-              <ChevronDown
-                size={16}
-                color={MUTED}
-                style={{
-                  transition: "transform 0.2s ease",
-                  transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)",
-                }}
-              />
-            </button>
+              NAME<span style={{ color: ORANGE }}>FIT</span>
+            </span>
+          </Link>
 
-            {menuOpen && (
-              <div
-                role="menu"
-                className="absolute right-0 mt-2 w-64 rounded-xl overflow-hidden py-2"
+          <div className="flex items-center gap-2 shrink-0 justify-self-end">
+            <div className="relative" ref={menuRef}>
+              <button
+                type="button"
+                onClick={() => setMenuOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                aria-label="Abrir menu de perfil"
+                className="flex items-center gap-2 p-1 pr-2 rounded-full transition-all"
                 style={{
-                  background: PANEL,
-                  backdropFilter: "blur(16px)",
-                  WebkitBackdropFilter: "blur(16px)",
-                  border: "1px solid " + BORDER,
-                  boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+                  background: menuOpen ? FIELD : "transparent",
+                  border: "1.5px solid " + (menuOpen ? ORANGE : BORDER),
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.borderColor = ORANGE;
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.borderColor = menuOpen
+                    ? ORANGE
+                    : BORDER;
                 }}
               >
-                <div
-                  className="px-4 py-3 mb-1"
-                  style={{ borderBottom: "1px solid " + BORDER }}
+                <span
+                  className="w-9 h-9 rounded-full flex items-center justify-center"
+                  style={{ background: ORANGE }}
                 >
-                  <p className="text-sm font-medium truncate text-white">
-                    {username}
-                  </p>
-                </div>
-
-                <DropdownItem
-                  icon={<User size={16} />}
-                  label="Meu perfil"
-                  as={Link}
-                  to="/perfil"
-                  onClick={() => setMenuOpen(false)}
-                />
-                <DropdownItem
-                  icon={<LogOut size={16} />}
-                  label="Sair"
-                  danger
-                  onClick={() => {
-                    setMenuOpen(false);
-                    logout();
+                  <currentAvatar.icon size={24} color={BG} strokeWidth={1.5} />
+                </span>
+                <ChevronDown
+                  size={16}
+                  color={MUTED}
+                  style={{
+                    transition: "transform 0.2s ease",
+                    transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)",
                   }}
                 />
-              </div>
-            )}
+              </button>
+
+              {menuOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 mt-2 w-64 rounded-xl overflow-hidden py-2"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, #17130f 0%, #100d0a 180%)",
+                    backdropFilter: "blur(16px)",
+                    WebkitBackdropFilter: "blur(16px)",
+                    border: "1px solid " + BORDER,
+                    boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+                  }}
+                >
+                  <div
+                    className="px-4 py-3 mb-1"
+                    style={{ borderBottom: "1px solid " + BORDER }}
+                  >
+                    <p className="text-sm font-medium truncate text-white">
+                      {username}
+                    </p>
+                  </div>
+
+                  <DropdownItem
+                    icon={<User size={16} />}
+                    label="Meu perfil"
+                    as={Link}
+                    to="/perfil"
+                    onClick={() => setMenuOpen(false)}
+                  />
+                  <DropdownItem
+                    icon={<LogOut size={16} />}
+                    label="Sair"
+                    danger
+                    onClick={() => {
+                      setMenuOpen(false);
+                      logout();
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+
+        {activeWorkout && !location.pathname.startsWith("/execucao") && (
+          <Link
+            to={`/execucao/${activeWorkout.id}`}
+            className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-[0.04em] transition-all"
+            style={{
+              background: "rgba(255,77,28,0.12)",
+              borderTop: "1px solid rgba(255,77,28,0.25)",
+              color: ORANGE,
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = "rgba(255,77,28,0.18)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = "rgba(255,77,28,0.12)";
+            }}
+          >
+            <span className="relative flex h-2 w-2">
+              <span
+                className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+                style={{ background: ORANGE }}
+              />
+              <span
+                className="relative inline-flex h-2 w-2 rounded-full"
+                style={{ background: ORANGE }}
+              />
+            </span>
+            <span className="truncate">
+              Treino em andamento: {activeWorkout.title}
+            </span>
+            <ChevronRight size={14} strokeWidth={2.5} className="shrink-0" />
+          </Link>
+        )}
+      </header>
 
       {mobileNavOpen && (
-        <div
-          className="md:hidden px-4 pb-4 flex flex-col gap-1"
-          style={{ borderTop: "1px solid " + BORDER }}
-        >
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={() => setMobileNavOpen(false)}
-              className="px-4 py-3 rounded-xl text-base"
-              style={({ isActive }) => ({
-                color: isActive ? ORANGE : "#c9c4bf",
-                fontWeight: 550,
-                background: isActive ? FIELD : "transparent",
-              })}
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </div>
+        <>
+          <div
+            className="md:hidden fixed left-0 right-0 bottom-0 z-40"
+            style={{
+              top: "66px",
+              background: "rgba(0,0,0,0.6)",
+              backdropFilter: "blur(2px)",
+            }}
+            onClick={() => setMobileNavOpen(false)}
+          />
+          <div
+            className="md:hidden fixed left-0 right-0 z-50 flex flex-col"
+            style={{
+              top: "66px",
+              background: "linear-gradient(180deg, #17130f 0%, #100d0a 100%)",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+              borderTop: "1px solid " + BORDER,
+              boxShadow: "0 12px 32px rgba(0,0,0,0.5)",
+              fontFamily: "'Barlow', sans-serif",
+            }}
+          >
+            {navItems.map((item, index) => (
+              <div key={item.to}>
+                <NavLink
+                  to={item.to}
+                  onClick={() => setMobileNavOpen(false)}
+                  className="block px-8 py-3 text-base"
+                  style={({ isActive }) => ({
+                    color: isActive ? ORANGE : "#c9c4bf",
+                    fontWeight: 550,
+                    background: isActive ? FIELD : "transparent",
+                  })}
+                >
+                  {item.label}
+                </NavLink>
+                {index < navItems.length - 1 && (
+                  <div style={{ borderTop: "1px solid " + BORDER }} />
+                )}
+              </div>
+            ))}
+          </div>
+        </>
       )}
-      {activeWorkout && !location.pathname.startsWith("/execucao") && (
-        <Link
-          to={`/execucao/${activeWorkout.id}`}
-          className="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-[0.04em] transition-all"
-          style={{
-            background: "rgba(255,77,28,0.12)",
-            borderTop: "1px solid rgba(255,77,28,0.25)",
-            color: ORANGE,
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.background = "rgba(255,77,28,0.18)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.background = "rgba(255,77,28,0.12)";
-          }}
-        >
-          <span className="relative flex h-2 w-2">
-            <span
-              className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-              style={{ background: ORANGE }}
-            />
-            <span
-              className="relative inline-flex h-2 w-2 rounded-full"
-              style={{ background: ORANGE }}
-            />
-          </span>
-          <span className="truncate">
-            Treino em andamento: {activeWorkout.title}
-          </span>
-          <ChevronRight size={14} strokeWidth={2.5} className="shrink-0" />
-        </Link>
-      )}
-    </header>
+    </>
   );
 }
 
