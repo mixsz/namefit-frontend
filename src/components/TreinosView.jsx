@@ -45,6 +45,11 @@ function TreinosView({ data }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const atLimit = workouts.length >= MAX_WORKOUTS;
+  const blocked = !!activeWorkout;
+
+  function warnBlocked() {
+    showToast("Finalize seu treino em andamento antes de fazer isso", "info");
+  }
 
   const ordered = useMemo(
     () => [...workouts].sort((a, b) => a.position - b.position),
@@ -89,8 +94,8 @@ function TreinosView({ data }) {
           <EmptyState onCreate={() => setModalOpen(true)} />
         ) : (
           <>
-            <header className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-              <div>
+            <header className="sm:mb-8 mb-5 flex flex-col items-end gap-5 md:flex-row md:items-end md:justify-between">
+              <div className="w-full">
                 <h1
                   className="font-bold leading-[0.95]"
                   style={{
@@ -116,23 +121,28 @@ function TreinosView({ data }) {
                 type="button"
                 onClick={() => {
                   if (atLimit) return;
+                  if (blocked) {
+                    warnBlocked();
+                    return;
+                  }
                   setModalOpen(true);
                 }}
                 disabled={atLimit}
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all sm:px-6 sm:py-3"
                 style={{
                   background: atLimit ? "#3a2a22" : ORANGE,
                   color: atLimit ? "#7a6a60" : BG,
                   boxShadow: atLimit ? "none" : "0 2px 8px rgba(0,0,0,0.35)",
+                  opacity: blocked && !atLimit ? 0.5 : 1,
                 }}
                 onMouseOver={(e) => {
-                  if (atLimit) return;
+                  if (atLimit || blocked) return;
                   e.currentTarget.style.background = "#ff6b42";
                   e.currentTarget.style.boxShadow =
                     "0 4px 12px rgba(0,0,0,0.4)";
                 }}
                 onMouseOut={(e) => {
-                  if (atLimit) return;
+                  if (atLimit || blocked) return;
                   e.currentTarget.style.background = ORANGE;
                   e.currentTarget.style.boxShadow =
                     "0 2px 8px rgba(0,0,0,0.35)";

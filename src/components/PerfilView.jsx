@@ -333,7 +333,7 @@ export default function PerfilView({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-[auto_auto_auto] justify-between gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-8">
+                <div className="grid grid-cols-[0.8fr_1fr_1fr] gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-8">
                   <StatItem
                     icon={
                       <Dumbbell size={26} color={ORANGE} strokeWidth={2.2} />
@@ -648,9 +648,11 @@ export default function PerfilView({
 
 function StatItem({ icon, label, value }) {
   return (
-    <div className="flex items-center gap-3">
-      {icon}
-      <div className="flex flex-col justify-center">
+    <div className="flex items-center gap-2 sm:gap-3">
+      <div className="shrink-0 [&>svg]:h-5 [&>svg]:w-5 sm:[&>svg]:h-[26px] sm:[&>svg]:w-[26px]">
+        {icon}
+      </div>
+      <div className="min-w-0 flex flex-col justify-center">
         <p
           className="text-xs font-bold uppercase tracking-[0.1em] leading-none"
           style={{ color: MUTED }}

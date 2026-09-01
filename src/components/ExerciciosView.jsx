@@ -243,7 +243,7 @@ function SearchField({ value, onChange, onClear }) {
 function CategoryChips({ active, onToggle }) {
   return (
     <div
-      className="mt-5 flex flex-wrap justify-center gap-1.5 sm:justify-start sm:gap-2.5 max-h-24 overflow-y-auto pr-1 sm:max-h-none sm:overflow-visible sm:pr-0"
+      className="mt-5 flex flex-wrap justify-center gap-1.5 sm:justify-start sm:gap-2.5 max-h-28 overflow-y-auto pr-1 sm:max-h-none sm:overflow-visible sm:pr-0"
       style={{
         WebkitOverflowScrolling: "touch",
       }}
@@ -256,7 +256,7 @@ function CategoryChips({ active, onToggle }) {
             type="button"
             onClick={() => onToggle(cat.key)}
             aria-pressed={isActive}
-            className="inline-flex shrink-0 items-center gap-1 sm:gap-2 rounded-full py-1 sm:py-2 pl-1 sm:pl-2 pr-2.5 sm:pr-4 text-xs sm:text-sm transition-all"
+            className="inline-flex shrink-0 items-center gap-1 sm:gap-2 rounded-full py-1 sm:py-2 pl-1 sm:pl-2 pr-2.5 sm:pr-4 text-[13px] sm:text-sm transition-all"
             style={{
               background: isActive ? "rgba(255,77,28,0.03)" : PANEL,
               border: "1.5px solid " + (isActive ? ORANGE : BORDER),
@@ -272,7 +272,7 @@ function CategoryChips({ active, onToggle }) {
             }}
           >
             <span className="sm:hidden">
-              <MuscleIcon group={cat.icon} size={20} />
+              <MuscleIcon group={cat.icon} size={22} />
             </span>
             <span className="hidden sm:inline-flex">
               <MuscleIcon group={cat.icon} size={26} />
@@ -305,7 +305,17 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="relative flex h-36 sm:h-44 flex-col justify-between rounded-xl p-3 sm:p-6 transition-all"
+      onClick={onAdd}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onAdd();
+        }
+      }}
+      aria-label={"Adicionar " + exercise.name + " ao treino"}
+      className="relative flex h-36 sm:h-44 cursor-pointer flex-col justify-between rounded-xl p-3 sm:p-6 transition-all"
       style={{
         background:
           "linear-gradient(to bottom right, " +
@@ -317,13 +327,17 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
           "radial-gradient(180% 600% at 100% -130%, rgba(255, 110, 50, 0.06) 0%, rgba(180, 60, 15, 0.02) 20%, rgb(23, 19, 16) 45%, rgb(14, 11, 9) 100%)",
         backgroundBlendMode: "lighten",
         backgroundClip: "padding-box",
-        border: "1px solid " + (hover ? "rgba(255,77,28,0.35)" : BORDER),
-        boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
+        border:
+          "1px solid " + (hover && !blocked ? "rgba(255,77,28,0.35)" : BORDER),
+        boxShadow: hover && !blocked ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
       }}
     >
       <button
         type="button"
-        onClick={() => onShowDetails(exercise)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onShowDetails(exercise);
+        }}
         aria-label={"Ver descrição de " + exercise.name}
         className="absolute right-0 top-0 sm:right-1 sm:top-1 flex h-8 w-8 items-center justify-center rounded-full transition-all"
         style={{
@@ -337,11 +351,11 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
           e.currentTarget.style.color = MUTED;
         }}
       >
-        <Info size={17} strokeWidth={2.1} className="sm:hidden" />
+        <Info size={14} strokeWidth={2.1} className="sm:hidden" />
         <Info size={19} strokeWidth={2.1} className="hidden sm:block" />
       </button>
 
-      <div className="flex items-center gap-2 sm:gap-4 pr-6 sm:pr-8">
+      <div className="flex items-center gap-2 sm:gap-4 pr-6 sm:pr-8 mt-1.5 sm:mt-0">
         <span
           className="flex h-11 w-11 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-xl"
           style={{ background: FIELD, border: "1px solid " + BORDER }}
@@ -369,11 +383,10 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
             {exercise.name}
           </h3>
           <span
-            className="mt-1 sm:mt-1.5 inline-block -translate-y-0.5 sm:translate-y-0 rounded-full px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-xs font-bold uppercase tracking-[0.05em]"
+            className="mt-0.5 sm:mt-1.5 inline-flex items-center rounded-full px-2 sm:px-2.5 py-0.5 text-[8.5px] sm:text-xs font-bold uppercase leading-none sm:tracking-[0.05em] tracking-[0.07em] border border-[rgba(255,77,28,0.2)] -translate-y-0.5 sm:translate-y-0"
             style={{
               background: "transparent",
               color: "#e8956a",
-              border: "1px solid rgba(255,77,28,0.2)",
             }}
           >
             {exercise.muscleGroupLabel}
@@ -385,31 +398,19 @@ function ExerciseCard({ exercise, onAdd, onShowDetails, blocked }) {
         className="mt-5 flex items-center justify-center gap-2 pt-4"
         style={{ borderTop: "1px solid " + BORDER }}
       >
-        <button
-          type="button"
-          onClick={onAdd}
+        <span
           className="inline-flex shrink-0 items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap rounded-full px-8 sm:px-10 py-1.5 sm:py-2 text-[11px] sm:text-sm font-extrabold uppercase tracking-[0.01em] transition-all"
           style={{
-            background: "transparent",
-            color: ORANGE,
+            background: hover && !blocked ? ORANGE : "transparent",
+            color: hover && !blocked ? PANEL : ORANGE,
             border: "1.5px solid " + ORANGE,
             opacity: blocked ? 0.5 : 1,
-          }}
-          onMouseOver={(e) => {
-            if (blocked) return;
-            e.currentTarget.style.background = ORANGE;
-            e.currentTarget.style.color = PANEL;
-          }}
-          onMouseOut={(e) => {
-            if (blocked) return;
-            e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.color = ORANGE;
           }}
         >
           <Plus size={12} className="sm:hidden" strokeWidth={2.5} />
           <Plus size={14} className="hidden sm:block" strokeWidth={2.5} />
           Adicionar ao treino
-        </button>
+        </span>
       </div>
     </div>
   );
