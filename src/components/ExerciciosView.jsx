@@ -258,10 +258,10 @@ function CategoryChips({ active, onToggle }) {
             aria-pressed={isActive}
             className="inline-flex shrink-0 items-center gap-1 sm:gap-2 rounded-full py-1 sm:py-2 pl-1 sm:pl-2 pr-2.5 sm:pr-4 text-[13px] sm:text-sm transition-all"
             style={{
-              background: isActive ? "rgba(255,77,28,0.03)" : PANEL,
+              background: isActive ? "rgba(255,77,28,0.02)" : PANEL,
               border: "1.5px solid " + (isActive ? ORANGE : BORDER),
               color: isActive ? ORANGE : "#c9c4bf",
-              fontWeight: isActive ? 560 : 550,
+              fontWeight: isActive ? 550 : 550,
             }}
             onMouseOver={(e) => {
               if (!isActive)
@@ -876,7 +876,7 @@ function Pagination({ page = 0, totalPages = 1, onPageChange }) {
                 className="flex w-5 items-center justify-center text-sm transition-colors"
                 style={{
                   color: p === page ? ORANGE : MUTED,
-                  fontWeight: p === page ? 800 : 600,
+                  fontWeight: p === page ? 600 : 600,
                 }}
                 onMouseOver={(e) => {
                   if (p !== page) e.currentTarget.style.color = TEXT;
