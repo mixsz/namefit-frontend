@@ -148,10 +148,10 @@ function AdminView({ data }) {
       }}
     >
       <div className="mx-auto w-full max-w-6xl px-6 pb-24 md:px-10">
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div>
+        <header className="sm:mb-8 mb-5 flex flex-col items-end gap-5 md:flex-row md:items-end md:justify-between">
+          <div className="w-full">
             <p
-              className="mb-1 text-xs font-bold uppercase tracking-[0.2em]"
+              className="sm:mb-1 mb-1.5 text-xs font-bold uppercase tracking-[0.2em]"
               style={{ color: MUTED }}
             >
               Painel administrativo
@@ -175,7 +175,7 @@ function AdminView({ data }) {
           <button
             type="button"
             onClick={openCreate}
-            className="inline-flex shrink-0 items-center gap-2 rounded-full px-6 py-3 text-sm font-extrabold uppercase tracking-[0.05em] transition-all"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-extrabold uppercase tracking-[0.05em] transition-all sm:px-6 sm:py-3"
             style={{
               background: ORANGE,
               color: BG,
@@ -247,13 +247,35 @@ function AdminView({ data }) {
                   {exercises.map((exercise, index) => (
                     <li
                       key={exercise.id}
-                      className="flex flex-col gap-3 px-5 py-4 sm:grid sm:grid-cols-[1fr_160px_160px] sm:items-center sm:gap-4"
+                      className="flex items-center gap-3 px-5 py-4 sm:grid sm:grid-cols-[1fr_160px_160px] sm:items-center sm:gap-4"
                       style={{
                         borderTop: index === 0 ? "none" : "1px solid " + BORDER,
                         background: PANEL,
                       }}
                     >
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1 sm:hidden">
+                        <p
+                          className="truncate font-semibold"
+                          style={{ color: TEXT }}
+                        >
+                          {exercise.name}
+                        </p>
+                        <p
+                          className="mt-1 text-[11px] font-semibold uppercase tracking-[0.04em]"
+                          style={{ color: "#827c77" }}
+                        >
+                          {exercise.muscleGroupLabel ??
+                            muscleLabel(exercise.muscleGroup)}
+                        </p>
+                        <p
+                          className="mt-1 truncate text-xs"
+                          style={{ color: MUTED }}
+                        >
+                          {exercise.description}
+                        </p>
+                      </div>
+
+                      <div className="hidden min-w-0 sm:block">
                         <p
                           className="truncate font-semibold"
                           style={{ color: TEXT }}
@@ -268,7 +290,7 @@ function AdminView({ data }) {
                         </p>
                       </div>
 
-                      <div className="flex sm:justify-center">
+                      <div className="hidden sm:flex sm:justify-center">
                         <span
                           className="text-xs font-bold uppercase tracking-[0.05em]"
                           style={{ color: "#959595" }}
@@ -278,12 +300,12 @@ function AdminView({ data }) {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2 sm:justify-end sm:pr-1">
+                      <div className="flex shrink-0 items-center gap-2 sm:justify-end sm:pr-1">
                         <button
                           type="button"
                           onClick={() => openEdit(exercise)}
                           aria-label={"Editar " + exercise.name}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg transition-all"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg transition-all sm:h-9 sm:w-9"
                           style={{
                             color: "#af4d1c",
                             background: FIELD,
@@ -300,13 +322,14 @@ function AdminView({ data }) {
                             e.currentTarget.style.borderColor = BORDER;
                           }}
                         >
-                          <Pencil size={15} />
+                          <Pencil size={13} className="sm:hidden" />
+                          <Pencil size={15} className="hidden sm:block" />
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeleteTarget(exercise)}
                           aria-label={"Excluir " + exercise.name}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg transition-all"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg transition-all sm:h-9 sm:w-9"
                           style={{
                             color: "#bf4444",
                             background: FIELD,
@@ -323,7 +346,8 @@ function AdminView({ data }) {
                             e.currentTarget.style.borderColor = BORDER;
                           }}
                         >
-                          <Trash2 size={15} />
+                          <Trash2 size={13} className="sm:hidden" />
+                          <Trash2 size={15} className="hidden sm:block" />
                         </button>
                       </div>
                     </li>
@@ -418,7 +442,7 @@ function CategoryDropdown({ value, onChange }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-2 rounded-xl px-4 py-3 text-left text-sm outline-none transition-all"
+        className="flex w-full items-center justify-between gap-2 rounded-xl px-4 text-left text-sm outline-none transition-all h-[38px] sm:h-[46px]"
         style={{
           background: FIELD,
           border: "1.5px solid " + (open ? ORANGE : BORDER),
@@ -522,6 +546,7 @@ function ExerciseFormModal({ exercise, onClose, onSubmit }) {
   const [error, setError] = useState(null);
   const [groupOpen, setGroupOpen] = useState(false);
   const groupRef = useRef(null);
+  const [descFocused, setDescFocused] = useState(false);
 
   useEffect(() => {
     function handleEsc(e) {
@@ -713,20 +738,26 @@ function ExerciseFormModal({ exercise, onClose, onSubmit }) {
             >
               Descrição
             </span>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Breve descrição de como executar o exercício"
-              rows={3}
-              className="w-full resize-none rounded-xl px-4 py-3 text-sm outline-none transition-all"
+            <div
+              className="w-full overflow-hidden rounded-xl transition-all"
               style={{
-                background: FIELD,
-                border: "1.5px solid " + BORDER,
-                color: TEXT,
+                border: "1.5px solid " + (descFocused ? ORANGE : BORDER),
               }}
-              onFocus={(e) => (e.currentTarget.style.borderColor = ORANGE)}
-              onBlur={(e) => (e.currentTarget.style.borderColor = BORDER)}
-            />
+            >
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Breve descrição de como executar o exercício"
+                rows={3}
+                className="w-full resize-none px-4 py-3 text-sm outline-none nf-scroll block"
+                style={{
+                  background: FIELD,
+                  color: TEXT,
+                }}
+                onFocus={() => setDescFocused(true)}
+                onBlur={() => setDescFocused(false)}
+              />
+            </div>
           </div>
 
           {error && (
@@ -763,7 +794,6 @@ function ExerciseFormModal({ exercise, onClose, onSubmit }) {
               style={{
                 background: ORANGE,
                 color: BG,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
               }}
               onMouseOver={(e) => {
                 if (!isValid || saving) return;
