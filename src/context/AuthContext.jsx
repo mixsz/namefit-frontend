@@ -55,7 +55,15 @@ export function AuthProvider({ children }) {
     setLoadingUser(true);
   }
 
-  function logout() {
+  async function logout() {
+    const refreshToken = localStorage.getItem("refreshToken");
+    try {
+      if (refreshToken) {
+        await api.post("/auth/logout", { refreshToken });
+      }
+    } catch {
+      // mesmo se falhar, limpa o token local
+    }
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     setToken(null);

@@ -3,7 +3,6 @@ import LoginForm from "../components/LoginForm";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import axios from "axios";
 
 function Login() {
   const [error, setError] = useState(null);
@@ -12,21 +11,6 @@ function Login() {
 
   async function handleLogin({ email, password }) {
     setError(null);
-
-    if (email === "a" && password === "a") {
-      // atalho dps remover!!!!!!!!!!!!!!!!!!
-      try {
-        const { data } = await axios.post("http://localhost:8080/auth/login", {
-          email: "bola@email.com",
-          password: "Bola123!",
-        });
-        login(data.token, data.refreshToken);
-        navigate("/home");
-      } catch (error) {
-        console.error("erro atalho login:", error);
-      }
-      return;
-    }
 
     try {
       const { data } = await api.post("/auth/login", { email, password });
